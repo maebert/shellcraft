@@ -125,7 +125,7 @@ class Game:
             if tool.condition < (difficulty - total_wear):
                 total_wear += tool.condition
                 efficiency += tool.condition * tool.mining_bonus[resource] / difficulty
-                self._messages.append("Destroyed {} while mining {}.".format(tool.name, resource))
+                self._messages.append("Destroyed ${}$ while mining *{}*.".format(tool.name, resource))
                 self.items.remove(tool)
             else:
                 tool.condition -= (difficulty - total_wear)

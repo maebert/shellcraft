@@ -10,7 +10,7 @@ class ClayShovel(Item):
 
     durability = 10
     mining_bonus = {'clay': 2}
-    cost = {'clay': 6}
+    cost = {'clay': 4}
 
 
 class SturdyClayShovel(ClayShovel):

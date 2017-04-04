@@ -4,7 +4,7 @@
 import inflection
 
 
-class StateCollector(object):
+class StateCollector:
     """Class that acts as a serializable accessor to game state variables."""
 
     def __init__(self):
@@ -70,7 +70,7 @@ class ToolBox(type):
         return cls
 
 
-class Item(object):
+class Item(metaclass=ToolBox):  # noqa
     """Concept denoting any tool that the player can produce."""
 
     __metaclass__ = ToolBox

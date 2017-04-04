@@ -5,6 +5,8 @@
 import click
 from click.termui import get_terminal_size
 import time
+import re
+import sys
 
 RESOURCE_COLORS = {
     "clay": 'yellow',
@@ -14,10 +16,32 @@ RESOURCE_COLORS = {
 }
 
 
-def fmt_res(resource, n=None):
-    """Return a colorised resource string."""
-    s = "{} {}".format(n, resource) if n else resource
-    return click.style(s, fg=RESOURCE_COLORS[resource])
+def _color_in(match):
+    s = match.group(0)
+    color = 'white'
+    if s.startswith("$"):
+        color = 'magenta'
+    elif s.startswith("*"):
+        for res, col in RESOURCE_COLORS.items():
+            if res in s:
+                color = col
+    else:
+        color = 'blue'
+    return click.style(s.strip("$*`"), fg=color)
+
+
+def secho(s, *vals, **kwargs):
+    """Echo a string with colours.
+
+    Options are *resource* to highlight a resource, `code` for tutorials.
+    """
+    s = s.format(*vals)
+    if kwargs.get("err"):
+        click.secho(s, fg='red', err=True)
+        sys.exit(1)
+    else:
+        s = re.sub(r'(([\$\*`])[:.a-z0-9_\- ]+(\2))', _color_in, s)
+        click.echo(s)
 
 
 class Action:
@@ -75,11 +99,3 @@ class Action:
         term_width, _ = get_terminal_size()
         click.echo("\r" + " " * (term_width - 1) + "\r", nl=False)
 
-
-def resource_string(game):
-    parts = []
-    for resource in ("clay", "ore", "energy"):
-        if game.flags.resource_available(resource):
-            line = "{}: {:<5d}".format(resource, game.resources.get(resource))
-            parts.append(click.style(line, fg=RESOURCE_COLORS[resource]))
-    return "\n".join(parts)

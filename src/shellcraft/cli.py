@@ -5,9 +5,8 @@ from __future__ import absolute_import
 
 import click
 from shellcraft.shellcraft import Game
-import shellcraft._cli_impl as cli_impl
+from shellcraft._cli_impl import secho, Action, RESOURCE_COLORS
 import os
-import sys
 
 APP_NAME = 'ShellCraft'
 GAME_PATH = os.path.join(click.get_app_dir(APP_NAME), 'config.json')
@@ -25,21 +24,20 @@ def main():  # noqa
 def mine(resource):
     """Mine a resource."""
     if not game.flags.resource_available(resource):
-        click.secho("You can't mine {} yet".format(resource), fg='red', err=True)
-        sys.exit(1)
+
+        secho("You can't mine {} yet", resource, err=True)
     if game.is_busy:
-        click.secho("You're busy {}ing {}.".format(game.action.task, game.action.completion), fg='red', err=True)
-        sys.exit(1)
+        secho("You're busy {}ing {}.", game.action.task, game.action.completion, err=True)
 
     duration, quantity = game.mine(resource)
     game.save()
 
-    action = cli_impl.Action("Mining " + resource, duration, color=cli_impl.RESOURCE_COLORS[resource])
+    action = Action("Mining " + resource, duration, color=RESOURCE_COLORS[resource])
     action.do()
     for m in game._messages:
-        click.echo(m)
+        secho(m)
     game._messages = []
-    click.echo("Mined " + cli_impl.fmt_res(resource, quantity))
+    secho("Mined *{} {}*", quantity, resource)
 
 
 @main.command()
@@ -49,14 +47,13 @@ def craft(item):
 
     if not game._can_craft(item):
         missing_resources = game._resources_missing_to_craft(item)
-        e = "Need {} to craft.".format(", ".join("{} {}".format(v, k) for k, v in missing_resources.items()))
-        click.secho(e, fg='red', err=True)
-        sys.exit(1)
+        e = "Need {} to craft {}.".format(", ".join("{} {}".format(v, k) for k, v in missing_resources.items()), item)
+        secho(e, err=True)
 
-    action = cli_impl.Action("Crafting " + item, 5, color=cli_impl.RESOURCE_COLORS['item'])
+    action = Action("Crafting " + item, 5, color=RESOURCE_COLORS['item'])
     action.do()
     game._craft(item)
-    click.echo("Crafted " + click.style(item, fg=cli_impl.RESOURCE_COLORS['item']))
+    secho("Crafted ${}$", item)
     game.save()
 
 
@@ -65,19 +62,24 @@ def craft(item):
 def resources(type=None):
     """Show available resources."""
     if not type:
-        click.echo(cli_impl.resource_string(game))
+        for resource in ("clay", "ore", "energy"):
+            if game.flags.resource_available(resource):
+                secho("*{}: {}*", resource, game.resources.get(resource))
     else:
-        click.echo(game.resources.get(type))
+        if game.flags.resource_available(type):
+            secho("*{}: {:<5d}*", type, game.resources.get(type))
+        else:
+            secho("{} is not available yet.", type)
 
 
 @main.command()
 def inventory():
     """Show owned items and their condition."""
     if not game.items:
-        click.secho("You don't own any items", fg='red', err=True)
+        secho("You don't own any items", err=True)
     else:
         for item in game.items:
-            click.echo(item)
+            secho(item)
 
 
 if __name__ == "__main__":

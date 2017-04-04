@@ -27,12 +27,19 @@ def mine(resource):
     if not game.flags.resource_available(resource):
         click.secho("You can't mine {} yet".format(resource), fg='red', err=True)
         sys.exit(1)
-    action = cli_impl.Action("Mining " + resource, 5, color=cli_impl.RESOURCE_COLORS[resource])
-    action.do()
-    n = 2
-    game.resources.add(resource, n)
-    click.echo("Mined " + cli_impl.fmt_res(resource, n))
+    if game.is_busy:
+        click.secho("You're busy {}ing {}.".format(game.action.task, game.action.completion), fg='red', err=True)
+        sys.exit(1)
+
+    duration, quantity = game.mine(resource)
     game.save()
+
+    action = cli_impl.Action("Mining " + resource, duration, color=cli_impl.RESOURCE_COLORS[resource])
+    action.do()
+    for m in game._messages:
+        click.echo(m)
+    game._messages = []
+    click.echo("Mined " + cli_impl.fmt_res(resource, quantity))
 
 
 @main.command()

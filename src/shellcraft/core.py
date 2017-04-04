@@ -9,7 +9,7 @@ class StateCollector(object):
 
     def __init__(self):
         """Create a new StateCollector."""
-        self.__dict__.update({k: v for k, v in self.__class__.__dict__.items() if not k.startswith("_") and isinstance(v, (int, float, bool))})
+        self.__dict__.update({k: v for k, v in self.__class__.__dict__.items() if not k.startswith("_") and isinstance(v, (str, int, float, bool))})
 
     def to_dict(self):
         """Create a serializable dict representing this state."""
@@ -75,16 +75,17 @@ class Item(object):
 
     __metaclass__ = ToolBox
 
+    durability = 1
     mining_bonus = {}
     crafting_bonus = {}
 
-    def __init__(self, condition=1):
+    def __init__(self, condition=None):
         """Create a new instance of the item.
 
-        Uusually called because it gets added to the game state when a
+        Usually called because it gets added to the game state when a
         player crafts this item, or when we load a saved game state.
         """
-        self.condition = condition
+        self.condition = condition or self.durability
 
     def to_dict(self):
         """Serialize into dict."""
@@ -95,4 +96,4 @@ class Item(object):
 
     def __repr__(self):
         """Representation, e.g. 'clay_shovel (82%)'"""
-        return "{} ({:.0%})".format(self.name, self.condition)
+        return "{} ({:.0%})".format(self.name, 1.0 * self.condition / self.durability)

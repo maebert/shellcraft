@@ -5,18 +5,24 @@ from __future__ import absolute_import
 
 import click
 from shellcraft.shellcraft import Game
+from shellcraft.tutorial import Tutorial
 from shellcraft._cli_impl import secho, Action, RESOURCE_COLORS
 import os
 
 APP_NAME = 'ShellCraft'
 GAME_PATH = os.path.join(click.get_app_dir(APP_NAME), 'config.json')
+
 game = Game.load(GAME_PATH) if os.path.exists(GAME_PATH) else Game.create(GAME_PATH)
+TUTORIAL = Tutorial(game)
 
 
-@click.group()
-def main():  # noqa
+@click.group(invoke_without_command=True)
+@click.pass_context
+def main(ctx):  # noqa
     """ShellCraft is a command line based crafting game"""
-    pass
+    has_tut = TUTORIAL.cont()
+    if not has_tut and ctx.invoked_subcommand is None:
+        click.echo("Use shellcraft --help to see a list of available commands.")
 
 
 @main.command()
@@ -38,6 +44,7 @@ def mine(resource):
         secho(m)
     game._messages = []
     secho("Mined *{} {}*", quantity, resource)
+    TUTORIAL.cont()
 
 
 @main.command()
@@ -55,6 +62,7 @@ def craft(item):
     game._craft(item)
     secho("Crafted ${}$", item)
     game.save()
+    TUTORIAL.cont()
 
 
 @main.command()
@@ -79,7 +87,7 @@ def inventory():
         secho("You don't own any items", err=True)
     else:
         for item in game.items:
-            secho(item)
+            secho("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
 
 @main.command()
@@ -92,6 +100,11 @@ def reset(force):
     else:
         click.echo("Nevermind then.")
 
+
+@main.command()
+def tutorial():
+    """Print the last step of the tutorial."""
+    TUTORIAL.print_last_step()
 
 if __name__ == "__main__":
     main()

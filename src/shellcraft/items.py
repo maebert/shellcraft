@@ -8,7 +8,7 @@ from shellcraft.core import Item
 class ClayShovel(Item):
     """Basic clay mining item."""
 
-    durability = 10
+    durability = 30
     mining_bonus = {'clay': 2}
     cost = {'clay': 4}
 
@@ -16,5 +16,5 @@ class ClayShovel(Item):
 class SturdyClayShovel(ClayShovel):
     """Better clay mining item."""
 
-    durability = 10
+    durability = 120
     cost = {'clay': 10}

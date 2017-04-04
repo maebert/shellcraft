@@ -7,6 +7,7 @@ from click.termui import get_terminal_size
 import time
 import re
 import sys
+import textwrap
 
 RESOURCE_COLORS = {
     "clay": 'yellow',
@@ -14,6 +15,16 @@ RESOURCE_COLORS = {
     "energy": 'cyan',
     "item": 'magenta',
 }
+
+
+def secho_tutorial(message):
+    """Pretty-print a tutoria step."""
+    term_width, _ = get_terminal_size()
+    for part in message.splitlines():
+        for line in textwrap.wrap(part, width=term_width - 2):
+            if line.startswith("`"):
+                line = "\n    " + line + "\n"
+            secho(line)
 
 
 def _color_in(match):
@@ -35,12 +46,13 @@ def secho(s, *vals, **kwargs):
 
     Options are *resource* to highlight a resource, `code` for tutorials.
     """
-    s = s.format(*vals)
+    if vals:
+        s = s.format(*vals)
     if kwargs.get("err"):
         click.secho(s, fg='red', err=True)
         sys.exit(1)
     else:
-        s = re.sub(r'(([\$\*`])[:.a-z0-9_\- ]+(\2))', _color_in, s)
+        s = re.sub(r'(([\$\*`])[{};:.a-z0-9_\- ]+(\2))', _color_in, s)
         click.echo(s)
 
 

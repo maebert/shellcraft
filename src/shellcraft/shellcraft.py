@@ -33,7 +33,8 @@ class Resources(StateCollector):
 class Flags(StateCollector):
     """Flags that get set during the game."""
 
-    tutorial_1 = False
+    tutorial_step = 0
+
     clay_available = True
     ore_available = True
     energy_available = False
@@ -109,6 +110,12 @@ class Game:
         """Return the (currently owned) tool that gives the highest bonus on mining a particular resource."""
         bonus, item = max((item.mining_bonus.get(resource, 0), item) for item in self.items)
         return item
+
+    def _get_item(self, item_name):
+        """Return the first item that matches the name or None."""
+        for item in self.items:
+            if item.name == item_name:
+                return item
 
     def mine(self, resource):
         """Mine a resource."""

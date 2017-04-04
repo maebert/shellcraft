@@ -1,0 +1,83 @@
+
+0:
+    message: >
+        Welcome to ShellCraft.
+
+        ShellCraft is a game about mining, crafting, and puzzling, loosely based
+        on Ted Chiang's short story "72 letters". But all of that doesn't matter
+        much now, we've got work to do. Let's start with mining some *clay* by typing
+
+        `shellcraft mine clay`
+1:
+    message: >
+        Excellent! Mining resources (like everything in ShellCraft) takes some time,
+        but you're rewarded with this warm, moist, delicate... well, *clay*. Time to
+        stock up on *clay* some more:
+
+        `shellcraft mine clay`
+    required_resources:
+        clay: 1
+
+2:
+    message: >
+        Well done. Let's continue this until we have *4 clay*.
+    required_resources:
+        clay: 2
+
+3:
+    message: >
+        Notice how every time you run `shellcraft mine clay`, it takes a little longer?
+        That's because the resources on the surface are easy to reach, but the more you
+        mine them, the harder it is to get more. For now, there's not much you can do about it,
+        however you can increase the yield of your mining operations with tools! Try crafting
+        a $clay shovel$ by running
+
+        `shellcraft craft clay_shovel`
+
+    required_resources:
+        clay: 4
+
+4:
+    message: >
+        Whoop whoop! Let's put this to use by running `shellcraft mine clay` again.
+
+    required_items:
+        - clay_shovel
+
+5:
+    message: >
+        See how we're getting a lot more clay now? You can see which $items$ are currently
+        in your posession by running `shellcraft inventory`. You can also find out much *clay*
+        (and later, other resources) you have by running `shellcraft resources`.
+
+        When you're ready, continue mining until you have *10 clay*.
+    required_resources:
+        clay: 2
+    required_items:
+        - clay_shovel
+
+6:
+    message: >
+        Oh no, our $clay_shovel$ broke! All items have a certain durability, which is the number
+        of seconds you can use them before they break. When mining, shellcraft will always pick
+        the best tool for the job until it breaks, and then continue with the next-best tool.
+        In this case, your bare hands.
+
+        Let's invest a little bit into our tools and craft a $sturdy_clay_shovel$.
+    required_resources:
+        clay: 10
+
+7:
+    message: >
+        The $sturdy_clay_shovel$ costs a little more than the good ol' $clay_shovel$ and doens't
+        give us any better bonus, but it lasts four times as long! That means we can get some serious
+        mining done.
+
+        ShellCraft is a hackable game. That doesn't mean that you should cheat, but rather, that you
+        can use your coding skills to your advantage and automate and improve some aspects of the game!
+
+        For example, let's mine *clay* ten times in a row by using this little bash script:
+
+            `for i in {1..10}; do shellcraft mine clay; done`
+    required_items:
+        - sturdy_clay_shovel

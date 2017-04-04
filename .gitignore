@@ -60,3 +60,7 @@ target/
 
 # pyenv python configuration file
 .python-version
+
+docs/shellcraft.rst
+
+docs/modules.rst

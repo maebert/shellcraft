@@ -82,5 +82,16 @@ def inventory():
             secho(item)
 
 
+@main.command()
+@click.option("--force", is_flag=True, help="Don't question my orders, just execute them!")
+def reset(force):
+    """Reset all progress."""
+    if force or click.confirm("Do you really want to reset the game and start over again?"):
+        Game.create(GAME_PATH).save()
+        click.echo("Tabula rasa.")
+    else:
+        click.echo("Nevermind then.")
+
+
 if __name__ == "__main__":
     main()

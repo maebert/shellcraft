@@ -29,7 +29,7 @@ def main(ctx):  # noqa
 @click.argument("resource")
 def mine(resource):
     """Mine a resource."""
-    if not game.flags.resource_available(resource):
+    if not game.flags.resource_enabled.get(resource):
 
         secho("You can't mine {} yet", resource, err=True)
     if game.is_busy:
@@ -71,10 +71,10 @@ def resources(type=None):
     """Show available resources."""
     if not type:
         for resource in ("clay", "ore", "energy"):
-            if game.flags.resource_available(resource):
+            if game.flags.resource_enabled.get(resource):
                 secho("*{}: {}*", resource, game.resources.get(resource))
     else:
-        if game.flags.resource_available(type):
+        if game.flags.resource_enabled.get(type):
             secho("*{}: {:<5d}*", type, game.resources.get(type))
         else:
             secho("{} is not available yet.", type)

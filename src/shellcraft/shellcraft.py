@@ -35,25 +35,26 @@ class Flags(StateCollector):
 
     tutorial_step = 0
 
-    clay_available = True
-    ore_available = True
-    energy_available = False
+    resource_enabled = {
+        "clay": True,
+        "ore": False,
+        "flint": False
+    }
 
-    clay_difficulty = 1
-    ore_difficulty = 1
-    energy_difficulty = 1
+    items_enabled = []
+    research_completed = []
 
-    def resource_available(self, resource):
-        """Check if a resource is available for mining."""
-        return self.__dict__.get("{}_available".format(resource))
+    mining_difficulty = {
+        "clay": 1,
+        "ore": 1,
+        "flint": 1
+    }
 
-    def resource_difficulty(self, resource):
-        """Return the difficulty of mining a resource."""
-        return self.__dict__.get("{}_difficulty".format(resource))
-
-    def raise_resource_difficulty(self, resource, value=.5):
-        """Set the difficulty of mining a resource."""
-        self.__dict__["{}_difficulty".format(resource)] += value
+    mining_difficulty_increment = {
+        "clay": .5,
+        "ore": .5,
+        "flint": .5
+    }
 
 
 class Action(StateCollector):
@@ -94,7 +95,7 @@ class Game:
 
     def _can_craft(self, item_name):
         cost = ToolBox.get_cost(item_name)
-        return all(self.resources.get(res) >= res_cost for res, res_cost in cost.items())
+        return self._can_afford(required_resources=cost)
 
     def _resources_missing_to_craft(self, item_name):
         cost = ToolBox.get_cost(item_name)
@@ -117,12 +118,39 @@ class Game:
             if item.name == item_name:
                 return item
 
+    def _can_afford(self, **cost):
+        if 'required_resources' in cost and not all(self.resources.get(res) >= res_cost for res, res_cost in cost['required_resources'].items()):
+            return False
+        if 'required_items' in cost and not all(map(self.get_item, cost['required_items'])):
+            return False
+
+        required_research = cost.get('required_research', [])
+        if isinstance(required_research, (tuple, list)) and not set(required_research).issubset(self.flags.research_completed):
+            return False
+        elif isinstance(required_research, str) and required_research not in self.flags.research_completed:
+            return False
+
+        enabled_items = cost.get('enabled_items', [])
+        if isinstance(enabled_items, (tuple, list)) and not set(enabled_items).issubset(self.flags.items_enabled):
+            return False
+        elif isinstance(enabled_items, str) and required_research not in self.flags.items_enabled:
+            return False
+
+        return True
+
+    def _unlock_items(self):
+        for item in ToolBox.tools.values():
+            if item.name != 'item' and item.name not in self.flags.items_enabled and self._can_afford(**item.prerequisites):
+                self._messages.append("Unlocked ${}$.".format(item.name))
+                print("ready for", item)
+                self.flags.items_enabled.append(item.name)
+
     def mine(self, resource):
         """Mine a resource."""
         if self.is_busy:
             return None  # @Todo Raise Exception
 
-        difficulty = self.flags.resource_difficulty(resource)
+        difficulty = self.flags.mining_difficulty.get(resource)
 
         total_wear = 0
         efficiency = 0
@@ -142,9 +170,10 @@ class Game:
         # Hand mining has efficiency of 1
         efficiency += (difficulty - total_wear) / difficulty
 
-        self.flags.raise_resource_difficulty(resource)
+        self.flags.mining_difficulty[resource] = self.flags.mining_difficulty[resource] + self.flags.mining_difficulty_increment[resource]
         self._act("mine", resource, difficulty)
         self.resources.add(resource, efficiency)
+        self._unlock_items()
         return difficulty, efficiency
 
     def _act(self, task, target, duration):

@@ -11,6 +11,7 @@ class ClayShovel(Item):
     durability = 30
     mining_bonus = {'clay': 2}
     cost = {'clay': 4}
+    prerequisites = {'resources_required': {'clay': 4}}
 
 
 class SturdyClayShovel(ClayShovel):
@@ -18,3 +19,4 @@ class SturdyClayShovel(ClayShovel):
 
     durability = 120
     cost = {'clay': 10}
+    prerequisites = {'resources_required': {'clay': 10}}

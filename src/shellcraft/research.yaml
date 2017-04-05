@@ -1,0 +1,11 @@
+clay_cart:
+  description: A way to transport your clay faster.
+  enables_item: clay_cart
+  required_resources:
+    clay: 20
+
+ore:
+  description: There's something shiny here...
+  enables_resource: ore
+  required_resources:
+    clay: 30

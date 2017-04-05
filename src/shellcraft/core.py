@@ -9,7 +9,7 @@ class StateCollector:
 
     def __init__(self):
         """Create a new StateCollector."""
-        self.__dict__.update({k: v for k, v in self.__class__.__dict__.items() if not k.startswith("_") and isinstance(v, (str, int, float, bool))})
+        self.__dict__.update({k: v for k, v in self.__class__.__dict__.items() if not k.startswith("_") and isinstance(v, (str, int, float, bool, list, dict))})
 
     def to_dict(self):
         """Create a serializable dict representing this state."""
@@ -78,6 +78,7 @@ class Item(metaclass=ToolBox):  # noqa
     durability = 1
     mining_bonus = {}
     crafting_bonus = {}
+    prerequisites = {}
 
     def __init__(self, condition=None):
         """Create a new instance of the item.

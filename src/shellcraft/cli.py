@@ -4,7 +4,6 @@
 from __future__ import absolute_import
 
 import click
-from functools import wraps
 from shellcraft.shellcraft import Game
 from shellcraft.tutorial import Tutorial
 from shellcraft._cli_impl import secho, Action, RESOURCE_COLORS
@@ -22,7 +21,7 @@ def action_step(callback):
         # Do the action
         callback(**kwargs)
         for m in game._messages:
-            secho(m)
+            secho("❯ " + m)
         game._messages = []
         TUTORIAL.cont()
     return inner
@@ -53,7 +52,6 @@ def mine(resource):
 
     action = Action("Mining " + resource, duration, color=RESOURCE_COLORS[resource])
     action.do()
-    secho("Mined *{} {}*", quantity, resource)
 
 
 @main.command()
@@ -69,7 +67,6 @@ def craft(item):
     action = Action("Crafting " + item, 5, color=RESOURCE_COLORS['item'])
     action.do()
     game._craft(item)
-    secho("Crafted ${}$", item)
     game.save()
 
 

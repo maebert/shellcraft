@@ -20,9 +20,9 @@ RESOURCE_COLORS = {
 def secho_tutorial(message):
     """Pretty-print a tutoria step."""
     term_width, _ = get_terminal_size()
-    click.echo("")
-    message = _format_str(message)
     for part in message.splitlines():
+        click.echo("")
+        part = _format_str(part)
         for line in textwrap.wrap(part, width=term_width - 2):
             if line.startswith("`"):
                 line = "\n    " + line + "\n"

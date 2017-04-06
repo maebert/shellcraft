@@ -108,6 +108,7 @@ class Game:
         for resource, res_cost in cost.items():
             self.resources.add(resource, -res_cost)
         self._create_item(item_name)
+        self._messages.append("Crafted ${}$".format(item_name))
 
     def _best_mining_tool(self, resource):
         """Return the (currently owned) tool that gives the highest bonus on mining a particular resource."""
@@ -158,7 +159,7 @@ class Game:
 
         while self.items and total_wear < difficulty:
             tool = self._best_mining_tool(resource)
-            if tool.condition < (difficulty - total_wear):
+            if tool.condition <= (difficulty - total_wear):
                 total_wear += tool.condition
                 efficiency += tool.condition * tool.mining_bonus[resource] / difficulty
                 self._messages.append("Destroyed ${}$ while mining *{}*.".format(tool.name, resource))
@@ -175,6 +176,7 @@ class Game:
         self._act("mine", resource, difficulty)
         self.resources.add(resource, efficiency)
         self._unlock_items()
+        self._messages.append("Mined *{} {}*.".format(efficiency, resource))
         return difficulty, efficiency
 
     def _act(self, task, target, duration):

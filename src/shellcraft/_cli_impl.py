@@ -20,11 +20,13 @@ RESOURCE_COLORS = {
 def secho_tutorial(message):
     """Pretty-print a tutoria step."""
     term_width, _ = get_terminal_size()
+    click.echo("")
+    message = _format_str(message)
     for part in message.splitlines():
         for line in textwrap.wrap(part, width=term_width - 2):
             if line.startswith("`"):
                 line = "\n    " + line + "\n"
-            secho(line)
+            click.echo(line)
 
 
 def _color_in(match):
@@ -41,6 +43,10 @@ def _color_in(match):
     return click.style(s.strip("$*`"), fg=color)
 
 
+def _format_str(s):
+    return re.sub(r'(([\$\*`])[{};:.a-z0-9_\- ]+(\2))', _color_in, s)
+
+
 def secho(s, *vals, **kwargs):
     """Echo a string with colours.
 
@@ -52,8 +58,7 @@ def secho(s, *vals, **kwargs):
         click.secho(s, fg='red', err=True)
         sys.exit(1)
     else:
-        s = re.sub(r'(([\$\*`])[{};:.a-z0-9_\- ]+(\2))', _color_in, s)
-        click.echo(s)
+        click.echo(_format_str(s))
 
 
 class Action:

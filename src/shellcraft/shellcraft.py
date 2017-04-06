@@ -41,6 +41,8 @@ class Flags(StateCollector):
         "flint": False
     }
 
+    commands_enabled = ['reset']
+
     items_enabled = []
     research_completed = []
 
@@ -119,21 +121,21 @@ class Game:
                 return item
 
     def _can_afford(self, **cost):
-        if 'required_resources' in cost and not all(self.resources.get(res) >= res_cost for res, res_cost in cost['required_resources'].items()):
+        if 'resources_required' in cost and not all(self.resources.get(res) >= res_cost for res, res_cost in cost['resources_required'].items()):
             return False
-        if 'required_items' in cost and not all(map(self.get_item, cost['required_items'])):
+        if 'items_required' in cost and not all(map(self.get_item, cost['items_required'])):
             return False
 
-        required_research = cost.get('required_research', [])
-        if isinstance(required_research, (tuple, list)) and not set(required_research).issubset(self.flags.research_completed):
+        research_required = cost.get('research_required', [])
+        if isinstance(research_required, (tuple, list)) and not set(research_required).issubset(self.flags.research_completed):
             return False
-        elif isinstance(required_research, str) and required_research not in self.flags.research_completed:
+        elif isinstance(research_required, str) and research_required not in self.flags.research_completed:
             return False
 
         enabled_items = cost.get('enabled_items', [])
         if isinstance(enabled_items, (tuple, list)) and not set(enabled_items).issubset(self.flags.items_enabled):
             return False
-        elif isinstance(enabled_items, str) and required_research not in self.flags.items_enabled:
+        elif isinstance(enabled_items, str) and research_required not in self.flags.items_enabled:
             return False
 
         return True
@@ -142,7 +144,6 @@ class Game:
         for item in ToolBox.tools.values():
             if item.name != 'item' and item.name not in self.flags.items_enabled and self._can_afford(**item.prerequisites):
                 self._messages.append("Unlocked ${}$.".format(item.name))
-                print("ready for", item)
                 self.flags.items_enabled.append(item.name)
 
     def mine(self, resource):

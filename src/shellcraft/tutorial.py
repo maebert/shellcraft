@@ -4,7 +4,6 @@
 from __future__ import absolute_import
 import os
 import yaml
-import sys
 from shellcraft._cli_impl import secho_tutorial
 
 
@@ -25,17 +24,24 @@ class Tutorial:
         if 'required_items' in step:
             if not all(self.game._get_item(item) for item in step['required_items']):
                 return None
-        return step['message']
+        return step
 
     def print_last_step(self):
         step = self.steps.get(self.game.flags.tutorial_step - 1)
         if step:
             secho_tutorial(step['message'])
 
+    def enable_bonuses(self, step):
+        for command in step.get('enable_commands', []):
+            if command not in self.game.flags.commands_enabled:
+                self.game._messages.append("You unlocked the `{}` command".format(command))
+                self.game.flags.commands_enabled.append(command)
+
     def cont(self):
         step = self.get_next_step()
         if step:
             self.game.flags.tutorial_step += 1
+            self.enable_bonuses(step)
             self.game.save()
-            secho_tutorial(step)
+            secho_tutorial(step['message'])
             return True

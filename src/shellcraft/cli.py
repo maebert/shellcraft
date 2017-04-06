@@ -4,6 +4,7 @@
 from __future__ import absolute_import
 
 import click
+from functools import wraps
 from shellcraft.shellcraft import Game
 from shellcraft.tutorial import Tutorial
 from shellcraft._cli_impl import secho, Action, RESOURCE_COLORS
@@ -16,17 +17,29 @@ game = Game.load(GAME_PATH) if os.path.exists(GAME_PATH) else Game.create(GAME_P
 TUTORIAL = Tutorial(game)
 
 
+def action_step(callback):
+    def inner(**kwargs):
+        # Do the action
+        callback(**kwargs)
+        for m in game._messages:
+            secho(m)
+        game._messages = []
+        TUTORIAL.cont()
+    return inner
+
+
 @click.group(invoke_without_command=True)
 @click.pass_context
 def main(ctx):  # noqa
-    """ShellCraft is a command line based crafting game"""
-    has_tut = TUTORIAL.cont()
-    if not has_tut and ctx.invoked_subcommand is None:
-        click.echo("Use shellcraft --help to see a list of available commands.")
+    """ShellCraft is a command line based crafting game."""
+    if ctx.invoked_subcommand is None:
+        has_tut = TUTORIAL.cont()
+        if not has_tut:
+            click.echo("Use shellcraft --help to see a list of available commands.")
 
 
 @main.command()
-@click.argument("resource")
+@click.argument("resource", metavar='<resource>')
 def mine(resource):
     """Mine a resource."""
     if not game.flags.resource_enabled.get(resource):
@@ -40,15 +53,11 @@ def mine(resource):
 
     action = Action("Mining " + resource, duration, color=RESOURCE_COLORS[resource])
     action.do()
-    for m in game._messages:
-        secho(m)
-    game._messages = []
     secho("Mined *{} {}*", quantity, resource)
-    TUTORIAL.cont()
 
 
 @main.command()
-@click.argument("item")
+@click.argument("item", metavar='<item>')
 def craft(item):
     """Mine a resource."""
 
@@ -62,11 +71,10 @@ def craft(item):
     game._craft(item)
     secho("Crafted ${}$", item)
     game.save()
-    TUTORIAL.cont()
 
 
 @main.command()
-@click.option("--type", help="Only print value for a specific resource, e.g. clay", type=str)
+@click.option("--type", help="Only print value for a specific resource, e.g. clay", type=str, metavar="<resource>")
 def resources(type=None):
     """Show available resources."""
     if not type:
@@ -105,6 +113,14 @@ def reset(force):
 def tutorial():
     """Print the last step of the tutorial."""
     TUTORIAL.print_last_step()
+
+# This removes all commands from the main group that are not enabled
+# in the game yet.
+main.commands = {cmd: command for cmd, command in main.commands.items() if cmd in game.flags.commands_enabled}
+
+for cmd in ('mine', 'craft'):
+    if cmd in main.commands:
+        main.commands[cmd].callback = action_step(main.commands[cmd].callback)
 
 if __name__ == "__main__":
     main()

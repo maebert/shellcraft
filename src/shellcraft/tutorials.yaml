@@ -8,6 +8,9 @@
         much now, we've got work to do. Let's start with mining some *clay* by typing
 
         `shellcraft mine clay`
+    enable_commands:
+        - mine
+        - tutorial
 1:
     message: >
         Excellent! Mining resources (like everything in ShellCraft) takes some time,
@@ -36,6 +39,8 @@
 
     required_resources:
         clay: 4
+    enable_commands:
+        - craft
 
 4:
     message: >
@@ -55,6 +60,9 @@
         clay: 2
     required_items:
         - clay_shovel
+    enable_commands:
+        - inventory
+        - resources
 
 6:
     message: >

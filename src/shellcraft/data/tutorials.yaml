@@ -103,3 +103,9 @@
         clay: 20
     effects:
         enable_commands: research
+9:
+    description: >
+        This should make our job a little easier. Keep on mining now!
+
+    prerequisites:
+        items: clay_cart

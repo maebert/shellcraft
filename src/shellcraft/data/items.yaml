@@ -21,3 +21,13 @@ sturdy_clay_shovel:
     prerequisites:
       clay: 10
 
+clay_cart:
+    description: As simple cart to transport clay.
+    durability: 140
+    difficulty: 18
+    mining_bonus:
+      clay: 4
+    cost:
+      clay: 20
+    prerequisites:
+      research: clay_cart

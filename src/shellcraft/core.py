@@ -62,6 +62,7 @@ class AbstractItem:
 
         item.prerequisites = data.get("prerequisites", {})
         item.prerequisites['items'] = to_list(item.prerequisites.get('items'))
+        item.prerequisites['research'] = to_list(item.prerequisites.get('research'))
         item.cost = data.get("cost", {})
         item.effects = data.get("effects", {})
         for effect in ('enable_commands', 'enable_items', 'enable_resources'):
@@ -134,5 +135,8 @@ class AbstractCollection:
                 return False
         for required_item in item.prerequisites['items']:
             if not self.game.tools.get(required_item):
+                return False
+        for research in item.prerequisites['research']:
+            if research not in self.game.flags.research_completed:
                 return False
         return True

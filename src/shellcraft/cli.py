@@ -48,7 +48,7 @@ def mine(resource):
     game.save()
 
     action = Action("mine", resource, duration)
-    action.do()
+    action.do(skip=game.flags.debug)
 
 
 @main.command()
@@ -74,7 +74,7 @@ def craft(item):
     game.save()
 
     action = Action("craft", item, difficulty)
-    action.do()
+    action.do(skip=game.flags.debug)
 
 
 @main.command()
@@ -129,7 +129,7 @@ def research(projects):
         game.save()
 
         action = Action("research", project, difficulty)
-        action.do()
+        action.do(skip=game.flags.debug)
 
 
 @main.command()

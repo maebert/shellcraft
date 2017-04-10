@@ -120,8 +120,10 @@ class Action:
         )
         click.echo(bar, nl=False)
 
-    def do(self):
+    def do(self, skip=False):
         """Start the action."""
+        if skip:
+            return
         term_width, _ = get_terminal_size()
         blocks = (term_width - len(self.action) - 20.0)
         delta = self.duration / blocks

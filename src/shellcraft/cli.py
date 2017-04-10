@@ -41,7 +41,7 @@ def main(ctx):  # noqa
 @click.argument("resource", metavar='<resource>')
 def mine(resource):
     """Mine a resource."""
-    if not game.flags.resource_enabled.get(resource):
+    if resource not in game.flags.resources_enabled:
 
         secho("You can't mine {} yet", resource, err=True)
     if game.is_busy:
@@ -50,7 +50,7 @@ def mine(resource):
     duration, quantity = game.mine(resource)
     game.save()
 
-    action = Action("Mining " + resource, duration, color=RESOURCE_COLORS[resource])
+    action = Action("Mining *{}*".format(resource), duration, color=RESOURCE_COLORS[resource])
     action.do()
 
 
@@ -58,15 +58,24 @@ def mine(resource):
 @click.argument("item", metavar='<item>')
 def craft(item):
     """Mine a resource."""
+    item = game.tools.get(item)
 
-    if not game._can_craft(item):
-        missing_resources = game._resources_missing_to_craft(item)
+    if not item:
+        secho("No such item", err=True)
+        return None
+
+    if not game.tools.is_available(item):
+        secho("{} is not available yet.", item, err=True)
+        return None
+
+    if not game.tools.can_afford(item):
+        missing_resources = game.tools._resources_missing_to_craft(item)
         e = "Need {} to craft {}.".format(", ".join("{} {}".format(v, k) for k, v in missing_resources.items()), item)
         secho(e, err=True)
 
-    action = Action("Crafting " + item, 5, color=RESOURCE_COLORS['item'])
+    action = Action("Crafting {}".format(str(item)), 5, color=RESOURCE_COLORS['item'])
     action.do()
-    game._craft(item)
+    game.craft(item)
     game.save()
 
 
@@ -76,10 +85,10 @@ def resources(type=None):
     """Show available resources."""
     if not type:
         for resource in ("clay", "ore", "energy"):
-            if game.flags.resource_enabled.get(resource):
+            if resource in game.flags.resources_enabled:
                 secho("*{}: {}*", resource, game.resources.get(resource))
     else:
-        if game.flags.resource_enabled.get(type):
+        if type in game.flags.resources_enabled:
             secho("*{}: {:<5d}*", type, game.resources.get(type))
         else:
             secho("{} is not available yet.", type)
@@ -92,7 +101,8 @@ def inventory():
         secho("You don't own any items", err=True)
     else:
         for item in game.items:
-            secho("${}$ ({:.0%})", item.name, item.condition / item.durability)
+            secho(str(item))
+            # secho("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
 
 @main.command()

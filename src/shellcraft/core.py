@@ -1,7 +1,19 @@
 # -*- coding: utf-8 -*-
 """Core Classes."""
 
-import inflection
+import os
+import yaml
+
+RESOURCES = ['clay', 'energy', 'ore']
+
+
+def to_list(string_or_list):
+    """Encapsulate strings or numbers in a list."""
+    if not string_or_list:
+        return []
+    if not isinstance(string_or_list, (list, tuple)):
+        return [string_or_list]
+    return string_or_list
 
 
 class StateCollector:
@@ -30,71 +42,93 @@ class StateCollector:
         state.__dict__.update(d)
         return state
 
+class AbstractItem:
 
-class ToolBox(type):
-    """Meta class that acts as a item registry."""
-
-    tools = {}
-
-    @classmethod
-    def get(cls, name, **kwargs):
-        """Instantiate a new item from the toolbox by name.
-
-        Example:
-            >>> ToolBox.get("clay_shovel", condition=.4)
-        """
-        if name not in cls.tools:
-            raise ValueError
-        else:
-            tool_cls = cls.tools.get(name)
-            return tool_cls(**kwargs)
+    def __init__(self, name):
+        self.name = name
+        self.prerequisites = {}
+        self.cost = {}
+        self.effects = {}
 
     @classmethod
-    def get_cost(cls, name):
-        """Return the cost of any item.
+    def from_dict(cls, name, data):
+        """Load an item from dict representation."""
+        item = cls(name)
+        item.description = data.get("description", {})
+        item.prerequisites = data.get("prerequisites", {})
+        item.prerequisites['items'] = to_list(item.prerequisites.get('items'))
 
-        Example:
-            >>> ToolBox.get_cost("clay_shovel")
-            {"clay": 6}
-        """
-        if name not in cls.tools:
-            raise ValueError
-        else:
-            return cls.tools.get(name).cost
+        item.cost = data.get("cost", {})
+        item.effects = data.get("effects", {})
+        for effect in ('enable_commands', 'enable_items', 'enable_resources'):
+            item.effects[effect] = to_list(item.effects.get(effect))
+        return item
 
-    def __new__(meta, class_name, bases, class_dict):  # noqa
-        """Create a new (Item) class and register it in the ToolBox."""
-        cls = type.__new__(meta, class_name, bases, class_dict)
-        cls.name = inflection.underscore(cls.__name__)
-        ToolBox.tools[cls.name] = cls
-        return cls
-
-
-class Item(metaclass=ToolBox):  # noqa
-    """Concept denoting any tool that the player can produce."""
-
-    __metaclass__ = ToolBox
-
-    durability = 1
-    mining_bonus = {}
-    crafting_bonus = {}
-    prerequisites = {}
-
-    def __init__(self, condition=None):
-        """Create a new instance of the item.
-
-        Usually called because it gets added to the game state when a
-        player crafts this item, or when we load a saved game state.
-        """
-        self.condition = condition or self.durability
-
-    def to_dict(self):
-        """Serialize into dict."""
-        return {
-            "name": self.name,
-            "condition": self.condition,
-        }
+    def serialize(self):
+        """Serialise the AbstractItem."""
+        return self.name
 
     def __repr__(self):
-        """Representation, e.g. 'clay_shovel (82%)'"""
-        return "{} ({:.0%})".format(self.name, 1.0 * self.condition / self.durability)
+        return self.name
+
+
+class AbstractCollection:
+    FIXTURES = "collection.yaml"
+    ITEM_CLASS = AbstractItem
+
+    def __init__(self, game):
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), self.FIXTURES)) as f:
+            self.all_items = {name: self.ITEM_CLASS.from_dict(name, data) for name, data in yaml.load(f).items()}
+        self.game = game
+
+    def get(self, item_name):
+        """Get an item instance by name."""
+        if isinstance(item_name, AbstractItem):
+            return item_name
+        return self.all_items.get(item_name)
+
+    @property
+    def available_items(self):
+        """Return all items that are currently available."""
+        return [item for item in self.all_items.values() if self.is_available(item)]
+
+    def _resources_missing_to_craft(self, item_name):
+        item = self.get(item_name)
+        return {res: res_cost - self.game.resources.get(res) for res, res_cost in item.cost.items() if res_cost - self.game.resources.get(res) > 0}
+
+    def can_afford(self, item_name):
+        """Return true if we have enough resources to create an item."""
+        item = self.get(item_name)
+        for resource in RESOURCES:
+            if item.cost.get(resource, 0) > self.game.resources.get(resource):
+                return False
+
+        return True
+
+    def apply_effects(self, item_name):
+        item = self.get(item_name)
+        for command in item.effects.get('enable_commands', []):
+            if command not in self.game.flags.commands_enabled:
+                self.game.alert("You unlocked the `{}` command".format(command))
+                self.game.flags.commands_enabled.append(command)
+        for resources in item.effects.get('enable_resourcess', []):
+            if resources not in self.game.flags.resourcess_enabled:
+                self.game.alert("You discovered ${}$.".format(resources))
+                self.game.flags.resourcess_enabled.append(resources)
+        for item_name in item.effects.get('enable_items', []):
+            if item_name not in self.game.flags.items_enabled:
+                self.game.alert("You can now craft the ${}$.".format(item_name))
+                self.game.flags.item_names_enabled.append(item)
+
+    def is_available(self, item_name):
+        """Return true if the prerequisites for an item are met."""
+        item = self.get(item_name)
+        if not item:
+            return False
+        for resource in RESOURCES:
+            if self.game.resources.get(resource) < item.prerequisites.get(resource, 0):
+                return False
+        for required_item in item.prerequisites['items']:
+            if not self.game.tools.get(required_item):
+                return False
+        return True

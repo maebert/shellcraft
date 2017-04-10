@@ -2,21 +2,62 @@
 """Item Classes."""
 from __future__ import absolute_import
 
-from shellcraft.core import Item
+from shellcraft.core import AbstractItem, AbstractCollection
+from copy import copy
 
 
-class ClayShovel(Item):
-    """Basic clay mining item."""
+class Tool(AbstractItem):
+    """Concept denoting any tool that the player can produce."""
 
-    durability = 20
-    mining_bonus = {'clay': 2}
-    cost = {'clay': 4}
-    prerequisites = {'resources_required': {'clay': 4}}
+    @classmethod
+    def from_dict(cls, name, data):
+        tool = super().from_dict(name, data)
+        tool.durability = data.get("durability", -1)
+        tool.mining_bonus = data.get("mining_bonus", {})
+        tool.crafting_bonus = data.get("crafting_bonus", {})
+        tool.research_bonus = data.get("research_bonus", 0)
+        tool.condition = tool.durability
+        return tool
+
+    def serialize(self):
+        """Serialize into dict."""
+        return {
+            "name": self.name,
+            "condition": self.condition,
+        }
+
+    def __repr__(self):
+        """Representation, e.g. 'clay_shovel (worn)'"""
+        if self.durability == -1 or self.durability == self.condition:
+            return "${}$".format(self.name)
+
+        wear = 1.0 * self.condition / self.durability
+        descriptions = {
+            1: "new",
+            .9: "slightly used",
+            .8: "used",
+            .6: "worn",
+            .3: "damaged",
+            .15: "about to break",
+        }
+        for thresh, des in sorted(descriptions.items()):
+            if wear < thresh:
+                return "${}$ ({})".format(self.name, des)
 
 
-class SturdyClayShovel(ClayShovel):
-    """Better clay mining item."""
+class Tools(AbstractCollection):
+    FIXTURES = "items.yaml"
+    ITEM_CLASS = Tool
 
-    durability = 120
-    cost = {'clay': 10}
-    prerequisites = {'resources_required': {'clay': 10}}
+    def craft(self, item):
+        return copy(item)
+
+    def instantiate(self, data):
+        item = self.get(data['name'])
+        copy = self.craft(item)
+        copy.condition = data.get('condition')
+        return copy
+
+    def is_available(self, item_name):
+        item = self.get(item_name)
+        return item.name in self.game.flags.items_enabled or super().is_available(item)

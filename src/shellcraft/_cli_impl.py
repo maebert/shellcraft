@@ -12,8 +12,9 @@ import textwrap
 RESOURCE_COLORS = {
     "clay": 'yellow',
     "ore": 'green',
-    "energy": 'cyan',
+    "command": 'blue',
     "item": 'magenta',
+    "research": 'green',
 }
 
 
@@ -33,18 +34,26 @@ def _color_in(match):
     s = match.group(0)
     color = 'white'
     if s.startswith("$"):
-        color = 'magenta'
+        color = RESOURCE_COLORS['item']
+    elif s.startswith("@"):
+        color = RESOURCE_COLORS['research']
+    elif s.startswith("`"):
+        color = RESOURCE_COLORS['command']
     elif s.startswith("*"):
         for res, col in RESOURCE_COLORS.items():
             if res in s:
                 color = col
     else:
         color = 'blue'
-    return click.style(s.strip("$*`"), fg=color)
+    return click.style(s.strip("$*@`"), fg=color)
 
 
 def _format_str(s):
-    return re.sub(r'(([\$\*`])[{};:.a-z0-9_\- ]+(\2))', _color_in, s)
+    return re.sub(r'(([\$\*@`])[{};:.a-z0-9_\- ]+(\2))', _color_in, s)
+
+
+def _unformat_str(s):
+    return re.sub(r'(([\$\*@`])([{};:.a-z0-9_\- ]+)(\2))', r"\3", s)
 
 
 def secho(s, *vals, **kwargs):
@@ -55,7 +64,7 @@ def secho(s, *vals, **kwargs):
     if vals:
         s = s.format(*vals)
     if kwargs.get("err"):
-        click.secho(s, fg='red', err=True)
+        click.secho(_unformat_str(s), fg='red', err=True)
         sys.exit(1)
     else:
         click.echo(_format_str(s))
@@ -72,7 +81,7 @@ class Action:
             duration (float): duration of the action in seconds
             color (str): color representing the action if progress bar is used.
         """
-        self.action = action
+        self.action = _format_str(action)
         self.duration = duration
         self.color = color
         self.elapsed = 0.

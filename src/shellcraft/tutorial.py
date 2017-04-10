@@ -2,46 +2,35 @@
 
 """Basic CLI for ShellCraft."""
 from __future__ import absolute_import
-import os
-import yaml
+from shellcraft.core import AbstractCollection, AbstractItem
 from shellcraft._cli_impl import secho_tutorial
 
 
-class Tutorial:
-    def __init__(self, game):
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tutorials.yaml")) as f:
-            self.steps = yaml.load(f)
-        self.game = game
+class Step(AbstractItem):
+    def __repr__(self):
+        return "<Tutorial {}>".format(self.name)
+
+
+class Tutorial(AbstractCollection):
+    FIXTURES = "tutorials.yaml"
+    ITEM_CLASS = Step
 
     def get_next_step(self):
-        next_step = self.game.flags.tutorial_step
-        step = self.steps.get(next_step)
-        if not step:
+        step = self.get(self.game.flags.tutorial_step)
+        if not step or not self.is_available(step):
             return None
-        if 'required_resources' in step:
-            if not all(self.game.resources.get(res) >= res_cost for res, res_cost in step['required_resources'].items()):
-                return None
-        if 'required_items' in step:
-            if not all(self.game._get_item(item) for item in step['required_items']):
-                return None
         return step
 
     def print_last_step(self):
-        step = self.steps.get(self.game.flags.tutorial_step - 1)
+        step = self.get(self.game.flags.tutorial_step - 1)
         if step:
-            secho_tutorial(step['message'])
-
-    def enable_bonuses(self, step):
-        for command in step.get('enable_commands', []):
-            if command not in self.game.flags.commands_enabled:
-                self.game._messages.append("You unlocked the `{}` command".format(command))
-                self.game.flags.commands_enabled.append(command)
+            secho_tutorial(step.description)
 
     def cont(self):
         step = self.get_next_step()
         if step:
             self.game.flags.tutorial_step += 1
-            self.enable_bonuses(step)
+            self.apply_effects(step)
             self.game.save()
-            secho_tutorial(step['message'])
+            secho_tutorial(step.description)
             return True

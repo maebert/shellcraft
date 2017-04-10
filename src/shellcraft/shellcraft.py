@@ -3,8 +3,9 @@
 
 from __future__ import absolute_import
 
-from shellcraft.core import StateCollector, ToolBox
-import shellcraft.items  # noqa
+from shellcraft.core import StateCollector
+from shellcraft.items import Tools
+from shellcraft.research import Research
 import json
 import os
 import datetime
@@ -35,15 +36,10 @@ class Flags(StateCollector):
 
     tutorial_step = 0
 
-    resource_enabled = {
-        "clay": True,
-        "ore": False,
-        "flint": False
-    }
-
+    resources_enabled = ['clay']
     commands_enabled = ['reset']
-
     items_enabled = []
+
     research_completed = []
 
     mining_difficulty = {
@@ -70,13 +66,19 @@ class Action(StateCollector):
 class Game:
     """The Game class holds all information about, well, the game's state, and handles the logic."""
 
-    def __init__(self, resources=None, flags=None, items=None, action=None):
+    def __init__(self):
         """Create a new Game instante."""
-        self.resources = resources or Resources()
-        self.flags = flags or Flags()
-        self.items = items or []
-        self.action = action or Action()
+        self.resources = Resources()
+        self.flags = Flags()
+        self.items = []
+        self.action = Action()
         self._messages = []
+
+        self.research = Research(self)
+        self.tools = Tools(self)
+
+    def alert(self, msg, *args):
+        self._messages.append(msg.format(*args))
 
     @property
     def is_busy(self):
@@ -90,62 +92,16 @@ class Game:
             return True
         return False
 
-    def _create_item(self, name, **attrs):
-        item = ToolBox.get(name, **attrs)
-        self.items.append(item)
-        return item
-
-    def _can_craft(self, item_name):
-        cost = ToolBox.get_cost(item_name)
-        return self._can_afford(required_resources=cost)
-
-    def _resources_missing_to_craft(self, item_name):
-        cost = ToolBox.get_cost(item_name)
-        return {res: res_cost - self.resources.get(res) for res, res_cost in cost.items() if res_cost - self.resources.get(res) > 0}
-
-    def _craft(self, item_name):
-        cost = ToolBox.get_cost(item_name)
-        for resource, res_cost in cost.items():
+    def craft(self, item_name):
+        item = self.tools.get(item_name)
+        for resource, res_cost in item.cost.items():
             self.resources.add(resource, -res_cost)
-        self._create_item(item_name)
-        self._messages.append("Crafted ${}$".format(item_name))
+        self.items.append(self.tools.craft(item))
+        self.alert("Crafted {}", item_name)
 
     def _best_mining_tool(self, resource):
         """Return the (currently owned) tool that gives the highest bonus on mining a particular resource."""
-        bonus, item = max((item.mining_bonus.get(resource, 0), item) for item in self.items)
-        return item
-
-    def _get_item(self, item_name):
-        """Return the first item that matches the name or None."""
-        for item in self.items:
-            if item.name == item_name:
-                return item
-
-    def _can_afford(self, **cost):
-        if 'resources_required' in cost and not all(self.resources.get(res) >= res_cost for res, res_cost in cost['resources_required'].items()):
-            return False
-        if 'items_required' in cost and not all(map(self.get_item, cost['items_required'])):
-            return False
-
-        research_required = cost.get('research_required', [])
-        if isinstance(research_required, (tuple, list)) and not set(research_required).issubset(self.flags.research_completed):
-            return False
-        elif isinstance(research_required, str) and research_required not in self.flags.research_completed:
-            return False
-
-        enabled_items = cost.get('enabled_items', [])
-        if isinstance(enabled_items, (tuple, list)) and not set(enabled_items).issubset(self.flags.items_enabled):
-            return False
-        elif isinstance(enabled_items, str) and research_required not in self.flags.items_enabled:
-            return False
-
-        return True
-
-    def _unlock_items(self):
-        for item in ToolBox.tools.values():
-            if item.name != 'item' and item.name not in self.flags.items_enabled and self._can_afford(**item.prerequisites):
-                self._messages.append("Unlocked ${}$.".format(item.name))
-                self.flags.items_enabled.append(item.name)
+        return max(self.items, key=lambda item: item.mining_bonus.get(resource, 0))
 
     def mine(self, resource):
         """Mine a resource."""
@@ -161,12 +117,12 @@ class Game:
             tool = self._best_mining_tool(resource)
             if tool.condition <= (difficulty - total_wear):
                 total_wear += tool.condition
-                efficiency += tool.condition * tool.mining_bonus[resource] / difficulty
-                self._messages.append("Destroyed ${}$ while mining *{}*.".format(tool.name, resource))
+                efficiency += tool.condition * tool.mining_bonus.get(resource) / difficulty
+                self.alert("Destroyed ${}$ while mining *{}*.".format(tool.name, resource))
                 self.items.remove(tool)
             else:
                 tool.condition -= (difficulty - total_wear)
-                efficiency += (difficulty - total_wear) * tool.mining_bonus[resource] / difficulty
+                efficiency += (difficulty - total_wear) * tool.mining_bonus.get(resource) / difficulty
                 total_wear = difficulty
 
         # Hand mining has efficiency of 1
@@ -176,8 +132,14 @@ class Game:
         self._act("mine", resource, difficulty)
         self.resources.add(resource, efficiency)
         self._unlock_items()
-        self._messages.append("Mined *{} {}*.".format(efficiency, resource))
+        self.alert("Mined *{} {}*.".format(efficiency, resource))
         return difficulty, efficiency
+
+    def _unlock_items(self):
+        for item in self.tools.available_items:
+            if item.name not in self.flags.items_enabled:
+                self.alert("You can now craft the {}.", item)
+                self.flags.items_enabled.append(item.name)
 
     def _act(self, task, target, duration):
         if self.is_busy:
@@ -192,7 +154,7 @@ class Game:
             "resources": self.resources.to_dict(),
             "action": self.action.to_dict(),
             "flags": self.flags.to_dict(),
-            "items": [item.to_dict() for item in self.items]
+            "items": [item.serialize() for item in self.items]
         }
 
     @classmethod
@@ -223,8 +185,9 @@ class Game:
     @classmethod
     def from_dict(cls, d):
         """Deserialize from dict."""
-        resources = Resources.from_dict(d.get('resources', {}))
-        action = Action.from_dict(d.get('action', {}))
-        flags = Flags.from_dict(d.get('flags', {}))
-        items = [ToolBox.get(**item) for item in d.get('items', [])]
-        return cls(resources=resources, flags=flags, items=items, action=action)
+        game = cls()
+        game.resources = Resources.from_dict(d.get('resources', {}))
+        game.action = Action.from_dict(d.get('action', {}))
+        game.flags = Flags.from_dict(d.get('flags', {}))
+        game.items = [game.tools.instantiate(item) for item in d.get('items', [])]
+        return game

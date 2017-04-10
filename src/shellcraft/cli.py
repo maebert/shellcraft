@@ -80,18 +80,15 @@ def craft(item):
 
 
 @main.command()
-@click.option("--type", help="Only print value for a specific resource, e.g. clay", type=str, metavar="<resource>")
-def resources(type=None):
+@click.argument("resource_types", nargs=-1, type=str, metavar="<resource>")
+def resources(resource_types=None):
     """Show available resources."""
-    if not type:
-        for resource in ("clay", "ore", "energy"):
-            if resource in game.flags.resources_enabled:
-                secho("*{}: {}*", resource, game.resources.get(resource))
-    else:
-        if type in game.flags.resources_enabled:
-            secho("*{}: {:<5d}*", type, game.resources.get(type))
-        else:
-            secho("{} is not available yet.", type)
+    types = resource_types or ("clay", "ore", "energy")
+    for resource in types:
+        if resource in game.flags.resources_enabled:
+            secho("*{}: {}*", resource, game.resources.get(resource))
+        elif resource_types:
+            secho("*{}* is not available yet.", resource)
 
 
 @main.command()
@@ -103,6 +100,22 @@ def inventory():
         for item in game.items:
             secho(str(item))
             # secho("${}$ ({:.0%})", item.name, item.condition / item.durability)
+
+
+@main.command()
+@click.argument("projects", nargs=-1, type=str, metavar="<project>")
+def research(projects):
+    """Show owned items and their condition."""
+    if len(projects) > 1:
+        secho("Can only research one project at a time", err=True)
+    elif not projects:
+        for item in game.research.available_items:
+            secho("{} {} ({} sec)", item, item.description, item.difficulty)
+    else:
+        # Researching something now
+        project = game.research.get(projects[0])
+        action = Action("Researching {}".format(str(project)), project.difficulty, color=RESOURCE_COLORS['research'])
+        action.do()
 
 
 @main.command()

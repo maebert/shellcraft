@@ -6,11 +6,16 @@ from shellcraft.core import AbstractItem, AbstractCollection
 
 
 class ResearchProject(AbstractItem):
-    pass
+    def __repr__(self):
+        return "@{}@".format(self.name)
 
+    @classmethod
+    def from_dict(cls, name, data):
+        project = super().from_dict(name, data)
+        project.difficulty = data.get("difficulty", -1)
+        return project
 
 
 class Research(AbstractCollection):
     FIXTURES = 'research.yaml'
     ITEM_CLASS = ResearchProject
-    pass

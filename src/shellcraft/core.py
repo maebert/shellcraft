@@ -77,7 +77,7 @@ class AbstractCollection:
     ITEM_CLASS = AbstractItem
 
     def __init__(self, game):
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), self.FIXTURES)) as f:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES)) as f:
             self.all_items = {name: self.ITEM_CLASS.from_dict(name, data) for name, data in yaml.load(f).items()}
         self.game = game
 

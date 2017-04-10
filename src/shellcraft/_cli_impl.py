@@ -101,9 +101,9 @@ class Action:
         elif t < 60:
             return "{:.0f}s".format(t)
         elif t < 3600:
-            return "{:.0f}m {:.0f}s".format(t / 60, t % 60)
+            return "{:.0f}m {:.0f}s".format(t // 60, t % 60)
         else:
-            return "{:.0f}h {:.0f}m".format(t / 3600, (t % 3600) / 60)
+            return "{:.0f}h {:.0f}m".format(t // 3600, (t % 3600) / 60)
 
     def draw(self):
         """Echo the current progress bar."""

@@ -61,3 +61,4 @@ class Tools(AbstractCollection):
     def is_available(self, item_name):
         item = self.get(item_name)
         return item.name in self.game.flags.items_enabled or super().is_available(item)
+

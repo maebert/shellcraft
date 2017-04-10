@@ -70,10 +70,11 @@ def craft(item):
         e = "Need {} to craft {}.".format(", ".join("{} {}".format(v, k) for k, v in missing_resources.items()), item)
         secho(e, err=True)
 
-    action = Action("craft", item, 5)
-    action.do()
-    game.craft(item)
+    difficulty = game.craft(item)
     game.save()
+
+    action = Action("craft", item, difficulty)
+    action.do()
 
 
 @main.command()
@@ -105,23 +106,29 @@ def research(projects):
     """Show owned items and their condition."""
     if len(projects) > 1:
         secho("Can only research one project at a time", err=True)
+
     elif not projects:
-        for item in game.research.available_items:
+        for item in game.lab.available_items:
             secho("{} {} ({} sec)", item, item.description, item.difficulty)
+        else:
+            secho("There are currently no projects available for research.", err=True)
     else:
         # Researching something now
         if game.is_busy:
             secho("You're busy {} until {}.", VERBS[game.action.task], game.action.completion, err=True)
 
-        project = game.research.get(projects[0])
+        project = game.lab.get(projects[0])
         if not project:
             secho("No such research project.", err=True)
 
-        if not game.research.is_available(project):
+        if not game.lab.is_available(project):
             secho("You can't research {} yet.", project, err=True)
             return None
 
-        action = Action("research", project, project.difficulty)
+        difficulty = game.research(project)
+        game.save()
+
+        action = Action("research", project, difficulty)
         action.do()
 
 

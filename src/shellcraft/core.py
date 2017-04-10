@@ -42,10 +42,12 @@ class StateCollector:
         state.__dict__.update(d)
         return state
 
-class AbstractItem:
 
+class AbstractItem:
     def __init__(self, name):
         self.name = name
+        self.difficulty = 0
+        self.description = ""
         self.prerequisites = {}
         self.cost = {}
         self.effects = {}
@@ -54,10 +56,12 @@ class AbstractItem:
     def from_dict(cls, name, data):
         """Load an item from dict representation."""
         item = cls(name)
-        item.description = data.get("description", {})
+
+        item.description = data.get("description", "")
+        item.difficulty = data.get("difficulty", 0)
+
         item.prerequisites = data.get("prerequisites", {})
         item.prerequisites['items'] = to_list(item.prerequisites.get('items'))
-
         item.cost = data.get("cost", {})
         item.effects = data.get("effects", {})
         for effect in ('enable_commands', 'enable_items', 'enable_resources'):
@@ -114,11 +118,11 @@ class AbstractCollection:
         for resources in item.effects.get('enable_resourcess', []):
             if resources not in self.game.flags.resourcess_enabled:
                 self.game.alert("You discovered ${}$.".format(resources))
-                self.game.flags.resourcess_enabled.append(resources)
+                self.game.flags.resources_enabled.append(resources)
         for item_name in item.effects.get('enable_items', []):
             if item_name not in self.game.flags.items_enabled:
                 self.game.alert("You can now craft the ${}$.".format(item_name))
-                self.game.flags.item_names_enabled.append(item)
+                self.game.flags.items_enabled.append(item_name)
 
     def is_available(self, item_name):
         """Return true if the prerequisites for an item are met."""

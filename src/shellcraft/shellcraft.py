@@ -36,6 +36,8 @@ class Flags(StateCollector):
 
     tutorial_step = 0
 
+    debug = False
+
     resources_enabled = ['clay']
     commands_enabled = ['reset']
     items_enabled = []
@@ -74,7 +76,7 @@ class Game:
         self.action = Action()
         self._messages = []
 
-        self.research = Research(self)
+        self.lab = Research(self)
         self.tools = Tools(self)
 
     def alert(self, msg, *args):
@@ -97,7 +99,17 @@ class Game:
         for resource, res_cost in item.cost.items():
             self.resources.add(resource, -res_cost)
         self.items.append(self.tools.craft(item))
-        self.alert("Crafted {}", item_name)
+        self._act("craft", item_name, item.difficulty)
+        self.alert("Crafted {}", item)
+        return item.difficulty
+
+    def research(self, project_name):
+        project = self.lab.get(project_name)
+        self.lab.apply_effects(project)
+        self.flags.research_completed.append(project.name)
+        self._act("research", project_name, project.difficulty)
+        self.alert("Researched {}.", project)
+        return project.difficulty
 
     def _best_mining_tool(self, resource):
         """Return the (currently owned) tool that gives the highest bonus on mining a particular resource."""
@@ -144,8 +156,10 @@ class Game:
     def _act(self, task, target, duration):
         if self.is_busy:
             return None  # @Todo Raise Exception
+        if self.flags.debug:
+            duration = 0
         self.action.task = task
-        self.action.target = target
+        self.action.target = str(target)
         self.action.completion = to_date(duration)
 
     def to_dict(self):

@@ -1,6 +1,7 @@
 clay_shovel:
     description: Basic clay mining item.
     durability: 20
+    difficulty: 5
     mining_bonus:
       clay: 2
     cost:
@@ -12,9 +13,11 @@ clay_shovel:
 sturdy_clay_shovel:
     description: Better clay mining item.
     durability: 120
+    difficulty: 8
     mining_bonus:
       clay: 2
     cost:
       clay: 10
     prerequisites:
       clay: 10
+

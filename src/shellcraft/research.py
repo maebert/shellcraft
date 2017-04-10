@@ -9,13 +9,11 @@ class ResearchProject(AbstractItem):
     def __repr__(self):
         return "@{}@".format(self.name)
 
-    @classmethod
-    def from_dict(cls, name, data):
-        project = super().from_dict(name, data)
-        project.difficulty = data.get("difficulty", -1)
-        return project
-
 
 class Research(AbstractCollection):
     FIXTURES = 'research.yaml'
     ITEM_CLASS = ResearchProject
+
+    def is_available(self, item_name):
+        project = self.get(item_name)
+        return project.name not in self.game.flags.research_completed and super().is_available(project)

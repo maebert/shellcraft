@@ -6,7 +6,7 @@ from __future__ import absolute_import
 import click
 from shellcraft.shellcraft import Game
 from shellcraft.tutorial import Tutorial
-from shellcraft._cli_impl import secho, Action, RESOURCE_COLORS
+from shellcraft._cli_impl import secho, Action, VERBS
 import os
 
 APP_NAME = 'ShellCraft'
@@ -42,15 +42,12 @@ def main(ctx):  # noqa
 def mine(resource):
     """Mine a resource."""
     if resource not in game.flags.resources_enabled:
-
         secho("You can't mine {} yet", resource, err=True)
-    if game.is_busy:
-        secho("You're busy {}ing {}.", game.action.task, game.action.completion, err=True)
 
     duration, quantity = game.mine(resource)
     game.save()
 
-    action = Action("Mining *{}*".format(resource), duration, color=RESOURCE_COLORS[resource])
+    action = Action("mine", resource, duration)
     action.do()
 
 
@@ -73,7 +70,7 @@ def craft(item):
         e = "Need {} to craft {}.".format(", ".join("{} {}".format(v, k) for k, v in missing_resources.items()), item)
         secho(e, err=True)
 
-    action = Action("Crafting {}".format(str(item)), 5, color=RESOURCE_COLORS['item'])
+    action = Action("craft", item, 5)
     action.do()
     game.craft(item)
     game.save()
@@ -113,8 +110,18 @@ def research(projects):
             secho("{} {} ({} sec)", item, item.description, item.difficulty)
     else:
         # Researching something now
+        if game.is_busy:
+            secho("You're busy {} until {}.", VERBS[game.action.task], game.action.completion, err=True)
+
         project = game.research.get(projects[0])
-        action = Action("Researching {}".format(str(project)), project.difficulty, color=RESOURCE_COLORS['research'])
+        if not project:
+            secho("No such research project.", err=True)
+
+        if not game.research.is_available(project):
+            secho("You can't research {} yet.", project, err=True)
+            return None
+
+        action = Action("research", project, project.difficulty)
         action.do()
 
 
@@ -138,7 +145,7 @@ def tutorial():
 # in the game yet.
 main.commands = {cmd: command for cmd, command in main.commands.items() if cmd in game.flags.commands_enabled}
 
-for cmd in ('mine', 'craft'):
+for cmd in ('mine', 'craft', 'research'):
     if cmd in main.commands:
         main.commands[cmd].callback = action_step(main.commands[cmd].callback)
 

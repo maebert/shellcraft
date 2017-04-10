@@ -13,8 +13,14 @@ RESOURCE_COLORS = {
     "clay": 'yellow',
     "ore": 'green',
     "command": 'blue',
-    "item": 'magenta',
+    "craft": 'magenta',
     "research": 'green',
+}
+
+VERBS = {
+    "research": "researching",
+    "mine": "mining",
+    "craft": "crafting"
 }
 
 
@@ -34,7 +40,7 @@ def _color_in(match):
     s = match.group(0)
     color = 'white'
     if s.startswith("$"):
-        color = RESOURCE_COLORS['item']
+        color = RESOURCE_COLORS['craft']
     elif s.startswith("@"):
         color = RESOURCE_COLORS['research']
     elif s.startswith("`"):
@@ -73,7 +79,7 @@ def secho(s, *vals, **kwargs):
 class Action:
     """Represent an action that takes some time to complete."""
 
-    def __init__(self, action, duration, color='yellow'):
+    def __init__(self, action, target, duration):
         """Set up the new action.
 
         Args:
@@ -81,9 +87,10 @@ class Action:
             duration (float): duration of the action in seconds
             color (str): color representing the action if progress bar is used.
         """
-        self.action = _format_str(action)
         self.duration = duration
-        self.color = color
+        self.color = RESOURCE_COLORS[target] if action == "mine" else RESOURCE_COLORS[action]
+        target_str = "*{}*".format(target) if action == 'mine' else target
+        self.action = _format_str("{} {}".format(VERBS[action], target_str).capitalize())
         self.elapsed = 0.
 
     def _eta(self):

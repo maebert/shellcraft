@@ -113,6 +113,12 @@ class Game(object):
         self.lab.apply_effects(project)
         return project.difficulty
 
+    def has_item(self, item_name):
+        for item in self.items:
+            if item.name == item_name:
+                return True
+        return False
+
     def _best_mining_tool(self, resource):
         """Return the (currently owned) tool that gives the highest bonus on mining a particular resource."""
         return max(self.items, key=lambda item: item.mining_bonus.get(resource, 0))

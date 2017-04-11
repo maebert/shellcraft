@@ -112,17 +112,23 @@ class AbstractCollection(object):
 
     def apply_effects(self, item_name):
         item = self.get(item_name)
+
+        # Enable commands
         for command in item.effects.get('enable_commands', []):
             if command not in self.game.flags.commands_enabled:
-                self.game.alert("You unlocked the `{}` command".format(command))
+                self.game.alert("You unlocked the `{}` command", command)
                 self.game.flags.commands_enabled.append(command)
+
+        # Enable resouces
         for resources in item.effects.get('enable_resourcess', []):
             if resources not in self.game.flags.resourcess_enabled:
-                self.game.alert("You discovered ${}$.".format(resources))
+                self.game.alert("You discovered ${}$.", resources)
                 self.game.flags.resources_enabled.append(resources)
+
+        # Enable items
         for item_name in item.effects.get('enable_items', []):
             if item_name not in self.game.flags.items_enabled:
-                self.game.alert("You can now craft the ${}$.".format(item_name))
+                self.game.alert("You can now craft the ${}$.", item_name)
                 self.game.flags.items_enabled.append(item_name)
 
     def is_available(self, item_name):
@@ -134,7 +140,7 @@ class AbstractCollection(object):
             if self.game.resources.get(resource) < item.prerequisites.get(resource, 0):
                 return False
         for required_item in item.prerequisites['items']:
-            if not self.game.tools.get(required_item):
+            if not self.game.has_item(required_item):
                 return False
         for research in item.prerequisites['research']:
             if research not in self.game.flags.research_completed:

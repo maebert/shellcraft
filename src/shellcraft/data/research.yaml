@@ -12,3 +12,10 @@ ore:
   difficulty: 400
   prerequisites:
     clay: 30
+dynamite:
+  description: BOOM goes the dynamite.
+  difficulty: 600
+  prerequisites:
+    ore: 120
+  effects:
+    enable_items: dynamite

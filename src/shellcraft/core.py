@@ -128,8 +128,14 @@ class AbstractCollection(object):
         # Enable items
         for item_name in item.effects.get('enable_items', []):
             if item_name not in self.game.flags.items_enabled:
-                self.game.alert("You can now craft the ${}$.", item_name)
+                self.game.alert("You can now craft ${}$.", item_name)
                 self.game.flags.items_enabled.append(item_name)
+
+        # Enable research
+        for item_name in item.effects.get('enable_research', []):
+            if item_name not in self.game.flags.research_enabled:
+                self.game.alert("You can now research ${}$.", item_name)
+                self.game.flags.research_enabled.append(item_name)
 
         # Grant resources
         for resource in RESOURCES:

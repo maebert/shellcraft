@@ -42,6 +42,7 @@ class Flags(StateCollector):
 
     resources_enabled = ['clay']
     commands_enabled = []
+    research_enabled = []
     items_enabled = []
 
     research_completed = []
@@ -160,8 +161,13 @@ class Game(object):
     def _unlock_items(self):
         for item in self.tools.available_items:
             if item.name not in self.flags.items_enabled:
-                self.alert("You can now craft the {}.", item)
+                self.alert("You can now craft {}.", item)
                 self.flags.items_enabled.append(item.name)
+
+        for item in self.lab.available_items:
+            if item.name not in self.flags.research_enabled:
+                self.alert("You can now research ${}$.", item.name)
+                self.flags.research_enabled.append(item.name)
 
     def _act(self, task, target, duration):
         if self.is_busy:

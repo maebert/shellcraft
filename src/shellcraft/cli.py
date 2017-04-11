@@ -5,7 +5,6 @@ from __future__ import absolute_import
 
 import click
 from shellcraft.shellcraft import Game
-from shellcraft.tutorial import Tutorial
 from shellcraft._cli_impl import secho, Action, VERBS
 import os
 
@@ -13,17 +12,17 @@ APP_NAME = 'ShellCraft'
 GAME_PATH = os.path.join(click.get_app_dir(APP_NAME), 'config.json')
 
 game = Game.load(GAME_PATH) if os.path.exists(GAME_PATH) else Game.create(GAME_PATH)
-TUTORIAL = Tutorial(game)
 
 
 def action_step(callback):
+    """Wrapper around actions."""
     def inner(**kwargs):
         # Do the action
         callback(**kwargs)
         for m in game._messages:
             secho("❯ " + m)
         game._messages = []
-        TUTORIAL.cont()
+        game.tutorial.cont()
     return inner
 
 
@@ -32,7 +31,7 @@ def action_step(callback):
 def main(ctx):  # noqa
     """ShellCraft is a command line based crafting game."""
     if ctx.invoked_subcommand is None:
-        has_tut = TUTORIAL.cont()
+        has_tut = game.tutorial.cont()
         if not has_tut:
             click.echo("Use shellcraft --help to see a list of available commands.")
 
@@ -146,7 +145,7 @@ def reset(force):
 @main.command()
 def tutorial():
     """Print the last step of the tutorial."""
-    TUTORIAL.print_last_step()
+    game.tutorial.print_last_step()
 
 # This removes all commands from the main group that are not enabled
 # in the game yet.

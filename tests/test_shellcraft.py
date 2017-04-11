@@ -8,35 +8,59 @@ test_shellcraft
 Tests for `shellcraft` module.
 """
 
-import pytest
-from contextlib import contextmanager
+import os
 from click.testing import CliRunner
-from shellcraft import shellcraft
+from shellcraft.shellcraft import Game
 from shellcraft import cli
 
 
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
-
-
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument.
-    """
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
-
-
-def test_command_line_interface():
+def test_basic_cli():
     runner = CliRunner()
+    game_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "test.json")
+    cli.game = Game.create(game_path)
     result = runner.invoke(cli.main)
     assert result.exit_code == 0
-    assert 'shellcraft.cli.main' in result.output
+    print(result.output)
+    assert 'Welcome to ShellCraft' in result.output
     help_result = runner.invoke(cli.main, ['--help'])
     assert help_result.exit_code == 0
     assert '--help  Show this message and exit.' in help_result.output
 
+
+def test_game_run():
+    runner = CliRunner()
+    game_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "test.json")
+    cli.game = Game.create(game_path)
+    cli.game.flags.debug = True
+
+    commands = """
+    mine clay
+    mine clay
+    mine clay
+    mine clay
+    craft clay_shovel
+    mine clay
+    mine clay
+    mine clay
+    mine clay
+    mine clay
+    craft sturdy_clay_shovel
+    mine clay
+    mine clay
+    mine clay
+    mine clay
+    mine clay
+    mine clay
+    mine clay
+    mine clay
+    mine clay
+    mine clay
+    research clay_cart
+    craft clay_cart
+    mine clay
+    """
+    for command in commands.splitlines():
+        runner.invoke(cli.main, command.split())
+        print(command, cli.game.resources.clay)
+    assert 'clay_cart' in cli.game.flags.research_completed
+    assert cli.game.resources.clay == 4

@@ -18,14 +18,21 @@ ShellCraft
      :alt: Updates
 
 
-ShellCraft is a command line based crafting game
+
+ShellCraft is a game about mining, crafting, and puzzling, loosely based on Ted Chiang's short story `"72 letters"`_.
 
 
-* Free software: MIT license
-* Documentation: https://shellcraft.readthedocs.io.
+.. image:: https://github.com/maebert/shellcraft/blob/master/docs/_static/logo.png?raw=true
+   :width: 128 px
 
+.. code-block:: console
 
-Features
---------
+    # Install ShellCraft
+    $ pip install shellcraft
 
-* TODO
+    # Run ShellCraft:
+    $ shellcraft
+
+Full documentatio can be found at: https://shellcraft.readthedocs.io.
+
+.. _"72 letters": https://archive.org/details/TedChiangSeventyTwoLetters

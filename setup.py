@@ -20,7 +20,7 @@ test_requirements = [
 setup(
     name='shellcraft',
     version=VERSION,
-    description="ShellCraft is a command line based crafting game",
+    description="ShellCraft is a command line based crafting game.",
     long_description=readme,
     author="Manuel Ebert",
     author_email='manuel@1450.me',

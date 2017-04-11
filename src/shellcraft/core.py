@@ -65,7 +65,7 @@ class AbstractItem(object):
         item.prerequisites['research'] = to_list(item.prerequisites.get('research'))
         item.cost = data.get("cost", {})
         item.effects = data.get("effects", {})
-        for effect in ('enable_commands', 'enable_items', 'enable_resources'):
+        for effect in ('enable_commands', 'enable_items', 'enable_resources', 'events'):
             item.effects[effect] = to_list(item.effects.get(effect))
         return item
 
@@ -130,6 +130,30 @@ class AbstractCollection(object):
             if item_name not in self.game.flags.items_enabled:
                 self.game.alert("You can now craft the ${}$.", item_name)
                 self.game.flags.items_enabled.append(item_name)
+
+        # Grant resources
+        for resource in RESOURCES:
+            if resource in item.effects:
+                value = item.effects[resource]
+                self.game.resources.add(resource, value)
+                if value > 0:
+                    self.game.alert("You found *{} {}*.", value, resource)
+                else:
+                    self.game.alert("You lost *{} {}*.", value, resource)
+
+        # Change mining difficulty
+        for resource in RESOURCES:
+            change = item.effects.get("{}_mining_difficulty".format(resource), None)
+            if change:
+                old = self.game.flags.mining_difficulty[resource]
+                self.game.flags.mining_difficulty[resource] = old * (1 - change)
+                self.game.alert("*{}* difficulty reduced by {:.0%}.", resource, change)
+
+        # Trigger events
+        for event_name in item.effects.get('events', []):
+            event = self.game.events.get(event_name)
+            self.game.alert(event.description)
+            self.game.events.apply_effects(event)
 
     def is_available(self, item_name):
         """Return true if the prerequisites for an item are met."""

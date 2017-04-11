@@ -7,6 +7,7 @@ from shellcraft.core import StateCollector
 from shellcraft.items import Tools
 from shellcraft.research import Research
 from shellcraft.tutorial import Tutorial
+from shellcraft.events import Events
 import json
 import os
 import datetime
@@ -80,6 +81,7 @@ class Game(object):
         self.lab = Research(self)
         self.tools = Tools(self)
         self.tutorial = Tutorial(self)
+        self.events = Events(self)
 
     def alert(self, msg, *args):
         self._messages.append(msg.format(*args))

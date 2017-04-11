@@ -69,6 +69,10 @@ def _unformat_str(s):
     return re.sub(r'(([\$\*@`])([{};:.a-z0-9_\- ]+)(\2))', r"\3", s)
 
 
+def _format_cost(cost):
+    return ", ".join("*{} {}*".format(v, k) for k, v in cost.items())
+
+
 def echo(s, *vals, **kwargs):
     """Echo a string with colours.
 

@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 
 import click
 from shellcraft.shellcraft import Game
-from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts
+from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost
 import os
 import sys
 
@@ -81,30 +81,40 @@ def mine(game, resource):
 
 
 @cli.command(options_metavar='')
-@click.argument("item", metavar='<item>')
+@click.argument("items", nargs=-1, type=str, metavar='<item>')
 @click.pass_obj
-def craft(game, item):
+def craft(game, items):
     """Mine a resource."""
-    item = game.tools.get(item)
 
-    if not item:
-        echo("No such item", err=True)
-        return None
+    if len(items) > 1:
+        echo("Can only craft one project at a time", err=True)
 
-    if not game.tools.is_available(item):
-        echo("{} is not available yet.", item, err=True)
-        return None
+    elif not items:
+        if not game.tools.available_items:
+            echo("There's nothing you can craft right now.", err=True)
+        for item in game.tools.available_items:
+            echo("{} ({})\n  {}", item, _format_cost(item.cost), item.description)
+    else:
+        item = game.tools.get(items[0])
 
-    if not game.tools.can_afford(item):
-        missing_resources = game.tools._resources_missing_to_craft(item)
-        e = "Need {} to craft {}.".format(", ".join("{} {}".format(v, k) for k, v in missing_resources.items()), item)
-        echo(e, err=True)
+        if not item:
+            echo("No such item", err=True)
+            return None
 
-    difficulty = game.craft(item)
-    game.save()
+        if not game.tools.is_available(item):
+            echo("{} is not available yet.", item, err=True)
+            return None
 
-    action = Action("craft", item, difficulty)
-    action.do(skip=game.flags.debug)
+        if not game.tools.can_afford(item):
+            missing_resources = game.tools._resources_missing_to_craft(item)
+            e = "Need {} to craft {}.".format(_format_cost(missing_resources), item)
+            echo(e, err=True)
+
+        difficulty = game.craft(item)
+        game.save()
+
+        action = Action("craft", item, difficulty)
+        action.do(skip=game.flags.debug)
 
 
 @cli.command(options_metavar='')
@@ -142,7 +152,7 @@ def research(game, projects):
 
     elif not projects:
         for item in game.lab.available_items:
-            echo("{} {} ({} sec)", item, item.description, item.difficulty)
+            echo("{} ({} sec)\n  {}", item, item.difficulty, item.description)
         if not game.lab.available_items:
             echo("There are currently no projects available for research.", err=True)
     else:

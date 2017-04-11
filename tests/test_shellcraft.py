@@ -63,7 +63,7 @@ def test_game_run():
     """
     for command in commands.splitlines():
         result = runner.invoke(cli.main, command.split())
-        print(command, cli.game.resources.clay)
+        print(cli.game.to_dict())
         print(result.output)
     assert 'small_cart' in cli.game.flags.research_completed
     assert cli.game.resources.clay == 4

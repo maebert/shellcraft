@@ -10,12 +10,19 @@ from shellcraft._cli_impl import secho, Action, VERBS
 import os
 
 APP_NAME = 'ShellCraft'
-GAME_PATH = os.path.join(click.get_app_dir(APP_NAME), 'config.json')
-
-game = Game.load(GAME_PATH) if os.path.exists(GAME_PATH) else Game.create(GAME_PATH)
+GAME = None
 
 
-def action_step(callback):
+def get_game(path=None):
+    global GAME
+    if GAME:
+        return GAME
+    path = path or os.path.join(click.get_app_dir(APP_NAME), 'config.json')
+    GAME = Game.load(path) if os.path.exists(path) else Game.create(path)
+    return GAME
+
+
+def action_step(callback, game):
     """Wrapper around actions."""
     def inner(**kwargs):
         # Do the action
@@ -27,19 +34,34 @@ def action_step(callback):
     return inner
 
 
+def main(game_path=None):
+    game = get_game(game_path)
+
+    # Remove all commands from the main group that are not enabled in the game yet.
+    cli.commands = {cmd: command for cmd, command in cli.commands.items() if cmd in game.flags.commands_enabled}
+
+    for cmd in ('mine', 'craft', 'research'):
+        if cmd in cli.commands:
+            cli.commands[cmd].callback = action_step(cli.commands[cmd].callback, game)
+    cli()
+
+
 @click.group(invoke_without_command=True)
 @click.pass_context
-def main(ctx):  # noqa
+def cli(ctx):
     """ShellCraft is a command line based crafting game."""
+    ctx.obj = game = get_game()
+
     if ctx.invoked_subcommand is None:
         has_tut = game.tutorial.cont()
         if not has_tut:
             click.echo("Use shellcraft --help to see a list of available commands.")
 
 
-@main.command()
+@cli.command()
 @click.argument("resource", metavar='<resource>')
-def mine(resource):
+@click.pass_obj
+def mine(game, resource):
     """Mine a resource."""
     if resource not in game.flags.resources_enabled:
         secho("You can't mine {} yet", resource, err=True)
@@ -51,9 +73,10 @@ def mine(resource):
     action.do(skip=game.flags.debug)
 
 
-@main.command()
+@cli.command()
 @click.argument("item", metavar='<item>')
-def craft(item):
+@click.pass_obj
+def craft(game, item):
     """Mine a resource."""
     item = game.tools.get(item)
 
@@ -77,9 +100,10 @@ def craft(item):
     action.do(skip=game.flags.debug)
 
 
-@main.command()
+@cli.command()
 @click.argument("resource_types", nargs=-1, type=str, metavar="<resource>")
-def resources(resource_types=None):
+@click.pass_obj
+def resources(game, resource_types=None):
     """Show available resources."""
     types = resource_types or ("clay", "ore", "energy")
     for resource in types:
@@ -89,8 +113,9 @@ def resources(resource_types=None):
             secho("*{}* is not available yet.", resource)
 
 
-@main.command()
-def inventory():
+@cli.command()
+@click.pass_obj
+def inventory(game):
     """Show owned items and their condition."""
     if not game.items:
         secho("You don't own any items", err=True)
@@ -100,9 +125,10 @@ def inventory():
             # secho("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
 
-@main.command()
+@cli.command()
 @click.argument("projects", nargs=-1, type=str, metavar="<project>")
-def research(projects):
+@click.pass_obj
+def research(game, projects):
     """Show owned items and their condition."""
     if len(projects) > 1:
         secho("Can only research one project at a time", err=True)
@@ -136,33 +162,24 @@ def research(projects):
         action.do(skip=game.flags.debug)
 
 
-@main.command()
+@cli.command()
 @click.option("--force", is_flag=True, help="Don't question my orders, just execute them!")
-def reset(force):
+@click.pass_obj
+def reset(game, force):
     """Reset all progress."""
     if force or click.confirm("Do you really want to reset the game and start over again?"):
-        Game.create(GAME_PATH).save()
-        click.echo("Tabula rasa.")
+        Game.create(game.save_file).save()
+        secho("Tohu wa-bohu.")
     else:
-        click.echo("Nevermind then.")
+        secho("Nevermind then.")
 
 
-@main.command()
-def tutorial():
+@cli.command()
+@click.pass_obj
+def tutorial(game):
     """Print the last step of the tutorial."""
     game.tutorial.print_last_step()
 
-
-def _command_shim(group, game):
-    """Remove all commands from the main group that are not enabled in the game yet."""
-    group._commands = {cmd: command for cmd, command in group.commands.items()}
-    group.commands = {cmd: command for cmd, command in group.commands.items() if cmd in game.flags.commands_enabled}
-
-    for cmd in ('mine', 'craft', 'research'):
-        if cmd in group.commands:
-            group.commands[cmd].callback = action_step(group.commands[cmd].callback)
-
-_command_shim(main, game)
 
 if __name__ == "__main__":
     main()

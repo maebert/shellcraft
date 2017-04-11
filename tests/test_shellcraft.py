@@ -2,39 +2,42 @@
 # -*- coding: utf-8 -*-
 
 """
-test_shellcraft
-----------------------------------
+test_shellcraft.
 
 Tests for `shellcraft` module.
 """
 
 from __future__ import unicode_literals
 
-import os
+import pytest
 from click.testing import CliRunner
-from shellcraft.shellcraft import Game
-from shellcraft import cli
+from shellcraft.cli import get_game, cli
 
 
-def test_basic_cli():
+@pytest.fixture(scope='module')
+def game():
+    """Create a local game."""
     runner = CliRunner()
-    game_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "test.json")
-    cli.game = Game.create(game_path)
-    result = runner.invoke(cli.main)
+    with runner.isolated_filesystem():
+        game = get_game("test.json")
+    return game
+
+
+
+def test_basic_cli(game):
+    """Test that the interface loads."""
+    runner = CliRunner()
+    result = runner.invoke(cli)
     assert result.exit_code == 0
-    print(result.output)
     assert 'Welcome to ShellCraft' in result.output
-    help_result = runner.invoke(cli.main, ['--help'])
+
+    help_result = runner.invoke(cli, ['--help'])
     assert help_result.exit_code == 0
     assert '--help  Show this message and exit.' in help_result.output
 
 
-def test_game_run():
-    runner = CliRunner()
-    game_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", "test.json")
-    cli.game = Game.create(game_path)
-    cli.game.flags.debug = True
-
+def test_game_run(game):
+    """Test that the basic game flow works."""
     commands = """
     mine clay
     mine clay
@@ -59,13 +62,13 @@ def test_game_run():
     mine clay
     research small_cart
     craft small_cart
-    mine clay
-    """
+    mine clay"""
+    runner = CliRunner()
+    game.flags.debug = True
     for command in commands.splitlines():
-        # This is an ugly, ugly thing.
-        cli.main.commands = cli.main._commands
-        cli._command_shim(cli.main, cli.game)
-        result = runner.invoke(cli.main, command.split())
-        print(result.output)
-    assert 'small_cart' in cli.game.flags.research_completed
-    assert cli.game.resources.clay == 4
+        assert not command or command.split()[0] in game.flags.commands_enabled
+        runner.invoke(cli, command.split())
+        game.tutorial.cont()
+    assert 'small_cart' in game.flags.research_completed
+    assert game.flags.tutorial_step == 10
+    assert game.resources.clay == 4

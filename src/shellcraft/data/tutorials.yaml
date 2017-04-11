@@ -11,7 +11,7 @@
     effects:
         enable_commands:
           - mine
-          - tutorial
+          - reset
 1:
     description: >
         Excellent! Mining resources (like everything in ShellCraft) takes some time,
@@ -21,6 +21,9 @@
         `shellcraft mine clay`
     prerequisites:
         clay: 1
+    effects:
+        enable_commands:
+          - tutorial
 
 2:
     description: >

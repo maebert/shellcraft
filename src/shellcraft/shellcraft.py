@@ -40,7 +40,7 @@ class Flags(StateCollector):
     debug = False
 
     resources_enabled = ['clay']
-    commands_enabled = ['reset']
+    commands_enabled = []
     items_enabled = []
 
     research_completed = []
@@ -188,7 +188,7 @@ class Game(object):
         game = Game()
         game.save_file = filename
         save_path, _ = os.path.split(filename)
-        if not os.path.exists(save_path):
+        if save_path and not os.path.exists(save_path):
             os.makedirs(save_path)
         game.save()
         return game

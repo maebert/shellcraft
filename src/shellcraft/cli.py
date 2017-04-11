@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 
 import click
 from shellcraft.shellcraft import Game
-from shellcraft._cli_impl import secho, Action, VERBS
+from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts
 import os
 
 APP_NAME = 'ShellCraft'
@@ -27,9 +27,7 @@ def action_step(callback, game):
     def inner(**kwargs):
         # Do the action
         callback(**kwargs)
-        for m in game._messages:
-            secho("❯ " + m)
-        game._messages = []
+        echo_alerts(game)
         game.tutorial.cont()
     return inner
 
@@ -56,7 +54,7 @@ def cli(ctx):
         if game.flags.tutorial_step == 0:
             game.tutorial.cont()
         else:
-            secho(ctx.get_help())
+            echo(ctx.get_help())
 
 
 @cli.command(options_metavar='')
@@ -65,7 +63,7 @@ def cli(ctx):
 def mine(game, resource):
     """Mine a resource."""
     if resource not in game.flags.resources_enabled:
-        secho("You can't mine {} yet", resource, err=True)
+        echo("You can't mine {} yet", resource, err=True)
 
     duration, quantity = game.mine(resource)
     game.save()
@@ -82,17 +80,17 @@ def craft(game, item):
     item = game.tools.get(item)
 
     if not item:
-        secho("No such item", err=True)
+        echo("No such item", err=True)
         return None
 
     if not game.tools.is_available(item):
-        secho("{} is not available yet.", item, err=True)
+        echo("{} is not available yet.", item, err=True)
         return None
 
     if not game.tools.can_afford(item):
         missing_resources = game.tools._resources_missing_to_craft(item)
         e = "Need {} to craft {}.".format(", ".join("{} {}".format(v, k) for k, v in missing_resources.items()), item)
-        secho(e, err=True)
+        echo(e, err=True)
 
     difficulty = game.craft(item)
     game.save()
@@ -109,9 +107,9 @@ def resources(game, resource_types=None):
     types = resource_types or ("clay", "ore", "energy")
     for resource in types:
         if resource in game.flags.resources_enabled:
-            secho("*{}: {}*", resource, game.resources.get(resource))
+            echo("*{}: {}*", resource, game.resources.get(resource))
         elif resource_types:
-            secho("*{}* is not available yet.", resource)
+            echo("*{}* is not available yet.", resource)
 
 
 @cli.command(options_metavar='')
@@ -119,11 +117,11 @@ def resources(game, resource_types=None):
 def inventory(game):
     """Show owned items and their condition."""
     if not game.items:
-        secho("You don't own any items", err=True)
+        echo("You don't own any items", err=True)
     else:
         for item in game.items:
-            secho(str(item))
-            # secho("${}$ ({:.0%})", item.name, item.condition / item.durability)
+            echo(str(item))
+            # echo("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
 
 @cli.command(options_metavar='')
@@ -132,28 +130,28 @@ def inventory(game):
 def research(game, projects):
     """Show owned items and their condition."""
     if len(projects) > 1:
-        secho("Can only research one project at a time", err=True)
+        echo("Can only research one project at a time", err=True)
 
     elif not projects:
         for item in game.lab.available_items:
-            secho("{} {} ({} sec)", item, item.description, item.difficulty)
+            echo("{} {} ({} sec)", item, item.description, item.difficulty)
         if not game.lab.available_items:
-            secho("There are currently no projects available for research.", err=True)
+            echo("There are currently no projects available for research.", err=True)
     else:
         # Researching something now
         if game.is_busy:
-            secho("You're busy {} until {}.", VERBS[game.action.task], game.action.completion, err=True)
+            echo("You're busy {} until {}.", VERBS[game.action.task], game.action.completion, err=True)
 
         project = game.lab.get(projects[0])
         if not project:
-            secho("No such research project.", err=True)
+            echo("No such research project.", err=True)
 
         if project.name in game.flags.research_completed:
-            secho("You've already researched {}.", project, err=True)
+            echo("You've already researched {}.", project, err=True)
             return None
 
         if not game.lab.is_available(project):
-            secho("You can't research {} yet.", project, err=True)
+            echo("You can't research {} yet.", project, err=True)
             return None
 
         difficulty = game.research(project)
@@ -170,9 +168,9 @@ def reset(game, force):
     """Reset all progress."""
     if force or click.confirm("Do you really want to reset the game and start over again?"):
         Game.create(game.save_file).save()
-        secho("Tohu wa-bohu.")
+        echo("Tohu wa-bohu.")
     else:
-        secho("Nevermind then.")
+        echo("Nevermind then.")
 
 
 @cli.command()

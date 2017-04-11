@@ -3,7 +3,7 @@
 """Basic CLI for ShellCraft."""
 from __future__ import absolute_import
 from shellcraft.core import AbstractCollection, AbstractItem
-from shellcraft._cli_impl import secho_tutorial
+from shellcraft._cli_impl import echo, echo_tutorial, echo_alerts
 
 
 class Step(AbstractItem):
@@ -24,7 +24,7 @@ class Tutorial(AbstractCollection):
     def print_last_step(self):
         step = self.get(self.game.flags.tutorial_step - 1)
         if step:
-            secho_tutorial(step.description)
+            echo_tutorial(step.description)
 
     def cont(self):
         step = self.get_next_step()
@@ -32,5 +32,8 @@ class Tutorial(AbstractCollection):
             self.game.flags.tutorial_step += 1
             self.apply_effects(step)
             self.game.save()
-            secho_tutorial(step.description)
+            echo_tutorial(step.description)
+            if self.game._messages:
+                echo("")
+            echo_alerts(self.game)
             return True

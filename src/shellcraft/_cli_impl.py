@@ -24,7 +24,14 @@ VERBS = {
 }
 
 
-def secho_tutorial(message):
+def echo_alerts(game):
+    """Display all alerts that are currently queued up."""
+    for m in game._messages:
+        echo("❯ " + m)
+    game._messages = []
+
+
+def echo_tutorial(message):
     """Pretty-print a tutoria step."""
     term_width, _ = get_terminal_size()
     for part in message.splitlines():
@@ -62,7 +69,7 @@ def _unformat_str(s):
     return re.sub(r'(([\$\*@`])([{};:.a-z0-9_\- ]+)(\2))', r"\3", s)
 
 
-def secho(s, *vals, **kwargs):
+def echo(s, *vals, **kwargs):
     """Echo a string with colours.
 
     Options are *resource* to highlight a resource, `code` for tutorials.

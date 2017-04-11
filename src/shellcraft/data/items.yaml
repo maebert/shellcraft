@@ -31,7 +31,6 @@ small_cart:
       ore: 4
     cost:
       clay: 20
-      ore: 12
     prerequisites:
       research: small_cart
 

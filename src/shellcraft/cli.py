@@ -155,6 +155,8 @@ def tutorial():
 
 # This removes all commands from the main group that are not enabled
 # in the game yet.
+print("COMMANDS FIRST", main.commands.values())
+print("COMMANDS ENABLED", game.flags.commands_enabled)
 main.commands = {cmd: command for cmd, command in main.commands.items() if cmd in game.flags.commands_enabled}
 
 for cmd in ('mine', 'craft', 'research'):

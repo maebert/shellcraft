@@ -7,4 +7,4 @@ coverage>=4.1
 Sphinx>=1.4.8
 pytest>=2.9.2
 sphinx_rtd_theme>=0.1.9
-sphinxcontrib-napoleon
+sphinxcontrib-napoleon==0.6.1

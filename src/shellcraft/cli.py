@@ -8,6 +8,7 @@ import click
 from shellcraft.shellcraft import Game
 from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts
 import os
+import sys
 
 APP_NAME = 'ShellCraft'
 GAME = None
@@ -34,6 +35,13 @@ def action_step(callback, game):
 
 def main(game_path=None):
     game = get_game(game_path)
+
+    # Cheat mode, properly hardcoded.
+    if sys.argv[1] == "debug":
+        game.flags.debug = not game.flags.debug
+        game.save()
+        echo("Debug mode is " + ("$on$" if game.flags.debug else "`off`"))
+        sys.exit(0)
 
     # Remove all commands from the main group that are not enabled in the game yet.
     cli.commands = {cmd: command for cmd, command in cli.commands.items() if cmd in game.flags.commands_enabled}

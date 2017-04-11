@@ -66,7 +66,7 @@ class Action(StateCollector):
     completion = None
 
 
-class Game:
+class Game(object):
     """The Game class holds all information about, well, the game's state, and handles the logic."""
 
     def __init__(self):
@@ -107,10 +107,10 @@ class Game:
 
     def research(self, project_name):
         project = self.lab.get(project_name)
-        self.lab.apply_effects(project)
         self.flags.research_completed.append(project.name)
         self._act("research", project_name, project.difficulty)
         self.alert("Researched {}.", project)
+        self.lab.apply_effects(project)
         return project.difficulty
 
     def _best_mining_tool(self, resource):

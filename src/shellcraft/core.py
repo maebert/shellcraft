@@ -16,7 +16,7 @@ def to_list(string_or_list):
     return string_or_list
 
 
-class StateCollector:
+class StateCollector(object):
     """Class that acts as a serializable accessor to game state variables."""
 
     def __init__(self):
@@ -43,7 +43,7 @@ class StateCollector:
         return state
 
 
-class AbstractItem:
+class AbstractItem(object):
     def __init__(self, name):
         self.name = name
         self.difficulty = 0
@@ -77,7 +77,7 @@ class AbstractItem:
         return self.name
 
 
-class AbstractCollection:
+class AbstractCollection(object):
     FIXTURES = "collection.yaml"
     ITEM_CLASS = AbstractItem
 

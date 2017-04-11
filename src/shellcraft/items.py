@@ -11,7 +11,7 @@ class Tool(AbstractItem):
 
     @classmethod
     def from_dict(cls, name, data):
-        tool = super().from_dict(name, data)
+        tool = super(Tool, cls).from_dict(name, data)
         tool.durability = data.get("durability", -1)
         tool.mining_bonus = data.get("mining_bonus", {})
         tool.crafting_bonus = data.get("crafting_bonus", {})
@@ -60,5 +60,4 @@ class Tools(AbstractCollection):
 
     def is_available(self, item_name):
         item = self.get(item_name)
-        return item.name in self.game.flags.items_enabled or super().is_available(item)
-
+        return item.name in self.game.flags.items_enabled or super(Tools, self).is_available(item)

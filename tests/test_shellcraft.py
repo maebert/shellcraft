@@ -8,6 +8,8 @@ test_shellcraft
 Tests for `shellcraft` module.
 """
 
+from __future__ import unicode_literals
+
 import os
 from click.testing import CliRunner
 from shellcraft.shellcraft import Game
@@ -38,13 +40,13 @@ def test_game_run():
     mine clay
     mine clay
     mine clay
-    craft clay_shovel
+    craft shovel
     mine clay
     mine clay
     mine clay
     mine clay
     mine clay
-    craft sturdy_clay_shovel
+    craft sturdy_shovel
     mine clay
     mine clay
     mine clay
@@ -55,12 +57,13 @@ def test_game_run():
     mine clay
     mine clay
     mine clay
-    research clay_cart
-    craft clay_cart
+    research small_cart
+    craft small_cart
     mine clay
     """
     for command in commands.splitlines():
-        runner.invoke(cli.main, command.split())
+        result = runner.invoke(cli.main, command.split())
         print(command, cli.game.resources.clay)
-    assert 'clay_cart' in cli.game.flags.research_completed
+        print(result.output)
+    assert 'small_cart' in cli.game.flags.research_completed
     assert cli.game.resources.clay == 4

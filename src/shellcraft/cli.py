@@ -2,6 +2,7 @@
 
 """Basic CLI for ShellCraft."""
 from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import click
 from shellcraft.shellcraft import Game
@@ -119,6 +120,10 @@ def research(projects):
         project = game.lab.get(projects[0])
         if not project:
             secho("No such research project.", err=True)
+
+        if project.name in game.flags.research_completed:
+            secho("You've already researched {}.", project, err=True)
+            return None
 
         if not game.lab.is_available(project):
             secho("You can't research {} yet.", project, err=True)

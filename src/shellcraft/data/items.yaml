@@ -1,4 +1,4 @@
-clay_shovel:
+shovel:
     description: Basic clay mining item.
     durability: 20
     difficulty: 5
@@ -10,7 +10,7 @@ clay_shovel:
       clay: 4
 
 
-sturdy_clay_shovel:
+sturdy_shovel:
     description: Better clay mining item.
     durability: 120
     difficulty: 8
@@ -21,13 +21,14 @@ sturdy_clay_shovel:
     prerequisites:
       clay: 10
 
-clay_cart:
-    description: As simple cart to transport clay.
-    durability: 140
+small_cart:
+    description: As simple cart to transport raw materials.
+    durability: 300
     difficulty: 18
     mining_bonus:
       clay: 4
+      ore: 4
     cost:
       clay: 20
     prerequisites:
-      research: clay_cart
+      research: small_cart

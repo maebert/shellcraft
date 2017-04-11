@@ -109,7 +109,7 @@ def research(projects):
     elif not projects:
         for item in game.lab.available_items:
             secho("{} {} ({} sec)", item, item.description, item.difficulty)
-        else:
+        if not game.lab.available_items:
             secho("There are currently no projects available for research.", err=True)
     else:
         # Researching something now
@@ -146,6 +146,7 @@ def reset(force):
 def tutorial():
     """Print the last step of the tutorial."""
     game.tutorial.print_last_step()
+
 
 # This removes all commands from the main group that are not enabled
 # in the game yet.

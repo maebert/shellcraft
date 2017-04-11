@@ -1,10 +1,10 @@
-clay_cart:
+small_cart:
   description: A way to transport your clay faster.
   difficulty: 120
   prerequisites:
     clay: 20
   effects:
-    enable_items: clay_cart
+    enable_items: small_cart
 ore:
   description: There's something shiny here...
   effects:

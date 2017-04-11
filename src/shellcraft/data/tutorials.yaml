@@ -36,7 +36,7 @@
         however you can increase the yield of your mining operations with tools! Try crafting
         a $clay shovel$ by running
 
-        `shellcraft craft clay_shovel`
+        `shellcraft craft shovel`
 
     prerequisites:
         clay: 4
@@ -47,7 +47,7 @@
     description: >
         Whoop whoop! Let's put this to use by running `shellcraft mine clay` again.
     prerequisites:
-        items: clay_shovel
+        items: shovel
 
 5:
     description: >
@@ -58,7 +58,7 @@
         When you're ready, continue mining until you have *10 clay*.
     prerequisites:
         clay: 2
-        items: clay_shovel
+        items: shovel
     effects:
         enable_commands:
         - inventory
@@ -66,18 +66,18 @@
 
 6:
     description: >
-        Oh no, our $clay_shovel$ broke! All items have a certain durability, which is the number
+        Oh no, our $shovel$ broke! All items have a certain durability, which is the number
         of seconds you can use them before they break. When mining, shellcraft will always pick
         the best tool for the job until it breaks, and then continue with the next-best tool.
         In this case, your bare hands.
 
-        Let's invest a little bit into our tools and craft a $sturdy_clay_shovel$.
+        Let's invest a little bit into our tools and craft a $sturdy_shovel$.
     prerequisites:
         clay: 10
 
 7:
     description: >
-        The $sturdy_clay_shovel$ costs a little more than the good ol' $clay_shovel$ and doens't
+        The $sturdy_shovel$ costs a little more than the good ol' $shovel$ and doens't
         give us any better bonus, but it lasts four times as long! That means we can get some serious
         mining done.
 
@@ -88,16 +88,16 @@
 
             `for i in {1..10}; do shellcraft mine clay; done`
     prerequisites:
-        items: sturdy_clay_shovel
+        items: sturdy_shovel
 
 8:
     description: >
-        Have a look at `shellcraft inventory` - our $sturdy_clay_shovel$ is still in pretty good shape.
+        Have a look at `shellcraft inventory` - our $sturdy_shovel$ is still in pretty good shape.
 
         Some items are unlocked simply by having enough resources to craft them. Others need to be
         researched first. A quick look at `shellcraft research` shows you the availabel research projects.
         Researching doesn't cost you anything, but can take a long time that you can't spend mining or
-        crafting anything. So let's embark on your first science project and research the @clay_cart@!
+        crafting anything. So let's embark on your first science project and research the @small_cart@!
 
     prerequisites:
         clay: 20
@@ -108,4 +108,4 @@
         This should make our job a little easier. Keep on mining now!
 
     prerequisites:
-        items: clay_cart
+        items: small_cart

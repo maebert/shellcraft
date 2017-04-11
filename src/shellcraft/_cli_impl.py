@@ -133,4 +133,3 @@ class Action:
             self.elapsed += delta
         term_width, _ = get_terminal_size()
         click.echo("\r" + " " * (term_width - 1) + "\r", nl=False)
-

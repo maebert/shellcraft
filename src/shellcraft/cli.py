@@ -37,7 +37,7 @@ def main(game_path=None):
     game = get_game(game_path)
 
     # Cheat mode, properly hardcoded.
-    if sys.argv[1] == "debug":
+    if sys.argv[-1] == "debug":
         game.flags.debug = not game.flags.debug
         game.save()
         echo("Debug mode is " + ("$on$" if game.flags.debug else "`off`"))

@@ -70,5 +70,5 @@ def test_game_run(game):
         runner.invoke(cli, command.split())
         game.tutorial.cont()
     assert 'small_cart' in game.flags.research_completed
-    assert game.flags.tutorial_step == 10
+    assert game.flags.tutorial_step == 11
     assert game.resources.clay == 4

@@ -46,19 +46,20 @@ def main(game_path=None):
     cli()
 
 
-@click.group(invoke_without_command=True)
+@click.group(invoke_without_command=True, options_metavar='', subcommand_metavar='<command>')
 @click.pass_context
 def cli(ctx):
     """ShellCraft is a command line based crafting game."""
     ctx.obj = game = get_game()
 
     if ctx.invoked_subcommand is None:
-        has_tut = game.tutorial.cont()
-        if not has_tut:
-            click.echo("Use shellcraft --help to see a list of available commands.")
+        if game.flags.tutorial_step == 0:
+            game.tutorial.cont()
+        else:
+            secho(ctx.get_help())
 
 
-@cli.command()
+@cli.command(options_metavar='')
 @click.argument("resource", metavar='<resource>')
 @click.pass_obj
 def mine(game, resource):
@@ -73,7 +74,7 @@ def mine(game, resource):
     action.do(skip=game.flags.debug)
 
 
-@cli.command()
+@cli.command(options_metavar='')
 @click.argument("item", metavar='<item>')
 @click.pass_obj
 def craft(game, item):
@@ -100,7 +101,7 @@ def craft(game, item):
     action.do(skip=game.flags.debug)
 
 
-@cli.command()
+@cli.command(options_metavar='')
 @click.argument("resource_types", nargs=-1, type=str, metavar="<resource>")
 @click.pass_obj
 def resources(game, resource_types=None):
@@ -113,7 +114,7 @@ def resources(game, resource_types=None):
             secho("*{}* is not available yet.", resource)
 
 
-@cli.command()
+@cli.command(options_metavar='')
 @click.pass_obj
 def inventory(game):
     """Show owned items and their condition."""
@@ -125,7 +126,7 @@ def inventory(game):
             # secho("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
 
-@cli.command()
+@cli.command(options_metavar='')
 @click.argument("projects", nargs=-1, type=str, metavar="<project>")
 @click.pass_obj
 def research(game, projects):
@@ -162,7 +163,7 @@ def research(game, projects):
         action.do(skip=game.flags.debug)
 
 
-@cli.command()
+@cli.command(options_metavar='')
 @click.option("--force", is_flag=True, help="Don't question my orders, just execute them!")
 @click.pass_obj
 def reset(game, force):

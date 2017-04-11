@@ -71,4 +71,4 @@ def test_game_run(game):
         game.tutorial.cont()
     assert 'small_cart' in game.flags.research_completed
     assert game.flags.tutorial_step == 11
-    assert game.resources.clay == 4
+    assert game.resources.clay == 6

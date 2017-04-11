@@ -120,9 +120,9 @@ class AbstractCollection(object):
                 self.game.flags.commands_enabled.append(command)
 
         # Enable resouces
-        for resources in item.effects.get('enable_resourcess', []):
-            if resources not in self.game.flags.resourcess_enabled:
-                self.game.alert("You discovered ${}$.", resources)
+        for resources in item.effects.get('enable_resources', []):
+            if resources not in self.game.flags.resources_enabled:
+                self.game.alert("You can now mine ${}$.", resources)
                 self.game.flags.resources_enabled.append(resources)
 
         # Enable items
@@ -134,7 +134,7 @@ class AbstractCollection(object):
         # Enable research
         for item_name in item.effects.get('enable_research', []):
             if item_name not in self.game.flags.research_enabled:
-                self.game.alert("You can now research ${}$.", item_name)
+                self.game.alert("You can now research @{}@.", item_name)
                 self.game.flags.research_enabled.append(item_name)
 
         # Grant resources
@@ -156,10 +156,7 @@ class AbstractCollection(object):
                 self.game.alert("*{}* difficulty reduced by {:.0%}.", resource, change)
 
         # Trigger events
-        for event_name in item.effects.get('events', []):
-            event = self.game.events.get(event_name)
-            self.game.alert(event.description)
-            self.game.events.apply_effects(event)
+        self.game.events.trigger(*item.effects.get('events', []))
 
     def is_available(self, item_name):
         """Return true if the prerequisites for an item are met."""

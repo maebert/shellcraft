@@ -14,6 +14,7 @@ class Tool(AbstractItem):
         tool = super(Tool, cls).from_dict(name, data)
         tool.durability = data.get("durability", -1)
         tool.mining_bonus = data.get("mining_bonus", {})
+        tool.event_bonus = data.get("event_bonus", {})
         tool.crafting_bonus = data.get("crafting_bonus", {})
         tool.research_bonus = data.get("research_bonus", 0)
         tool.condition = tool.durability

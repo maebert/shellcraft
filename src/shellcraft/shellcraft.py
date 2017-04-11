@@ -9,6 +9,7 @@ from shellcraft.research import Research
 from shellcraft.tutorial import Tutorial
 from shellcraft.events import Events
 import json
+from random import random
 import os
 import datetime
 
@@ -30,7 +31,15 @@ class Resources(StateCollector):
 
     def add(self, resource, value):
         """Add resource."""
+        if (value > 0):
+            self.total[resource] += value
         self.__dict__[resource] += value
+
+    total = {
+        'clay': 0,
+        'ore': 0,
+        'energy': 0
+    }
 
 
 class Flags(StateCollector):
@@ -50,14 +59,16 @@ class Flags(StateCollector):
     mining_difficulty = {
         "clay": 1,
         "ore": 1,
-        "flint": 1
+        "energy": 1
     }
 
     mining_difficulty_increment = {
         "clay": .5,
         "ore": .5,
-        "flint": .5
+        "energy": .5
     }
+
+    total_game_duration = 0
 
 
 class Action(StateCollector):
@@ -135,18 +146,26 @@ class Game(object):
 
         total_wear = 0
         efficiency = 0
+        events = []
 
         while self.items and total_wear < difficulty:
             tool = self._best_mining_tool(resource)
             if tool.condition <= (difficulty - total_wear):
+                contribution = tool.condition / difficulty
                 total_wear += tool.condition
                 efficiency += tool.condition * tool.mining_bonus.get(resource) / difficulty
                 self.alert("Destroyed ${}$ while mining *{}*.".format(tool.name, resource))
                 self.items.remove(tool)
             else:
+                contribution = (difficulty - total_wear) / difficulty
                 tool.condition -= (difficulty - total_wear)
-                efficiency += (difficulty - total_wear) * tool.mining_bonus.get(resource) / difficulty
                 total_wear = difficulty
+
+            efficiency += contribution * tool.mining_bonus.get(resource)
+
+            for event, prob in tool.event_bonus.items():
+                if random() * contribution < prob:
+                    events.append(event)
 
         # Hand mining has efficiency of 1
         efficiency += (difficulty - total_wear) / difficulty
@@ -156,6 +175,7 @@ class Game(object):
         self.resources.add(resource, efficiency)
         self._unlock_items()
         self.alert("Mined *{} {}*.".format(efficiency, resource))
+        self.events.trigger(*events)
         return difficulty, efficiency
 
     def _unlock_items(self):
@@ -166,12 +186,13 @@ class Game(object):
 
         for item in self.lab.available_items:
             if item.name not in self.flags.research_enabled:
-                self.alert("You can now research ${}$.", item.name)
+                self.alert("You can now research @{}@.", item.name)
                 self.flags.research_enabled.append(item.name)
 
     def _act(self, task, target, duration):
         if self.is_busy:
             return None  # @Todo Raise Exception
+        self.flags.total_game_duration += duration
         if self.flags.debug:
             duration = 0
         self.action.task = task

@@ -62,8 +62,10 @@ def test_game_run():
     mine clay
     """
     for command in commands.splitlines():
+        # This is an ugly, ugly thing.
+        cli.main.commands = cli.main._commands
+        cli._command_shim(cli.main, cli.game)
         result = runner.invoke(cli.main, command.split())
-        print(cli.main.commands.items())
         print(result.output)
     assert 'small_cart' in cli.game.flags.research_completed
     assert cli.game.resources.clay == 4

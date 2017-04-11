@@ -153,15 +153,16 @@ def tutorial():
     game.tutorial.print_last_step()
 
 
-# This removes all commands from the main group that are not enabled
-# in the game yet.
-print("COMMANDS FIRST", main.commands.values())
-print("COMMANDS ENABLED", game.flags.commands_enabled)
-main.commands = {cmd: command for cmd, command in main.commands.items() if cmd in game.flags.commands_enabled}
+def _command_shim(group, game):
+    """Remove all commands from the main group that are not enabled in the game yet."""
+    group._commands = {cmd: command for cmd, command in group.commands.items()}
+    group.commands = {cmd: command for cmd, command in group.commands.items() if cmd in game.flags.commands_enabled}
 
-for cmd in ('mine', 'craft', 'research'):
-    if cmd in main.commands:
-        main.commands[cmd].callback = action_step(main.commands[cmd].callback)
+    for cmd in ('mine', 'craft', 'research'):
+        if cmd in group.commands:
+            group.commands[cmd].callback = action_step(group.commands[cmd].callback)
+
+_command_shim(main, game)
 
 if __name__ == "__main__":
     main()

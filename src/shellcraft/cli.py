@@ -66,6 +66,14 @@ def cli(ctx):
 
 
 @cli.command(options_metavar='')
+@click.pass_obj
+def contract(game):
+    from shellcraft.events import Contract
+    c = Contract(game)
+    c.offer()
+
+
+@cli.command(options_metavar='')
 @click.argument("resource", metavar='<resource>')
 @click.pass_obj
 def mine(game, resource):

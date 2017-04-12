@@ -1,0 +1,74 @@
+{
+    "resources": {
+        "ore": 120,
+        "clay": 30,
+        "energy": 0,
+        "total": {
+            "clay": 30,
+            "ore": 12,
+            "energy": 0
+        }
+    },
+    "action": {
+        "task": "mine",
+        "target": "ore",
+        "completion": "2017-04-11T16:01:42.431879"
+    },
+    "flags": {
+        "tutorial_step": 11,
+        "debug": true,
+        "resources_enabled": [
+            "clay",
+            "ore"
+        ],
+        "commands_enabled": [
+            "mine",
+            "reset",
+            "tutorial",
+            "craft",
+            "inventory",
+            "resources",
+            "research"
+        ],
+        "research_enabled": [
+            "small_cart",
+            "ore",
+            "dynamite"
+        ],
+        "items_enabled": [
+            "shovel",
+            "sturdy_shovel",
+            "small_cart",
+            "axe"
+        ],
+        "research_completed": [
+            "small_cart",
+            "ore"
+        ],
+        "mining_difficulty": {
+            "clay": 7.147158573524941,
+            "ore": 13.5,
+            "energy": 1
+        },
+        "mining_difficulty_increment": {
+            "clay": 0.5,
+            "ore": 0.5,
+            "energy": 0.5
+        },
+        "total_game_duration": 921.1718207008523
+    },
+    "items": [
+        {
+            "name": "sturdy_shovel",
+            "condition": 42.5
+        },
+        {
+            "name": "small_cart",
+            "condition": 206.82817929914768
+        },
+        {
+            "name": "axe",
+            "condition": 457.5
+        }
+    ]
+}

@@ -35,6 +35,10 @@ class Resources(StateCollector):
             self.total[resource] += int(value)
         self.__dict__[resource] += int(value)
 
+    def get(self, resource):
+        """Get value of resource."""
+        return self.__dict__[resource]
+
     total = {
         'clay': 0,
         'ore': 0,
@@ -69,6 +73,8 @@ class Flags(StateCollector):
     }
 
     total_game_duration = 0
+
+    trade_reputation = .9
 
 
 class Action(StateCollector):

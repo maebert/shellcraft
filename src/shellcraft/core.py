@@ -7,6 +7,17 @@ from random import random
 
 RESOURCES = ['clay', 'energy', 'ore']
 
+RESOURCE_WORTH = {
+    'clay': 1,
+    'ore': 2,
+    'energy': 4
+}
+
+
+def convert_resource_value(frm, to):
+    """Return the market value of a resource to trade."""
+    return 1.0 * RESOURCE_WORTH[frm] / RESOURCE_WORTH[to]
+
 
 def to_list(string_or_list):
     """Encapsulate strings or numbers in a list."""

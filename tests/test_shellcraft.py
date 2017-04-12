@@ -9,9 +9,12 @@ Tests for `shellcraft` module.
 
 from __future__ import unicode_literals
 
+import os
 import pytest
 from click.testing import CliRunner
 from shellcraft.cli import get_game, cli
+from shellcraft.shellcraft import Game
+from shellcraft.events import Contract
 
 
 @pytest.fixture(scope='module')
@@ -22,6 +25,12 @@ def game():
         game = get_game("test.json")
     return game
 
+
+def load_game(filename):
+    """Load game from fixtures."""
+    filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", filename)
+    print(filename)
+    return Game.load(filename)
 
 
 def test_basic_cli(game):
@@ -34,6 +43,12 @@ def test_basic_cli(game):
     help_result = runner.invoke(cli, ['--help'])
     assert help_result.exit_code == 0
     assert '--help  Show this message and exit.' in help_result.output
+
+
+def test_contract(game):
+    game = load_game("save1.json")
+    assert game.resources.clay == 30
+    Contract(game)
 
 
 def test_game_run(game):

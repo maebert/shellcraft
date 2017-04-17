@@ -5,7 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import click
 from shellcraft.shellcraft import Game
-from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost
+from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost, animate_automaton
 import os
 import sys
 
@@ -36,14 +36,31 @@ def action_step(callback, game):
     return inner
 
 
+def handle_debug(game):
+    if sys.argv[2] == "off":  # Disable hyperlapse
+        game.flags.debug = False
+        echo("Debug mode is `off`")
+    elif sys.argv[2] == "on":  # Enable hyperlapse
+        game.flags.debug = True
+        echo("Debug mode is `on`")
+    elif sys.argv[2] == "trigger":  # Trigger an event
+        game.events.trigger(sys.argv[3])
+    elif sys.argv[2] == "automata":  # Trigger an event
+        from shellcraft.automata import Automaton
+        name = "".join(sys.stdin.readlines())
+        a = Automaton(name)
+        animate_automaton(a)
+
+    echo_alerts(game)
+    game.save()
+
+
 def main(game_path=None):
     game = get_game(game_path)
 
     # Cheat mode, properly hardcoded.
-    if sys.argv[-1] == "debug":
-        game.state.debug = not game.state.debug
-        game.save()
-        echo("Debug mode is " + ("$on$" if game.state.debug else "`off`"))
+    if len(sys.argv) > 2 and sys.argv[1] == "debug":
+        handle_debug(game)
         sys.exit(0)
 
     # Remove all commands from the main group that are not enabled in the game yet.

@@ -25,6 +25,23 @@ VERBS = {
 }
 
 
+def echo_automaton_state(automaton):
+    s = ""
+    for line in automaton._cells:
+        for cell in line:
+            s += click.style(cell.symbol.strip() or "·", ['white', 'yellow', 'red'][cell.state])
+        s += "\n"
+    click.echo(s)
+
+
+def animate_automaton(automaton):
+    while True:
+        echo_automaton_state(automaton)
+        automaton.step()
+        time.sleep(1)
+        click.echo("\x1b[8A")
+
+
 def echo_alerts(game):
     """Display all alerts that are currently queued up."""
     for m in game._messages:

@@ -21,6 +21,7 @@ Contents:
 
    installation
    fractions
+   nomenclature
 
 
 .. _"Seventy-Two Letters": https://archive.org/details/TedChiangSeventyTwoLetters

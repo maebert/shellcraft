@@ -23,7 +23,8 @@ class Library(type):
 class Epithet(with_metaclass(Library)):
     __metaclass__ = Library
     symbol = " "
-    transduces = True
+    traversing = True
+    period = 5
 
     def __init__(self, automaton, x, y):
         self.automaton = automaton
@@ -79,7 +80,7 @@ class Epithet(with_metaclass(Library)):
 
     def transduce(self):
         """Apply activity to neighbouring cells."""
-        if not self.transduces:
+        if not self.traversing:
             return
         if self.above.state == 1:
             self.below._next_state = 2
@@ -101,8 +102,9 @@ class Epithet(with_metaclass(Library)):
 
 
 class Move(Epithet):
+    """Epithet that when activated will move the automaton."""
     symbol = "M"
-    transduces = False
+    traversing = False
 
     def apply(self):
         if self.state == 2:
@@ -114,11 +116,10 @@ class Life(Epithet):
     symbol = "L"
 
     def apply(self):
-        self._next_value = self.value + 1
-        if self.value == 4:
+        self._next_value = (self.value + 1) % self.period
+        if self.value == 0:
             # Only weakly activate if not already activated
             self._next_state = max(self._next_state, 1)
-            self._next_value = 0
 
 
 class Amplify(Epithet):
@@ -132,8 +133,8 @@ class Amplify(Epithet):
                     c._next_state = max(c._next_state, 1)
 
 
-class Split(Epithet):
-    symbol = "T"
+class Concurrence(Epithet):
+    symbol = "C"
 
     def transduce(self):
         """Apply activity to neighbouring cells."""

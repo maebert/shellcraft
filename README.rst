@@ -2,7 +2,7 @@
 ShellCraft
 ===============================
 
-ShellCraft is a game about mining, crafting, and puzzling, loosely based on Ted Chiang's short story `"72 letters"`_.
+ShellCraft is a game about mining, crafting, and puzzling, loosely based on Ted Chiang's short story `"Seventy-Two Letters"`_.
 
 
 .. image:: https://github.com/maebert/shellcraft/blob/master/docs/_static/logo.png?raw=true
@@ -34,5 +34,5 @@ Full documentation can be found over at `Read The Docs`_.
      :alt: Updates
 
 
-.. _"72 letters": https://archive.org/details/TedChiangSeventyTwoLetters
+.. _"Seventy-Two Letters": https://archive.org/details/TedChiangSeventyTwoLetters
 .. _Read The Docs: https://shellcraft.readthedocs.io.

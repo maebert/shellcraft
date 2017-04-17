@@ -14,38 +14,21 @@ To install ShellCraft, run this command in your terminal:
 
     $ pip install shellcraft
 
-This is the preferred method to install ShellCraft, as it will always install the most recent stable release. 
+This is the preferred method to install ShellCraft, as it will always install the most recent stable release. This requires Python 2.7, or Python 3.3 or newer.
 
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
+If you don't have `pip`_ installed, this `Python installation guide`_ can guide you through the process.
 
 .. _pip: https://pip.pypa.io
 .. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
 
 
-From sources
-------------
+Running ShellCraft
+------------------
 
-The sources for ShellCraft can be downloaded from the `Github repo`_.
-
-You can either clone the public repository:
+To play ShellCraft, simply invoke it like this:
 
 .. code-block:: console
 
-    $ git clone git://github.com/maebert/shellcraft
+    $ shellcraft
 
-Or download the `tarball`_:
-
-.. code-block:: console
-
-    $ curl  -OL https://github.com/maebert/shellcraft/tarball/master
-
-Once you have a copy of the source, you can install it with:
-
-.. code-block:: console
-
-    $ python setup.py install
-
-
-.. _Github repo: https://github.com/maebert/shellcraft
-.. _tarball: https://github.com/maebert/shellcraft/tarball/master
+There's no need to consult the rest of the documentation right now, as the game will guide you through a tutorial and progressively explain all key gameplay elements.

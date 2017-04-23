@@ -27,11 +27,39 @@ VERBS = {
 }
 
 
+def echo_world(world, x, y, w, h):
+    def _shade(value):
+        value = max(min(value, 1), .2)
+        return "░▒▓█"[int((value - .21) * 5)]
+
+    def _field(**resources):
+        c = None
+        s = '░'
+        clay = resources.get('clay', 0)
+        ore = resources.get('ore', 0)
+        if ore:
+            c = RESOURCE_COLORS['ore']
+            s = _shade(ore)
+        elif clay:
+            c = RESOURCE_COLORS['clay']
+            s = _shade(clay)
+        return click.style(s, fg=c)
+
+    echo("┌" + "─" * w + "┐")
+    for dy in range(h):
+        row = ''
+        for dx in range(w):
+            p = (x - dx // 2) % world.width, (y - dy // 2) % world.height
+            row += _field(**world.get_resources(*p))
+        click.echo("│" + row + "│")
+    echo("└" + "─" * w + "┘")
+
+
 def echo_automaton_state(automaton):
     s = ""
     for line in automaton._cells:
         for cell in line:
-            s += click.style(cell.symbol.strip() or "·", ['white', 'yellow', 'red'][cell.state])
+            s += click.style(cell.symbol.strip() or "·", bg=[None, 'yellow', 'red'][cell.state])
         s += "\n"
     click.echo(s)
 

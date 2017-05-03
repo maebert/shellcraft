@@ -155,3 +155,45 @@ class Concurrence(Epithet):
             self.below._next_state = 2
         # ...and turn weak
         self._next_state = 1
+
+
+class Restraint(Epithet):
+    """Epithet that will only traverse it's charge every second time."""
+
+    symbol = "R"
+    traversing = False
+
+    def apply(self):
+        self._next_value = self.value
+        if self.state == 2:
+            self._next_value = (self.value + 1)
+            self._next_state = 0
+            if self.value == 1:
+                self._next_value = 0
+                self.traverse(force=True)
+
+
+class Silence(Epithet):
+    """Epithet that will can never be charged."""
+
+    symbol = "S"
+    traversing = False
+
+
+class Synchronicity(Epithet):
+    """Similar to concurrence, but will only traverse if charged from both sides."""
+    symbol = "Y"
+
+    def traverse(self):
+        """Apply activity to neighbouring cells."""
+        if self.above.state == 1 and self.below.state == 1:
+            self.left._next_state = 2
+            self.right._next_state = 2
+            self._next_state = 1
+        if self.right.state == 1 and self.left.state == 1:
+            self.above._next_state = 2
+            self.below._next_state = 2
+            self._next_state = 1
+        else:
+            self._next_state = 0
+        # ...and turn weak

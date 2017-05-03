@@ -71,3 +71,8 @@ Silence
 ~~~~~~~
 
 The *Silence* epithet, designated by a *S*, is non-traversing and can never be charged. Any strong charge traversing into a Silence epithet will immediately disperse.
+
+Restraint
+~~~~~~~~~
+
+The *Restraint* epithet, designated by a *R*, will only traverse every second time it gets strongly charged. Every other time, it will disperse che charge.

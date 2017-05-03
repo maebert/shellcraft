@@ -24,7 +24,8 @@ class Epithet(with_metaclass(Library)):
     __metaclass__ = Library
     symbol = " "
     traversing = True
-    period = 5
+    period = 4
+    generative = False
 
     def __init__(self, automaton, x, y):
         self.automaton = automaton
@@ -78,9 +79,9 @@ class Epithet(with_metaclass(Library)):
     def apply(self):
         pass
 
-    def transduce(self):
+    def traverse(self, force=False):
         """Apply activity to neighbouring cells."""
-        if not self.traversing:
+        if not self.traversing and not force:
             return
         if self.above.state == 1:
             self.below._next_state = 2
@@ -103,6 +104,7 @@ class Epithet(with_metaclass(Library)):
 
 class Move(Epithet):
     """Epithet that when activated will move the automaton."""
+
     symbol = "M"
     traversing = False
 
@@ -113,7 +115,10 @@ class Move(Epithet):
 
 
 class Life(Epithet):
+    """Epithet that generates a weak charge every 5 cycles."""
+
     symbol = "L"
+    generative = True
 
     def apply(self):
         self._next_value = (self.value + 1) % self.period
@@ -123,20 +128,24 @@ class Life(Epithet):
 
 
 class Amplify(Epithet):
+    """Epithet that will amplify a weak charge and allow it to travese."""
+
     symbol = "A"
 
     def apply(self):
         if self.state != 2:
             for c in self.neighbours:
-                if c.is_special and c.state == 1:
+                if c.generative and c.state == 1:
                     self._next_state = 2
                     c._next_state = max(c._next_state, 1)
 
 
 class Concurrence(Epithet):
+    """Epithet that will split a charge into two horizontal charges."""
+
     symbol = "C"
 
-    def transduce(self):
+    def traverse(self):
         """Apply activity to neighbouring cells."""
         if self.above.state == 1 or self.below.state == 1:
             self.left._next_state = 2

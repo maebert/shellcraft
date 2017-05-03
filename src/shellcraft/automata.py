@@ -121,7 +121,7 @@ class Automaton(object):
 
         # Active epithets transport their energy
         for epithet in self.active_epithets:
-            epithet.transduce()
+            epithet.traverse()
 
         for epithet in self.special_epithets:
             epithet.apply()

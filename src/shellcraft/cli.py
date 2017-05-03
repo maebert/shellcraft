@@ -5,7 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import click
 from shellcraft.shellcraft import Game
-from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost, animate_automaton, echo_world
+from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost, animate_automaton
 import os
 import sys
 
@@ -46,14 +46,11 @@ def handle_debug(game):
     elif sys.argv[2] == "trigger":  # Trigger an event
         game.events.trigger(sys.argv[3])
     elif sys.argv[2] == "automata":  # Trigger an event
-        from shellcraft.automata import Automaton
+        from shellcraft.automata import Automaton, World
         name = "".join(sys.stdin.readlines())
-        a = Automaton(name)
-        animate_automaton(a)
-    elif sys.argv[2] == "world":  # Trigger an event
-        from shellcraft.automata import World
         w = World(game, 20, 20)
-        echo_world(w, 0, 0, 80, 40)
+        a = Automaton(name)
+        animate_automaton(a, w)
 
     echo_alerts(game)
     game.save()

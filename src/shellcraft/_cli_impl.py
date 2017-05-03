@@ -11,6 +11,7 @@ import time
 import re
 import sys
 import textwrap
+from future.moves.itertools import zip_longest
 
 RESOURCE_COLORS = {
     "clay": Color.yellow,
@@ -27,7 +28,49 @@ VERBS = {
 }
 
 
-def echo_world(world, x, y, w, h):
+def alen(s):
+    """Length of a string without ANSI characters."""
+    return len(s) - len("".join(re.findall(r"((?:\x1b|\033)\[\d+m)", s)))
+
+
+def grid_echo(*cols, padding=1):
+    """Align columns into a grid and echo.
+
+    Args:
+        cols: str - columns to print
+        padding: int - space between columns.
+    Returns:
+        int - max height
+    """
+    cols = [box(col, join=False) for col in cols]
+    col_lengths = [max(map(alen, col)) for col in cols]
+    line_fmt = "{:{}}" * len(cols)
+    for parts in zip_longest(*cols, fillvalue=""):
+        values = [j for i in zip(parts, col_lengths) for j in i]
+        line = line_fmt.format(*values)
+        click.echo(line)
+    click.echo()
+    return max(map(len, cols))
+
+
+def box(s, join=True):
+    """Draw a box around a string.
+
+    Args:
+        s: str
+        join: bool - if true, return a string. Else, return list of lines.
+    """
+    lines = s.splitlines()
+    w = max(map(alen, lines))
+    result = ["┌" + "─" * w + "┐"]
+    result += ["│{:{}}│".format(line, w) for line in lines]
+    result += ["└" + "─" * w + "┘"]
+    if join:
+        return "\n".join(result)
+    return result
+
+
+def draw_world(world, x, y, w, h):
     def _shade(value):
         value = max(min(value, 1), .2)
         return "░▒▓█"[int((value - .21) * 5)]
@@ -45,31 +88,35 @@ def echo_world(world, x, y, w, h):
             s = _shade(clay)
         return click.style(s, fg=c)
 
-    echo("┌" + "─" * w + "┐")
-    for dy in range(h):
+    result = []
+    for py in range(y - h // 2, y + h // 2 + 1):
         row = ''
-        for dx in range(w):
-            p = (x - dx // 2) % world.width, (y - dy // 2) % world.height
-            row += _field(**world.get_resources(*p))
-        click.echo("│" + row + "│")
-    echo("└" + "─" * w + "┘")
+        for px in range(x - w // 2, x + w // 2 + 1):
+            if px == x and py == y:
+                row += click.style("▲", fg='magenta')
+            else:
+                row += _field(**world.get_resources(px, py))
+        result.append(row)
+    return "\n".join(result)
 
 
-def echo_automaton_state(automaton):
+def draw_automaton_state(automaton):
     s = ""
     for line in automaton._cells:
         for cell in line:
             s += click.style(cell.symbol.strip() or "·", bg=[None, 'yellow', 'red'][cell.state])
         s += "\n"
-    click.echo(s)
+    return s
 
 
-def animate_automaton(automaton):
+def animate_automaton(automaton, world):
     while True:
-        echo_automaton_state(automaton)
         automaton.step()
+        a = "{}, {}\n".format(automaton.y, automaton.x) + draw_automaton_state(automaton)
+        w = draw_world(world, automaton.x, automaton.y, 15, 9)
+        height = grid_echo(a, w)
         time.sleep(1)
-        click.echo("\x1b[8A")
+        click.echo("\x1b[{}A".format(height + 2))
 
 
 def echo_alerts(game):

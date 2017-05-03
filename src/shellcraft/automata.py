@@ -58,18 +58,18 @@ class World(object):
         return self.cache[(x, y, resource)]
 
     def get_resources(self, x, y):
+        x, y = x % self.width, y % self.height
         return {
             'clay': self._get_resource('clay', x, y),
             'ore': self._get_resource('ore', x, y),
         }
 
 
-
 class Automaton(object):
     def __init__(self, name):
         self.name = name.splitlines()[:6]
         self._cells = []
-        self._padder = Library.get('*', self, -1, -1)
+        self._padder = Library.get('S', self, -1, -1)
         for y in range(6):
             row = [Library.get(self.name[y][x], self, x, y) for x in range(12)]
             self._cells.append(row)

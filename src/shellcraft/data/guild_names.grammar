@@ -1,0 +1,7 @@
+@s -> @_s~title
+@leader_role -> Chairman | President | Secretary General | Leader
+@_s -> @people~gen @party | @adj @party of @people | @adj @cause @party | @adj @people~gen @party | @cause @party
+@adj -> common | parlamentarian | federal | first | free | liberal | modern | national | northern | progressive | revolutionary | social | southern | united
+@cause -> humanitarian | preservation | conservation | emancipation | independence | royal interests | solidarity | regulation | resistance | unionist
+@people -> lexicographers | nomenclators | loyalists | iron workers | sculptors | colonists
+@party -> party | league | movement | union | guild | front | alliance | coalition | legion | order | society

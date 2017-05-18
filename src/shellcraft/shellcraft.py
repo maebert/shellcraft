@@ -32,8 +32,8 @@ class Resources(StateCollector):
     def add(self, resource, value):
         """Add resource."""
         if (value > 0):
-            self.total[resource] += value
-        self.__dict__[resource] += value
+            self.total[resource] += int(value)
+        self.__dict__[resource] += int(value)
 
     total = {
         'clay': 0,
@@ -169,6 +169,9 @@ class Game(object):
 
         # Hand mining has efficiency of 1
         efficiency += (difficulty - total_wear) / difficulty
+
+        # Can only ever get integer results
+        efficiency = int(efficiency)
 
         self.flags.mining_difficulty[resource] = self.flags.mining_difficulty[resource] + self.flags.mining_difficulty_increment[resource]
         self._act("mine", resource, difficulty)

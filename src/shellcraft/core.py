@@ -3,6 +3,7 @@
 
 import os
 import yaml
+from random import random
 
 RESOURCES = ['clay', 'energy', 'ore']
 
@@ -14,6 +15,21 @@ def to_list(string_or_list):
     if not isinstance(string_or_list, (list, tuple)):
         return [string_or_list]
     return string_or_list
+
+
+def to_float(s):
+    """Converts anything to float.
+
+    Examples:
+        >>> to_float('.4')
+        .4
+        >>> to_float('random(1, 9)')
+        6
+    """
+    if s.startswith("random"):
+        low, high = map(float, s[6:].strip("()").split(","))
+        return low + random() * (high - low)
+    return float(s)
 
 
 class StateCollector(object):
@@ -140,7 +156,7 @@ class AbstractCollection(object):
         # Grant resources
         for resource in RESOURCES:
             if resource in item.effects:
-                value = item.effects[resource]
+                value = to_float(item.effects[resource])
                 self.game.resources.add(resource, value)
                 if value > 0:
                     self.game.alert("You found *{} {}*.", value, resource)
@@ -151,6 +167,7 @@ class AbstractCollection(object):
         for resource in RESOURCES:
             change = item.effects.get("{}_mining_difficulty".format(resource), None)
             if change:
+                change = to_float(change)
                 old = self.game.flags.mining_difficulty[resource]
                 self.game.flags.mining_difficulty[resource] = old * (1 - change)
                 self.game.alert("*{}* difficulty reduced by {:.0%}.", resource, change)

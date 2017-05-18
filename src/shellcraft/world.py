@@ -49,7 +49,7 @@ class NPC(object):
             title = ['', 'Lady', 'Baroness', 'Countess'][nobility]
         else:
             first = NAMES.generate("male")
-            middle = NAMES.generate("female")
+            middle = NAMES.generate("male")
             title = ['', 'Lord', 'Baron', 'Earl'][nobility]
         display = NAMES.generate("display_nickname") if nickname else NAMES.generate("display")
         return cls(first, middle, last, title, nickname, display)

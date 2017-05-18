@@ -8,30 +8,7 @@ from __future__ import absolute_import
 
 import random
 
-from shellcraft.grammar import GUILDS, NAMES
-
-
-class Fraction(object):
-    """Each fraction battles for influence."""
-
-    def __init__(self, name):
-        """Create a new fraction from scratch."""
-        self.name = name
-
-    @classmethod
-    def generate(cls):
-        """Generate a random fraction."""
-        fraction = cls(GUILDS.generate())
-        fraction.power = random.random()
-        fraction.leader = NPC.generate(nobility_factor=2)
-        fraction.leader_title = GUILDS.generate("leader_role")
-
-        fraction.aristocracy = (2 * random.random() - 1) ** 3
-        fraction.theocracy = (2 * random.random() - 1) ** 3
-        fraction.mercantilism = (2 * random.random() - 1) ** 3
-        fraction.industrialism = (2 * random.random() - 1) ** 3
-
-        return fraction
+from shellcraft.grammar import NAMES
 
 
 class NPC(object):
@@ -76,3 +53,9 @@ class NPC(object):
             title = ['', 'Lord', 'Baron', 'Earl'][nobility]
         display = NAMES.generate("display_nickname") if nickname else NAMES.generate("display")
         return cls(first, middle, last, title, nickname, display)
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "<{}>".format(self.name)

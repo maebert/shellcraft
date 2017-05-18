@@ -4,28 +4,19 @@ Fractions
 
 The political landscape in ShellCraft is divided into many fractions, each with their own objectives.
 
-Political Beliefs
------------------
+The Crown
+---------
 
-Aristocracy
-~~~~~~~~~~~
+The government has pledged to protect its subject from foreign interference, and preserve the structure of society. While it usually keeps out of business matters, the Crown may approach nomenclators with requests to support political efforts.
 
-While only the most extremly anti-aristocratic fractions would challenge the legitimacy of the crown itself, there is a divide between fractions as to how much influence the nobility should have over political affairs.
+Sculptor's Union
+----------------
 
-Theocracy
-~~~~~~~~~
+Sculptors and nomenclators work hand in hand in producing the latest and best automata. The sculptor's union is a political heavyweight far beyond the direct interest of just sculptors.
 
-...
+The Kabbalists
+--------------
 
+Rarely interested in worldy affairs, Kabbalists study Names and employ *golems* as a form of ecstatic meditation. To most modern nomenclators, Kabbalists are obscure relics of bygone days, but they still hold considerable influence in aristocratic circles.
 
-Mercantilism
-~~~~~~~~~~~~
-
-Libertarian fractions support free trade, oppose government rules, and will generally oppose war with other nations. On the other side of the spectrum, fractions may desire strong regulation of the markets,
-
-
-Industrialism
-~~~~~~~~~~~~~
-
-Fractions that support industrialism spend money on the research of secular euonyms and the design of new automata. Fractions opposing industrialism believe that an increase in automata will harm society, destroy jobs, and threaten the social order.
 

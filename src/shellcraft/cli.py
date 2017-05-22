@@ -10,6 +10,8 @@ from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost
 import os
 import sys
 
+click.disable_unicode_literals_warning = True
+
 APP_NAME = 'ShellCraft'
 GAME = None
 
@@ -85,7 +87,6 @@ def mine(game, resource):
 @click.pass_obj
 def craft(game, items):
     """Mine a resource."""
-
     if len(items) > 1:
         echo("Can only craft one project at a time", err=True)
 

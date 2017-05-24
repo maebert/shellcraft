@@ -7,6 +7,7 @@ from shellcraft.items import Tools
 from shellcraft.research import Research
 from shellcraft.tutorial import Tutorial
 from shellcraft.events import Events
+from shellcraft.missions import Missions
 from shellcraft.game_state_pb2 import GameState
 from google.protobuf import json_format
 from shellcraft.core import ResourceProxy, ItemProxy
@@ -29,6 +30,7 @@ class Game(object):
         self.tools = Tools(self)
         self.tutorial = Tutorial(self)
         self.events = Events(self)
+        self.mission_factory = Missions(self)
 
         self.resources = ResourceProxy(self.state.resources)
         self.total_mined = ResourceProxy(self.state.stats.total_mined)
@@ -37,7 +39,7 @@ class Game(object):
         self.mining_difficulty_increment = ResourceProxy(self.state.mining_difficulty_increment)
 
         self.items = ItemProxy(self.state.items, self.tools)
-        self.missions = []
+        self.missions = ItemProxy(self.state.missions, self.mission_factory)
 
     def alert(self, msg, *args):
         self._messages.append(msg.format(*args))
@@ -53,7 +55,9 @@ class Game(object):
         return False
 
     def add_mission(self, mission):
-        self.state.missions.append(mission)
+        mission = self.missions.add(mission)
+        if not mission.offer(self):
+            self.missions.remove(mission)
 
     def craft(self, item_name):
         item = self.tools.get(item_name)
@@ -103,6 +107,7 @@ class Game(object):
                 self.items.remove(tool)
             else:
                 contribution = (difficulty - total_wear) / difficulty
+                print("Subtracting", (difficulty - total_wear))
                 tool.condition -= (difficulty - total_wear)
                 total_wear = difficulty
 

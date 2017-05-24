@@ -19,19 +19,7 @@ class Tool(AbstractItem):
         tool.event_bonus = data.get("event_bonus", {})
         tool.crafting_bonus = data.get("crafting_bonus", {})
         tool.research_bonus = data.get("research_bonus", 0)
-        tool._condition = tool.durability
         return tool
-
-    @property
-    def condition(self):
-        return self._pb.condition if self._pb else self._condition
-
-    @condition.setter
-    def condition(self, value):
-        if self._pb:
-            self._pb.condition = value
-        else:
-            self._condition = value
 
     def __repr__(self):
         """Representation, e.g. 'clay_shovel (worn)'"""
@@ -56,6 +44,12 @@ class Tools(AbstractCollection):
     FIXTURES = "items.yaml"
     ITEM_CLASS = Tool
     PB_CLASS = Item
+
+    def make(self, source):
+        tool = super(Tools, self).make(source)
+        if not hasattr(tool, "condition"):
+            tool.condition = tool.durability
+        return tool
 
     def is_available(self, item_name):
         item = self.get(item_name)

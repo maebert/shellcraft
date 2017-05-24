@@ -2,6 +2,7 @@ include LICENSE
 include README.rst
 
 recursive-include src *.yaml
+recursive-include src *.proto
 recursive-include tests *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

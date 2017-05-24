@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 """CLI implementations."""
+from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import *  # noqa
 
 import click
 from click.termui import get_terminal_size

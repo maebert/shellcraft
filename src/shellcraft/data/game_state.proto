@@ -1,0 +1,61 @@
+/*
+  Proto schema for the Game State
+ */
+
+syntax = 'proto3';
+
+import "google/protobuf/timestamp.proto";
+
+message Action {
+  string task = 1;
+  string target = 2;
+  google.protobuf.Timestamp completion = 3;
+}
+
+message Resources {
+  float clay = 1;
+  float ore = 2;
+  float energy = 3;
+}
+
+message Item {
+  string name = 1;
+  float condition = 2;
+}
+
+message Mission {
+  int32 demand = 1;
+  int32 reward = 2;
+  string demand_type = 3;
+  string reward_type = 4;
+  int32 due = 5;
+  google.protobuf.Timestamp deadline = 6;
+}
+
+message Stats {
+  float total_game_duration = 1;
+  Resources total_mined = 2;
+}
+
+message GameState {
+  bool debug = 1;
+
+  Action action = 2;
+  repeated Item items = 3;
+  repeated Mission missions = 4;
+  Resources resources = 5;
+
+  repeated string items_enabled = 6;
+  repeated string resources_enabled = 7;
+  repeated string commands_enabled = 8;
+  repeated string research_enabled = 9;
+  repeated string research_completed = 10;
+
+  Resources mining_difficulty = 11;
+  Resources mining_difficulty_increment = 12;
+
+  float trade_reputation = 13;
+  int32 tutorial_step = 14;
+
+  Stats stats = 15;
+}

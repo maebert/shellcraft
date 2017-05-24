@@ -1,99 +1,28 @@
 # -*- coding: utf-8 -*-
 """Game Classes."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from shellcraft.core import StateCollector
 from shellcraft.items import Tools
 from shellcraft.research import Research
 from shellcraft.tutorial import Tutorial
 from shellcraft.events import Events
-import json
+from shellcraft.game_state_pb2 import GameState
+from google.protobuf import json_format
+from shellcraft.core import ResourceProxy, ItemProxy
+
 from random import random
 import os
 import datetime
 
 
-def to_date(delta_seconds):
-    return (datetime.datetime.now() + datetime.timedelta(seconds=delta_seconds)).isoformat()
-
-
-def parse_isoformat(s):
-    return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.%f")
-
-
-class Resources(StateCollector):
-    """Countable Resources."""
-
-    ore = 0
-    clay = 0
-    energy = 0
-
-    def add(self, resource, value):
-        """Add resource."""
-        if (value > 0):
-            self.total[resource] += int(value)
-        self.__dict__[resource] += int(value)
-
-    def get(self, resource):
-        """Get value of resource."""
-        return self.__dict__[resource]
-
-    total = {
-        'clay': 0,
-        'ore': 0,
-        'energy': 0
-    }
-
-
-class Flags(StateCollector):
-    """Flags that get set during the game."""
-
-    tutorial_step = 0
-
-    debug = False
-
-    resources_enabled = ['clay']
-    commands_enabled = []
-    research_enabled = []
-    items_enabled = []
-
-    research_completed = []
-
-    mining_difficulty = {
-        "clay": 1,
-        "ore": 1,
-        "energy": 1
-    }
-
-    mining_difficulty_increment = {
-        "clay": .5,
-        "ore": .5,
-        "energy": .5
-    }
-
-    total_game_duration = 0
-
-    trade_reputation = .9
-
-
-class Action(StateCollector):
-    """Information about the current action."""
-
-    task = None
-    target = None
-    completion = None
-
-
 class Game(object):
     """The Game class holds all information about, well, the game's state, and handles the logic."""
 
-    def __init__(self):
+    def __init__(self, state=None):
         """Create a new Game instante."""
-        self.resources = Resources()
-        self.flags = Flags()
-        self.items = []
-        self.action = Action()
+        self.state = state or GameState()
+
         self._messages = []
 
         self.lab = Research(self)
@@ -101,33 +30,43 @@ class Game(object):
         self.tutorial = Tutorial(self)
         self.events = Events(self)
 
+        self.resources = ResourceProxy(self.state.resources)
+        self.total_mined = ResourceProxy(self.state.stats.total_mined)
+
+        self.mining_difficulty = ResourceProxy(self.state.mining_difficulty)
+        self.mining_difficulty_increment = ResourceProxy(self.state.mining_difficulty_increment)
+
+        self.items = ItemProxy(self.state.items, self.tools)
+        self.missions = []
+
     def alert(self, msg, *args):
         self._messages.append(msg.format(*args))
 
     @property
     def is_busy(self):
         """True if the player is currently mining or crafting."""
-        if self.action.task:
-            if datetime.datetime.now() > parse_isoformat(self.action.completion):
-                self.action.task = None
-                self.action.completion = None
-                self.action.target = None
+        if self.state.action.task:
+            if datetime.datetime.now() > self.state.action.completion.ToDatetime():
+                self.state.action.Clear()
                 return False
             return True
         return False
+
+    def add_mission(self, mission):
+        self.state.missions.append(mission)
 
     def craft(self, item_name):
         item = self.tools.get(item_name)
         for resource, res_cost in item.cost.items():
             self.resources.add(resource, -res_cost)
-        self.items.append(self.tools.craft(item))
+        self.items.add(item)
         self._act("craft", item_name, item.difficulty)
         self.alert("Crafted {}", item)
         return item.difficulty
 
     def research(self, project_name):
         project = self.lab.get(project_name)
-        self.flags.research_completed.append(project.name)
+        self.state.research_completed.append(project.name)
         self._act("research", project_name, project.difficulty)
         self.alert("Researched {}.", project)
         self.lab.apply_effects(project)
@@ -148,7 +87,7 @@ class Game(object):
         if self.is_busy:
             return None  # @Todo Raise Exception
 
-        difficulty = self.flags.mining_difficulty.get(resource)
+        difficulty = self.mining_difficulty.get(resource)
 
         total_wear = 0
         efficiency = 0
@@ -179,9 +118,13 @@ class Game(object):
         # Can only ever get integer results
         efficiency = int(efficiency)
 
-        self.flags.mining_difficulty[resource] = self.flags.mining_difficulty[resource] + self.flags.mining_difficulty_increment[resource]
+        self.mining_difficulty.add(resource, self.mining_difficulty_increment.get(resource))
+
         self._act("mine", resource, difficulty)
         self.resources.add(resource, efficiency)
+
+        self.total_mined.add(resource, efficiency)
+
         self._unlock_items()
         self.alert("Mined *{} {}*.".format(efficiency, resource))
         self.events.trigger(*events)
@@ -189,40 +132,31 @@ class Game(object):
 
     def _unlock_items(self):
         for item in self.tools.available_items:
-            if item.name not in self.flags.items_enabled:
+            if item.name not in self.state.items_enabled:
                 self.alert("You can now craft {}.", item)
-                self.flags.items_enabled.append(item.name)
+                self.state.items_enabled.append(item.name)
 
         for item in self.lab.available_items:
-            if item.name not in self.flags.research_enabled:
+            if item.name not in self.state.research_enabled:
                 self.alert("You can now research @{}@.", item.name)
-                self.flags.research_enabled.append(item.name)
+                self.state.research_enabled.append(item.name)
 
     def _act(self, task, target, duration):
         if self.is_busy:
             return None  # @Todo Raise Exception
-        self.flags.total_game_duration += duration
-        if self.flags.debug:
+        self.state.stats.total_game_duration += duration
+        if self.state.debug:
             duration = 0
-        self.action.task = task
-        self.action.target = str(target)
-        self.action.completion = to_date(duration)
-
-    def to_dict(self):
-        """Serialize to dict."""
-        return {
-            "resources": self.resources.to_dict(),
-            "action": self.action.to_dict(),
-            "flags": self.flags.to_dict(),
-            "items": [item.serialize() for item in self.items]
-        }
+        self.state.action.task = task
+        self.state.action.target = str(target)
+        self.state.action.completion.FromDatetime(datetime.datetime.now() + datetime.timedelta(seconds=duration))
 
     @classmethod
     def load(cls, filename):
         """Load a game from a save file."""
         with open(filename) as f:
-            data = json.load(f)
-            game = cls.from_dict(data)
+            state = json_format.Parse(f.read(), GameState())
+            game = cls(state)
             game.save_file = filename
         return game
 
@@ -240,14 +174,4 @@ class Game(object):
     def save(self):
         """Save a game to disk."""
         with open(self.save_file, 'w') as f:
-            json.dump(self.to_dict(), f)
-
-    @classmethod
-    def from_dict(cls, d):
-        """Deserialize from dict."""
-        game = cls()
-        game.resources = Resources.from_dict(d.get('resources', {}))
-        game.action = Action.from_dict(d.get('action', {}))
-        game.flags = Flags.from_dict(d.get('flags', {}))
-        game.items = [game.tools.instantiate(item) for item in d.get('items', [])]
-        return game
+            f.write(json_format.MessageToJson(self.state))

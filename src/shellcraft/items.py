@@ -3,11 +3,13 @@
 from __future__ import absolute_import
 
 from shellcraft.core import AbstractItem, AbstractCollection
-from copy import copy
+from shellcraft.game_state_pb2 import Item
 
 
 class Tool(AbstractItem):
     """Concept denoting any tool that the player can produce."""
+
+    PB_MESSAGE = Item
 
     @classmethod
     def from_dict(cls, name, data):
@@ -17,15 +19,19 @@ class Tool(AbstractItem):
         tool.event_bonus = data.get("event_bonus", {})
         tool.crafting_bonus = data.get("crafting_bonus", {})
         tool.research_bonus = data.get("research_bonus", 0)
-        tool.condition = tool.durability
+        tool._condition = tool.durability
         return tool
 
-    def serialize(self):
-        """Serialize into dict."""
-        return {
-            "name": self.name,
-            "condition": self.condition,
-        }
+    @property
+    def condition(self):
+        return self._pb.condition if self._pb else self._condition
+
+    @condition.setter
+    def condition(self, value):
+        if self._pb:
+            self._pb.condition = value
+        else:
+            self._condition = value
 
     def __repr__(self):
         """Representation, e.g. 'clay_shovel (worn)'"""
@@ -49,16 +55,8 @@ class Tool(AbstractItem):
 class Tools(AbstractCollection):
     FIXTURES = "items.yaml"
     ITEM_CLASS = Tool
-
-    def craft(self, item):
-        return copy(item)
-
-    def instantiate(self, data):
-        item = self.get(data['name'])
-        copy = self.craft(item)
-        copy.condition = data.get('condition')
-        return copy
+    PB_CLASS = Item
 
     def is_available(self, item_name):
         item = self.get(item_name)
-        return item.name in self.game.flags.items_enabled or super(Tools, self).is_available(item)
+        return item.name in self.game.state.items_enabled or super(Tools, self).is_available(item)

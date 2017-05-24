@@ -16,20 +16,20 @@ class Tutorial(AbstractCollection):
     ITEM_CLASS = Step
 
     def get_next_step(self):
-        step = self.get(self.game.flags.tutorial_step)
+        step = self.get(self.game.state.tutorial_step)
         if not step or not self.is_available(step):
             return None
         return step
 
     def print_last_step(self):
-        step = self.get(self.game.flags.tutorial_step - 1)
+        step = self.get(self.game.state.tutorial_step - 1)
         if step:
             echo_tutorial(step.description)
 
     def cont(self):
         step = self.get_next_step()
         if step:
-            self.game.flags.tutorial_step += 1
+            self.game.state.tutorial_step += 1
             self.apply_effects(step)
             self.game.save()
             echo_tutorial(step.description)

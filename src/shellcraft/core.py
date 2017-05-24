@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """Core Classes."""
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import *  # noqa
+
 import os
 import yaml
-from random import random
+from copy import copy
+from shellcraft.utils import to_list, to_float
 
 RESOURCES = ['clay', 'energy', 'ore']
 
@@ -14,60 +18,44 @@ RESOURCE_WORTH = {
 }
 
 
-def convert_resource_value(frm, to):
-    """Return the market value of a resource to trade."""
-    return 1.0 * RESOURCE_WORTH[frm] / RESOURCE_WORTH[to]
+class ResourceProxy(object):
+    """Countable Resources."""
+
+    def __init__(self, field):
+        self._resources = field
+
+    def add(self, resource, value):
+        """Add resource."""
+        setattr(self._resources, resource, getattr(self._resources, resource) + value)
+
+    def get(self, resource):
+        """Get value of resource."""
+        return getattr(self._resources, resource)
+
+    def multiply(self, resource, factor):
+        """Multiply resource by factor."""
+        setattr(self._resources, resource, getattr(self._resources, resource) * factor)
 
 
-def to_list(string_or_list):
-    """Encapsulate strings or numbers in a list."""
-    if not string_or_list:
-        return []
-    if not isinstance(string_or_list, (list, tuple)):
-        return [string_or_list]
-    return string_or_list
+class ItemProxy(object):
+    def __init__(self, field, factory):
+        self._field = field
+        self._factory = factory
+        self._items = [factory.make(pb) for pb in field]
 
+    def __iter__(self):
+        return self._items.__iter__()
 
-def to_float(s):
-    """Converts anything to float.
+    def remove(self, item):
+        self._items.remove(item)
+        self._field.remove(item._pb)
 
-    Examples:
-        >>> to_float('.4')
-        .4
-        >>> to_float('random(1, 9)')
-        6
-    """
-    if s.startswith("random"):
-        low, high = map(float, s[6:].strip("()").split(","))
-        return low + random() * (high - low)
-    return float(s)
-
-
-class StateCollector(object):
-    """Class that acts as a serializable accessor to game state variables."""
-
-    def __init__(self):
-        """Create a new StateCollector."""
-        self.__dict__.update({k: v for k, v in self.__class__.__dict__.items() if not k.startswith("_") and isinstance(v, (str, int, float, bool, list, dict))})
-
-    def to_dict(self):
-        """Create a serializable dict representing this state."""
-        return self.__dict__
-
-    def get(self, key):
-        """Get the value for a key programatically."""
-        return self.__dict__.get(key)
-
-    def add(self, key, value):
-        """Add to the value of a key programatically."""
-        self.__dict__[key] += value
-
-    @classmethod
-    def from_dict(cls, d):
-        """Deserialise from a dict."""
-        state = cls()
-        state.__dict__.update(d)
-        return state
+    def add(self, item):
+        pb = self._field.add()
+        new_item = self._factory.make(item)
+        for field in self._factory.PB_CLASS.DESCRIPTOR.fields_by_name.keys():
+            setattr(pb, field, getattr(new_item, field))
+        self._items.append(new_item)
 
 
 class AbstractItem(object):
@@ -78,6 +66,7 @@ class AbstractItem(object):
         self.prerequisites = {}
         self.cost = {}
         self.effects = {}
+        self._pb = None
 
     @classmethod
     def from_dict(cls, name, data):
@@ -107,6 +96,7 @@ class AbstractItem(object):
 class AbstractCollection(object):
     FIXTURES = "collection.yaml"
     ITEM_CLASS = AbstractItem
+    PB_CLASS = None
 
     def __init__(self, game):
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES)) as f:
@@ -118,6 +108,16 @@ class AbstractCollection(object):
         if isinstance(item_name, AbstractItem):
             return item_name
         return self.all_items.get(item_name)
+
+    def make(self, source):
+        if isinstance(source, str):
+            return copy(self.get(source))
+        elif self.PB_CLASS and isinstance(source, self.PB_CLASS):
+            item = copy(self.get(source.name))
+            item._pb = source
+            return item
+        else:
+            return copy(source)
 
     @property
     def available_items(self):
@@ -142,27 +142,27 @@ class AbstractCollection(object):
 
         # Enable commands
         for command in item.effects.get('enable_commands', []):
-            if command not in self.game.flags.commands_enabled:
+            if command not in self.game.state.commands_enabled:
                 self.game.alert("You unlocked the `{}` command", command)
-                self.game.flags.commands_enabled.append(command)
+                self.game.state.commands_enabled.append(command)
 
         # Enable resouces
         for resources in item.effects.get('enable_resources', []):
-            if resources not in self.game.flags.resources_enabled:
+            if resources not in self.game.state.resources_enabled:
                 self.game.alert("You can now mine ${}$.", resources)
-                self.game.flags.resources_enabled.append(resources)
+                self.game.state.resources_enabled.append(resources)
 
         # Enable items
         for item_name in item.effects.get('enable_items', []):
-            if item_name not in self.game.flags.items_enabled:
+            if item_name not in self.game.state.items_enabled:
                 self.game.alert("You can now craft ${}$.", item_name)
-                self.game.flags.items_enabled.append(item_name)
+                self.game.state.items_enabled.append(item_name)
 
         # Enable research
         for item_name in item.effects.get('enable_research', []):
-            if item_name not in self.game.flags.research_enabled:
+            if item_name not in self.game.state.research_enabled:
                 self.game.alert("You can now research @{}@.", item_name)
-                self.game.flags.research_enabled.append(item_name)
+                self.game.state.research_enabled.append(item_name)
 
         # Grant resources
         for resource in RESOURCES:
@@ -179,8 +179,7 @@ class AbstractCollection(object):
             change = item.effects.get("{}_mining_difficulty".format(resource), None)
             if change:
                 change = to_float(change)
-                old = self.game.flags.mining_difficulty[resource]
-                self.game.flags.mining_difficulty[resource] = old * (1 - change)
+                self.game.mining_difficulty.multiply(resource, 1 - change)
                 self.game.alert("*{}* difficulty reduced by {:.0%}.", resource, change)
 
         # Trigger events
@@ -198,6 +197,6 @@ class AbstractCollection(object):
             if not self.game.has_item(required_item):
                 return False
         for research in item.prerequisites['research']:
-            if research not in self.game.flags.research_completed:
+            if research not in self.game.state.research_completed:
                 return False
         return True

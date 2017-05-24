@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
 """Basic CLI for ShellCraft."""
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import *  # noqa
 
 import click
 from shellcraft.shellcraft import Game
 from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost
 import os
 import sys
+
+click.disable_unicode_literals_warning = True
 
 APP_NAME = 'ShellCraft'
 GAME = None
@@ -38,13 +40,13 @@ def main(game_path=None):
 
     # Cheat mode, properly hardcoded.
     if sys.argv[-1] == "debug":
-        game.flags.debug = not game.flags.debug
+        game.state.debug = not game.state.debug
         game.save()
-        echo("Debug mode is " + ("$on$" if game.flags.debug else "`off`"))
+        echo("Debug mode is " + ("$on$" if game.state.debug else "`off`"))
         sys.exit(0)
 
     # Remove all commands from the main group that are not enabled in the game yet.
-    cli.commands = {cmd: command for cmd, command in cli.commands.items() if cmd in game.flags.commands_enabled}
+    cli.commands = {cmd: command for cmd, command in cli.commands.items() if cmd in game.state.commands_enabled}
 
     for cmd in ('mine', 'craft', 'research'):
         if cmd in cli.commands:
@@ -59,7 +61,7 @@ def cli(ctx):
     ctx.obj = game = get_game()
 
     if ctx.invoked_subcommand is None:
-        if game.flags.tutorial_step == 0:
+        if game.state.tutorial_step == 0:
             game.tutorial.cont()
         else:
             echo(ctx.get_help())
@@ -69,8 +71,9 @@ def cli(ctx):
 @click.pass_obj
 def contract(game):
     from shellcraft.events import Contract
-    c = Contract(game)
+    c = Contract.generate(game)
     c.offer()
+    game.save()
 
 
 @cli.command(options_metavar='')
@@ -78,14 +81,14 @@ def contract(game):
 @click.pass_obj
 def mine(game, resource):
     """Mine a resource."""
-    if resource not in game.flags.resources_enabled:
+    if resource not in game.state.resources_enabled:
         echo("You can't mine {} yet", resource, err=True)
 
     duration, quantity = game.mine(resource)
     game.save()
 
     action = Action("mine", resource, duration)
-    action.do(skip=game.flags.debug)
+    action.do(skip=game.state.debug)
 
 
 @cli.command(options_metavar='')
@@ -93,7 +96,6 @@ def mine(game, resource):
 @click.pass_obj
 def craft(game, items):
     """Mine a resource."""
-
     if len(items) > 1:
         echo("Can only craft one project at a time", err=True)
 
@@ -122,7 +124,7 @@ def craft(game, items):
         game.save()
 
         action = Action("craft", item, difficulty)
-        action.do(skip=game.flags.debug)
+        action.do(skip=game.state.debug)
 
 
 @cli.command(options_metavar='')
@@ -132,7 +134,7 @@ def resources(game, resource_types=None):
     """Show available resources."""
     types = resource_types or ("clay", "ore", "energy")
     for resource in types:
-        if resource in game.flags.resources_enabled:
+        if resource in game.state.resources_enabled:
             echo("*{}: {}*", resource, game.resources.get(resource))
         elif resource_types:
             echo("*{}* is not available yet.", resource)
@@ -172,7 +174,7 @@ def research(game, projects):
         if not project:
             echo("No such research project.", err=True)
 
-        if project.name in game.flags.research_completed:
+        if project.name in game.state.research_completed:
             echo("You've already researched {}.", project, err=True)
             return None
 
@@ -184,7 +186,7 @@ def research(game, projects):
         game.save()
 
         action = Action("research", project, difficulty)
-        action.do(skip=game.flags.debug)
+        action.do(skip=game.state.debug)
 
 
 @cli.command(options_metavar='')

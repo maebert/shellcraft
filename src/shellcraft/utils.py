@@ -12,6 +12,13 @@ __author__ = "Manuel Ebert"
 __email__ = "manuel@1450.me"
 
 
+RESOURCE_WORTH = {
+    'clay': 1,
+    'ore': 2,
+    'energy': 4
+}
+
+
 def to_date(delta_seconds=0):
     """Convert delta in seconds to ISO-8601 string."""
     return (datetime.datetime.now() + datetime.timedelta(seconds=delta_seconds)).isoformat()

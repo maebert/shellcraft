@@ -11,12 +11,6 @@ from shellcraft.utils import to_list, to_float
 
 RESOURCES = ['clay', 'energy', 'ore']
 
-RESOURCE_WORTH = {
-    'clay': 1,
-    'ore': 2,
-    'energy': 4
-}
-
 
 class ResourceProxy(object):
     """Countable Resources."""
@@ -54,11 +48,16 @@ class ItemProxy(object):
         pb = self._field.add()
         new_item = self._factory.make(item)
         for field in self._factory.PB_CLASS.DESCRIPTOR.fields_by_name.keys():
-            setattr(pb, field, getattr(new_item, field))
+            if hasattr(new_item, field):
+                setattr(pb, field, getattr(new_item, field))
+        new_item._pb = pb
         self._items.append(new_item)
+        return new_item
 
 
 class AbstractItem(object):
+    _pb = None
+
     def __init__(self, name):
         self.name = name
         self.difficulty = 0
@@ -66,7 +65,7 @@ class AbstractItem(object):
         self.prerequisites = {}
         self.cost = {}
         self.effects = {}
-        self._pb = None
+        self.strings = {}
 
     @classmethod
     def from_dict(cls, name, data):
@@ -80,6 +79,7 @@ class AbstractItem(object):
         item.prerequisites['items'] = to_list(item.prerequisites.get('items'))
         item.prerequisites['research'] = to_list(item.prerequisites.get('research'))
         item.cost = data.get("cost", {})
+        item.strings = data.get("strings", {})
         item.effects = data.get("effects", {})
         for effect in ('enable_commands', 'enable_items', 'enable_resources', 'events'):
             item.effects[effect] = to_list(item.effects.get(effect))
@@ -91,6 +91,17 @@ class AbstractItem(object):
 
     def __repr__(self):
         return self.name
+
+    def __setattr__(self, key, value):
+        if key != "_pb" and self._pb and key in self._pb.__class__.DESCRIPTOR.fields_by_name.keys():
+            setattr(self._pb, key, value)
+        else:
+            self.__dict__[key] = value
+
+    def __getattr__(self, key):
+        if key != "_pb" and self._pb and key in self._pb.__class__.DESCRIPTOR.fields_by_name.keys():
+            return getattr(self._pb, key)
+        raise AttributeError(key)
 
 
 class AbstractCollection(object):

@@ -70,9 +70,7 @@ def cli(ctx):
 @cli.command(options_metavar='')
 @click.pass_obj
 def contract(game):
-    from shellcraft.events import Contract
-    c = Contract.generate(game)
-    c.offer()
+    game.add_mission('trade_proposal')
     game.save()
 
 

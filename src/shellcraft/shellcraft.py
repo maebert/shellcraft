@@ -59,6 +59,11 @@ class Game(object):
         if not mission.offer(self):
             self.missions.remove(mission)
 
+    def complete_missions(self):
+        for mission in self.missions:
+            if mission.is_completed(self):
+                self.missions.remove(mission)
+
     def craft(self, item_name):
         item = self.tools.get(item_name)
         for resource, res_cost in item.cost.items():
@@ -102,16 +107,15 @@ class Game(object):
             if tool.condition <= (difficulty - total_wear):
                 contribution = tool.condition / difficulty
                 total_wear += tool.condition
-                efficiency += tool.condition * tool.mining_bonus.get(resource) / difficulty
+                efficiency += tool.condition * tool.mining_bonus.get(resource, 1) / difficulty
                 self.alert("Destroyed ${}$ while mining *{}*.".format(tool.name, resource))
                 self.items.remove(tool)
             else:
                 contribution = (difficulty - total_wear) / difficulty
-                print("Subtracting", (difficulty - total_wear))
                 tool.condition -= (difficulty - total_wear)
                 total_wear = difficulty
 
-            efficiency += contribution * tool.mining_bonus.get(resource)
+            efficiency += contribution * tool.mining_bonus.get(resource, 1)
 
             for event, prob in tool.event_bonus.items():
                 if random() * contribution < prob:

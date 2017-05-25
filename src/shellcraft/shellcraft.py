@@ -43,6 +43,7 @@ class Game(object):
         self.missions = ItemProxy(self.state.missions, self.mission_factory)
 
     def alert(self, msg, *args):
+        """Add a message to the alert stack."""
         self._messages.append(msg.format(*args))
 
     @property
@@ -56,25 +57,33 @@ class Game(object):
         return False
 
     def add_mission(self, mission):
+        """Add a new mission.
+
+        Args:
+            mission (str): Mission template to use.
+        """
         mission = self.missions.add(mission)
         if not mission.offer(self):
             self.missions.remove(mission)
 
     def complete_missions(self):
+        """Check if any missions can be completed."""
         for mission in self.missions:
             if mission.is_completed(self):
                 self.missions.remove(mission)
 
-    def craft(self, item_name):
-        item = self.workshop.get(item_name)
+    def craft(self, tool_name):
+        """Craft a new tool by expending resources and time."""
+        item = self.workshop.get(tool_name)
         for resource, res_cost in item.cost.items():
             self.resources.add(resource, -res_cost)
         self.tools.add(item)
-        self._act("craft", item_name, item.difficulty)
+        self._act("craft", tool_name, item.difficulty)
         self.alert("Crafted {}", item)
         return item.difficulty
 
     def research(self, project_name):
+        """Research a new project by expending time."""
         project = self.lab.get(project_name)
         self.state.research_completed.append(project.name)
         self._act("research", project_name, project.difficulty)
@@ -83,6 +92,7 @@ class Game(object):
         return project.difficulty
 
     def has_item(self, item_name):
+        """True if the player has an instance of the tool in posession."""
         for item in self.tools:
             if item.name == item_name:
                 return True

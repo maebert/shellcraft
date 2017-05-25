@@ -22,6 +22,10 @@ class ResourceProxy(object):
         """
         self._resources = field
 
+    @property
+    def _fields(self):
+        return self._resources.__class__.DESCRIPTOR.fields_by_name.keys()
+
     def add(self, resource, value):
         """Add resource.
 
@@ -38,6 +42,10 @@ class ResourceProxy(object):
     def multiply(self, resource, factor):
         """Multiply resource by factor."""
         setattr(self._resources, resource, getattr(self._resources, resource, 0) * factor)
+
+    def __repr__(self):
+        """String representation of resources."""
+        return str({f: self.get(f) for f in self._fields})
 
 
 class ItemProxy(object):
@@ -66,6 +74,10 @@ class ItemProxy(object):
     def __bool__(self):
         """True if the proxy contains any items."""
         return bool(self._items)
+
+    def __repr__(self):
+        """String representation of item proxy."""
+        return str(self._items)
 
     def add(self, item):
         """Add a new item.

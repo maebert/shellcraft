@@ -79,7 +79,7 @@ def test_game_run(game):
     runner = CliRunner()
     game.state.debug = True
     for command in commands.splitlines():
-        assert not command or command.split()[0] in game.state.commands_enabled
+        assert not command or command.split()[0] in game.state.commands_enabled, (command.split()[0], type(command.split()[0]))
         runner.invoke(cli, command.split())
         game.tutorial.cont()
     assert 'small_cart' in game.state.research_completed

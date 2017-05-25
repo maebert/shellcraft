@@ -31,12 +31,11 @@ def alen(s):
     return len(s) - len("".join(re.findall(r"((?:\x1b|\033)\[\d+m)", s)))
 
 
-def grid_echo(*cols, padding=1):
+def grid_echo(*cols):
     """Align columns into a grid and echo.
 
     Args:
         cols: str - columns to print
-        padding: int - space between columns.
     Returns:
         int - max height
     """

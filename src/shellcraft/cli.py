@@ -2,7 +2,6 @@
 
 """Basic CLI for ShellCraft."""
 from __future__ import absolute_import, division, print_function, unicode_literals
-from builtins import *  # noqa
 
 import click
 from shellcraft.shellcraft import Game

@@ -18,7 +18,7 @@ message Resources {
   float energy = 3;
 }
 
-message Item {
+message Tool {
   string name = 1;
   float condition = 2;
 }
@@ -42,11 +42,11 @@ message GameState {
   bool debug = 1;
 
   Action action = 2;
-  repeated Item items = 3;
+  repeated Tool tools = 3;
   repeated Mission missions = 4;
   Resources resources = 5;
 
-  repeated string items_enabled = 6;
+  repeated string tools_enabled = 6;
   repeated string resources_enabled = 7;
   repeated string commands_enabled = 8;
   repeated string research_enabled = 9;

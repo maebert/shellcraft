@@ -2,14 +2,12 @@
 """Item Classes."""
 from __future__ import absolute_import
 
-from shellcraft.core import AbstractItem, AbstractCollection
-from shellcraft.game_state_pb2 import Item
+from shellcraft.core import BaseItem, BaseFactory
+from shellcraft.game_state_pb2 import Tool as ToolPB
 
 
-class Tool(AbstractItem):
+class Tool(BaseItem):
     """Concept denoting any tool that the player can produce."""
-
-    PB_MESSAGE = Item
 
     @classmethod
     def from_dict(cls, name, data):
@@ -22,7 +20,7 @@ class Tool(AbstractItem):
         return tool
 
     def __repr__(self):
-        """Representation, e.g. 'clay_shovel (worn)'"""
+        """Representation, e.g. 'clay_shovel (worn)'."""
         if not hasattr(self, "condition") or self.durability == -1 or self.durability == self.condition:
             return "${}$".format(self.name)
 
@@ -40,17 +38,17 @@ class Tool(AbstractItem):
                 return "${}$ ({})".format(self.name, des)
 
 
-class Tools(AbstractCollection):
-    FIXTURES = "items.yaml"
+class ToolFactory(BaseFactory):
+    FIXTURES = "tools.yaml"
     ITEM_CLASS = Tool
-    PB_CLASS = Item
+    PB_CLASS = ToolPB
 
     def make(self, source):
-        tool = super(Tools, self).make(source)
+        tool = super(ToolFactory, self).make(source)
         if not hasattr(tool, "condition"):
             tool.condition = tool.durability
         return tool
 
     def is_available(self, item_name):
         item = self.get(item_name)
-        return item.name in self.game.state.items_enabled or super(Tools, self).is_available(item)
+        return item.name in self.game.state.tools_enabled or super(ToolFactory, self).is_available(item)

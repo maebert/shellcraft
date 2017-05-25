@@ -9,6 +9,7 @@
 
         `shellcraft mine clay`
     effects:
+        enable_resources: clay
         enable_commands:
           - mine
           - reset

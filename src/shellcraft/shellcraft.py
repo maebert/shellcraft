@@ -100,6 +100,8 @@ class Game(object):
 
     def _best_mining_tool(self, resource):
         """Return the (currently owned) tool that gives the highest bonus on mining a particular resource."""
+        if self.tools.is_empty:
+            return None
         return max(self.tools, key=lambda item: item.mining_bonus.get(resource, 0))
 
     def mine(self, resource):
@@ -113,7 +115,7 @@ class Game(object):
         efficiency = 0
         events = []
 
-        while self.tools and total_wear < difficulty:
+        while not self.tools.is_empty and total_wear < difficulty:
             tool = self._best_mining_tool(resource)
             if tool.condition <= (difficulty - total_wear):
                 contribution = tool.condition / difficulty

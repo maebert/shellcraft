@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='data/game_state.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\x15\x64\x61ta/game_state.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"V\n\x06\x41\x63tion\x12\x0c\n\x04task\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12.\n\ncompletion\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"6\n\tResources\x12\x0c\n\x04\x63lay\x18\x01 \x01(\x02\x12\x0b\n\x03ore\x18\x02 \x01(\x02\x12\x0e\n\x06\x65nergy\x18\x03 \x01(\x02\"\'\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\tcondition\x18\x02 \x01(\x02\"\x8e\x01\n\x07Mission\x12\x0e\n\x06\x64\x65mand\x18\x01 \x01(\x05\x12\x0e\n\x06reward\x18\x02 \x01(\x05\x12\x13\n\x0b\x64\x65mand_type\x18\x03 \x01(\t\x12\x13\n\x0breward_type\x18\x04 \x01(\t\x12\x0b\n\x03\x64ue\x18\x05 \x01(\x05\x12,\n\x08\x64\x65\x61\x64line\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"E\n\x05Stats\x12\x1b\n\x13total_game_duration\x18\x01 \x01(\x02\x12\x1f\n\x0btotal_mined\x18\x02 \x01(\x0b\x32\n.Resources\"\xa6\x03\n\tGameState\x12\r\n\x05\x64\x65\x62ug\x18\x01 \x01(\x08\x12\x17\n\x06\x61\x63tion\x18\x02 \x01(\x0b\x32\x07.Action\x12\x14\n\x05items\x18\x03 \x03(\x0b\x32\x05.Item\x12\x1a\n\x08missions\x18\x04 \x03(\x0b\x32\x08.Mission\x12\x1d\n\tresources\x18\x05 \x01(\x0b\x32\n.Resources\x12\x15\n\ritems_enabled\x18\x06 \x03(\t\x12\x19\n\x11resources_enabled\x18\x07 \x03(\t\x12\x18\n\x10\x63ommands_enabled\x18\x08 \x03(\t\x12\x18\n\x10research_enabled\x18\t \x03(\t\x12\x1a\n\x12research_completed\x18\n \x03(\t\x12%\n\x11mining_difficulty\x18\x0b \x01(\x0b\x32\n.Resources\x12/\n\x1bmining_difficulty_increment\x18\x0c \x01(\x0b\x32\n.Resources\x12\x18\n\x10trade_reputation\x18\r \x01(\x02\x12\x15\n\rtutorial_step\x18\x0e \x01(\x05\x12\x15\n\x05stats\x18\x0f \x01(\x0b\x32\x06.Statsb\x06proto3')
+  serialized_pb=_b('\n\x15\x64\x61ta/game_state.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"V\n\x06\x41\x63tion\x12\x0c\n\x04task\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12.\n\ncompletion\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"6\n\tResources\x12\x0c\n\x04\x63lay\x18\x01 \x01(\x02\x12\x0b\n\x03ore\x18\x02 \x01(\x02\x12\x0e\n\x06\x65nergy\x18\x03 \x01(\x02\"\'\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\tcondition\x18\x02 \x01(\x02\"\x9c\x01\n\x07Mission\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06\x64\x65mand\x18\x02 \x01(\x05\x12\x0e\n\x06reward\x18\x03 \x01(\x05\x12\x13\n\x0b\x64\x65mand_type\x18\x04 \x01(\t\x12\x13\n\x0breward_type\x18\x05 \x01(\t\x12\x0b\n\x03\x64ue\x18\x06 \x01(\x05\x12,\n\x08\x64\x65\x61\x64line\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"E\n\x05Stats\x12\x1b\n\x13total_game_duration\x18\x01 \x01(\x02\x12\x1f\n\x0btotal_mined\x18\x02 \x01(\x0b\x32\n.Resources\"\xa6\x03\n\tGameState\x12\r\n\x05\x64\x65\x62ug\x18\x01 \x01(\x08\x12\x17\n\x06\x61\x63tion\x18\x02 \x01(\x0b\x32\x07.Action\x12\x14\n\x05items\x18\x03 \x03(\x0b\x32\x05.Item\x12\x1a\n\x08missions\x18\x04 \x03(\x0b\x32\x08.Mission\x12\x1d\n\tresources\x18\x05 \x01(\x0b\x32\n.Resources\x12\x15\n\ritems_enabled\x18\x06 \x03(\t\x12\x19\n\x11resources_enabled\x18\x07 \x03(\t\x12\x18\n\x10\x63ommands_enabled\x18\x08 \x03(\t\x12\x18\n\x10research_enabled\x18\t \x03(\t\x12\x1a\n\x12research_completed\x18\n \x03(\t\x12%\n\x11mining_difficulty\x18\x0b \x01(\x0b\x32\n.Resources\x12/\n\x1bmining_difficulty_increment\x18\x0c \x01(\x0b\x32\n.Resources\x12\x18\n\x10trade_reputation\x18\r \x01(\x02\x12\x15\n\rtutorial_step\x18\x0e \x01(\x05\x12\x15\n\x05stats\x18\x0f \x01(\x0b\x32\x06.Statsb\x06proto3')
   ,
   dependencies=[google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -163,43 +163,50 @@ _MISSION = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='demand', full_name='Mission.demand', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      name='name', full_name='Mission.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='reward', full_name='Mission.reward', index=1,
+      name='demand', full_name='Mission.demand', index=1,
       number=2, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='demand_type', full_name='Mission.demand_type', index=2,
-      number=3, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      name='reward', full_name='Mission.reward', index=2,
+      number=3, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='reward_type', full_name='Mission.reward_type', index=3,
+      name='demand_type', full_name='Mission.demand_type', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='due', full_name='Mission.due', index=4,
-      number=5, type=5, cpp_type=1, label=1,
+      name='reward_type', full_name='Mission.reward_type', index=4,
+      number=5, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None),
+    _descriptor.FieldDescriptor(
+      name='due', full_name='Mission.due', index=5,
+      number=6, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='deadline', full_name='Mission.deadline', index=5,
-      number=6, type=11, cpp_type=10, label=1,
+      name='deadline', full_name='Mission.deadline', index=6,
+      number=7, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -217,7 +224,7 @@ _MISSION = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=244,
-  serialized_end=386,
+  serialized_end=400,
 )
 
 
@@ -254,8 +261,8 @@ _STATS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=388,
-  serialized_end=457,
+  serialized_start=402,
+  serialized_end=471,
 )
 
 
@@ -383,8 +390,8 @@ _GAMESTATE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=460,
-  serialized_end=882,
+  serialized_start=474,
+  serialized_end=896,
 )
 
 _ACTION.fields_by_name['completion'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP

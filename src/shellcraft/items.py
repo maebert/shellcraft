@@ -23,7 +23,7 @@ class Tool(AbstractItem):
 
     def __repr__(self):
         """Representation, e.g. 'clay_shovel (worn)'"""
-        if self.durability == -1 or self.durability == self.condition:
+        if not hasattr(self, "condition") or self.durability == -1 or self.durability == self.condition:
             return "${}$".format(self.name)
 
         wear = 1.0 * self.condition / self.durability

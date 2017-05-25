@@ -24,12 +24,13 @@ message Item {
 }
 
 message Mission {
-  int32 demand = 1;
-  int32 reward = 2;
-  string demand_type = 3;
-  string reward_type = 4;
-  int32 due = 5;
-  google.protobuf.Timestamp deadline = 6;
+  string name = 1;
+  int32 demand = 2;
+  int32 reward = 3;
+  string demand_type = 4;
+  string reward_type = 5;
+  int32 due = 6;
+  google.protobuf.Timestamp deadline = 7;
 }
 
 message Stats {

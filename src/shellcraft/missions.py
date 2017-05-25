@@ -31,15 +31,20 @@ class Mission(AbstractItem):
         extra_demand = random.random() * game.resources.get(demand_type)
 
         self.demand = int(game.resources.get(demand_type) + extra_demand)
-        self.due = int(extra_demand / efficiency * difficulty * (1 + random.random()))
+        self.due = int(extra_demand / efficiency * difficulty * (2 + random.random())) + 10
         self.demand_type = demand_type
         self.reward = int((game.state.trade_reputation + .3 * random.random()) * convert_resource_value(demand_type, reward_type) * self.demand)
         self.reward_type = reward_type
 
     def vars(self, game):
-        v = vars(self)
-        v['deficit'] = self.demand - game.resources.get(self.demand_type)
-        return v
+        return {
+            "demand": self.demand,
+            "due": self.due,
+            "demand_type": self.demand_type,
+            "reward": self.reward,
+            "reward_type": self.reward_type,
+            "deficit": self.demand - game.resources.get(self.demand_type)
+        }
 
     def offer(self, game):
         # return re.sub("  +", " ", d.replace("\n", " "))
@@ -52,6 +57,18 @@ class Mission(AbstractItem):
             game.state.trade_reputation -= 0.02
             echo(self.strings['disagree'].format(**self.vars(game)))
             return False
+
+    def is_completed(self, game):
+        if datetime.datetime.now() > self.deadline.ToDatetime():
+            # Failed!
+            echo(self.strings['failed'].format(**self.vars(game)))
+            return True
+        if game.resources.get(self.demand_type) >= self.demand:
+            echo(self.strings['completed'].format(**self.vars(game)))
+            game.resources.add(self.demand_type, -self.demand)
+            game.resources.add(self.reward_type, self.reward)
+            return True
+        return False
 
     def __repr__(self):
         return "<{demand} {demand_type} in {due}s for {reward} {reward_type}>".format(**vars(self))

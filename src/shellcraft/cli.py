@@ -30,8 +30,10 @@ def action_step(callback, game):
     def inner(**kwargs):
         # Do the action
         callback(**kwargs)
+        game.complete_missions()
         echo_alerts(game)
         game.tutorial.cont()
+        game.save()
     return inner
 
 

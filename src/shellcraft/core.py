@@ -20,15 +20,15 @@ class ResourceProxy(object):
 
     def add(self, resource, value):
         """Add resource."""
-        setattr(self._resources, resource, getattr(self._resources, resource) + value)
+        setattr(self._resources, resource, getattr(self._resources, resource, 0) + value)
 
     def get(self, resource):
         """Get value of resource."""
-        return getattr(self._resources, resource)
+        return getattr(self._resources, resource, 0)
 
     def multiply(self, resource, factor):
         """Multiply resource by factor."""
-        setattr(self._resources, resource, getattr(self._resources, resource) * factor)
+        setattr(self._resources, resource, getattr(self._resources, resource, 0) * factor)
 
 
 class ItemProxy(object):
@@ -43,6 +43,9 @@ class ItemProxy(object):
     def remove(self, item):
         self._items.remove(item)
         self._field.remove(item._pb)
+
+    def __bool__(self):
+        return bool(self._items)
 
     def add(self, item):
         pb = self._field.add()

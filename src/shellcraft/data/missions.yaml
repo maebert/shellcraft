@@ -7,3 +7,5 @@ trade_proposal:
     ask: Do you agree to this trade contract?
     agree: The *{demand_type}* will be automatically collected as soon as you have enough. Time is of the essence now!
     disagree: The trader leaves, disappointed.
+    failed: You failed to deliver the goods.
+    completed: The trader takes *{demand} {demand_type}*, hands you *{reward} {reward_type}* and smiles.

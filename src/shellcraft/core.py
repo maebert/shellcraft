@@ -22,9 +22,9 @@ class ResourceProxy(object):
         """Add resource."""
         setattr(self._resources, resource, getattr(self._resources, resource, 0) + value)
 
-    def get(self, resource):
+    def get(self, resource, default=0):
         """Get value of resource."""
-        return getattr(self._resources, resource, 0)
+        return getattr(self._resources, resource, default)
 
     def multiply(self, resource, factor):
         """Multiply resource by factor."""
@@ -58,7 +58,7 @@ class ItemProxy(object):
         return new_item
 
 
-class AbstractItem(object):
+class BaseItem(object):
     _pb = None
 
     def __init__(self, name):
@@ -88,10 +88,6 @@ class AbstractItem(object):
             item.effects[effect] = to_list(item.effects.get(effect))
         return item
 
-    def serialize(self):
-        """Serialise the AbstractItem."""
-        return self.name
-
     def __repr__(self):
         return self.name
 
@@ -107,9 +103,9 @@ class AbstractItem(object):
         raise AttributeError(key)
 
 
-class AbstractCollection(object):
+class BaseFactory(object):
     FIXTURES = "collection.yaml"
-    ITEM_CLASS = AbstractItem
+    ITEM_CLASS = BaseItem
     PB_CLASS = None
 
     def __init__(self, game):
@@ -119,7 +115,7 @@ class AbstractCollection(object):
 
     def get(self, item_name):
         """Get an item instance by name."""
-        if isinstance(item_name, AbstractItem):
+        if isinstance(item_name, BaseItem):
             return item_name
         return self.all_items.get(item_name)
 
@@ -168,9 +164,9 @@ class AbstractCollection(object):
 
         # Enable items
         for item_name in item.effects.get('enable_items', []):
-            if item_name not in self.game.state.items_enabled:
+            if item_name not in self.game.state.tools_enabled:
                 self.game.alert("You can now craft ${}$.", item_name)
-                self.game.state.items_enabled.append(item_name)
+                self.game.state.tools_enabled.append(item_name)
 
         # Enable research
         for item_name in item.effects.get('enable_research', []):

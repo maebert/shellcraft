@@ -100,23 +100,23 @@ def craft(game, items):
         echo("Can only craft one project at a time", err=True)
 
     elif not items:
-        if not game.tools.available_items:
+        if not game.workshop.available_items:
             echo("There's nothing you can craft right now.", err=True)
-        for item in game.tools.available_items:
+        for item in game.workshop.available_items:
             echo("{} ({})\n  {}", item, _format_cost(item.cost), item.description)
     else:
-        item = game.tools.get(items[0])
+        item = game.workshop.get(items[0])
 
         if not item:
             echo("No such item", err=True)
             return None
 
-        if not game.tools.is_available(item):
+        if not game.workshop.is_available(item):
             echo("{} is not available yet.", item, err=True)
             return None
 
-        if not game.tools.can_afford(item):
-            missing_resources = game.tools._resources_missing_to_craft(item)
+        if not game.workshop.can_afford(item):
+            missing_resources = game.workshop._resources_missing_to_craft(item)
             e = "Need {} to craft {}.".format(_format_cost(missing_resources), item)
             echo(e, err=True)
 
@@ -144,10 +144,10 @@ def resources(game, resource_types=None):
 @click.pass_obj
 def inventory(game):
     """Show owned items and their condition."""
-    if not game.items:
+    if not game.tools:
         echo("You don't own any items", err=True)
     else:
-        for item in game.items:
+        for item in game.tools:
             echo(str(item))
             # echo("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
@@ -195,7 +195,7 @@ def research(game, projects):
 def reset(game, force):
     """Reset all progress."""
     if force or click.confirm("Do you really want to reset the game and start over again?"):
-        Game.create(game.save_file).save()
+        Game.create(game.save_file)
         echo("Tohu wa-bohu.")
     else:
         echo("Nevermind then.")

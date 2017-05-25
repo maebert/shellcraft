@@ -2,16 +2,16 @@
 
 """Basic CLI for ShellCraft."""
 from __future__ import absolute_import
-from shellcraft.core import AbstractCollection, AbstractItem
+from shellcraft.core import BaseFactory, BaseItem
 from shellcraft._cli_impl import echo, echo_tutorial, echo_alerts
 
 
-class Step(AbstractItem):
+class Step(BaseItem):
     def __repr__(self):
         return "<Tutorial {}>".format(self.name)
 
 
-class Tutorial(AbstractCollection):
+class TutorialFactory(BaseFactory):
     FIXTURES = "tutorials.yaml"
     ITEM_CLASS = Step
 

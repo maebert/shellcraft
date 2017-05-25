@@ -14,7 +14,6 @@ import pytest
 from click.testing import CliRunner
 from shellcraft.cli import get_game, cli
 from shellcraft.shellcraft import Game
-from shellcraft.events import Contract
 
 
 @pytest.fixture(scope='module')
@@ -47,8 +46,7 @@ def test_basic_cli(game):
 
 def test_contract(game):
     game = load_game("save1.json")
-    assert game.resources.clay == 30
-    Contract(game)
+    assert game.resources.get("clay") == 30
 
 
 def test_game_run(game):
@@ -79,11 +77,11 @@ def test_game_run(game):
     craft small_cart
     mine clay"""
     runner = CliRunner()
-    game.flags.debug = True
+    game.state.debug = True
     for command in commands.splitlines():
-        assert not command or command.split()[0] in game.flags.commands_enabled
+        assert not command or command.split()[0] in game.state.commands_enabled
         runner.invoke(cli, command.split())
         game.tutorial.cont()
-    assert 'small_cart' in game.flags.research_completed
-    assert game.flags.tutorial_step == 11
-    assert game.resources.clay == 6
+    assert 'small_cart' in game.state.research_completed
+    assert game.state.tutorial_step == 11
+    assert game.resources.get("clay") == 4

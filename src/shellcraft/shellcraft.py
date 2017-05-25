@@ -3,11 +3,12 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from shellcraft.items import Tools
-from shellcraft.research import Research
-from shellcraft.tutorial import Tutorial
-from shellcraft.events import Events
-from shellcraft.missions import Missions
+from shellcraft.tools import ToolFactory
+from shellcraft.research import ResearchFactory
+from shellcraft.tutorial import TutorialFactory
+from shellcraft.events import EventFactory
+from shellcraft.missions import MissionFactory
+
 from shellcraft.game_state_pb2 import GameState
 from google.protobuf import json_format
 from shellcraft.core import ResourceProxy, ItemProxy
@@ -26,11 +27,11 @@ class Game(object):
 
         self._messages = []
 
-        self.lab = Research(self)
-        self.tools = Tools(self)
-        self.tutorial = Tutorial(self)
-        self.events = Events(self)
-        self.mission_factory = Missions(self)
+        self.lab = ResearchFactory(self)
+        self.workshop = ToolFactory(self)
+        self.tutorial = TutorialFactory(self)
+        self.events = EventFactory(self)
+        self.mission_factory = MissionFactory(self)
 
         self.resources = ResourceProxy(self.state.resources)
         self.total_mined = ResourceProxy(self.state.stats.total_mined)
@@ -38,7 +39,7 @@ class Game(object):
         self.mining_difficulty = ResourceProxy(self.state.mining_difficulty)
         self.mining_difficulty_increment = ResourceProxy(self.state.mining_difficulty_increment)
 
-        self.items = ItemProxy(self.state.items, self.tools)
+        self.tools = ItemProxy(self.state.tools, self.workshop)
         self.missions = ItemProxy(self.state.missions, self.mission_factory)
 
     def alert(self, msg, *args):
@@ -65,10 +66,10 @@ class Game(object):
                 self.missions.remove(mission)
 
     def craft(self, item_name):
-        item = self.tools.get(item_name)
+        item = self.workshop.get(item_name)
         for resource, res_cost in item.cost.items():
             self.resources.add(resource, -res_cost)
-        self.items.add(item)
+        self.tools.add(item)
         self._act("craft", item_name, item.difficulty)
         self.alert("Crafted {}", item)
         return item.difficulty
@@ -82,14 +83,14 @@ class Game(object):
         return project.difficulty
 
     def has_item(self, item_name):
-        for item in self.items:
+        for item in self.tools:
             if item.name == item_name:
                 return True
         return False
 
     def _best_mining_tool(self, resource):
         """Return the (currently owned) tool that gives the highest bonus on mining a particular resource."""
-        return max(self.items, key=lambda item: item.mining_bonus.get(resource, 0))
+        return max(self.tools, key=lambda item: item.mining_bonus.get(resource, 0))
 
     def mine(self, resource):
         """Mine a resource."""
@@ -102,14 +103,14 @@ class Game(object):
         efficiency = 0
         events = []
 
-        while self.items and total_wear < difficulty:
+        while self.tools and total_wear < difficulty:
             tool = self._best_mining_tool(resource)
             if tool.condition <= (difficulty - total_wear):
                 contribution = tool.condition / difficulty
                 total_wear += tool.condition
                 efficiency += tool.condition * tool.mining_bonus.get(resource, 1) / difficulty
                 self.alert("Destroyed ${}$ while mining *{}*.".format(tool.name, resource))
-                self.items.remove(tool)
+                self.tools.remove(tool)
             else:
                 contribution = (difficulty - total_wear) / difficulty
                 tool.condition -= (difficulty - total_wear)
@@ -140,10 +141,10 @@ class Game(object):
         return difficulty, efficiency
 
     def _unlock_items(self):
-        for item in self.tools.available_items:
-            if item.name not in self.state.items_enabled:
+        for item in self.workshop.available_items:
+            if item.name not in self.state.tools_enabled:
                 self.alert("You can now craft {}.", item)
-                self.state.items_enabled.append(item.name)
+                self.state.tools_enabled.append(item.name)
 
         for item in self.lab.available_items:
             if item.name not in self.state.research_enabled:
@@ -173,6 +174,14 @@ class Game(object):
     def create(cls, filename):
         """Create a new game."""
         game = Game()
+
+        game.state.mining_difficulty.clay = .5
+        game.state.mining_difficulty.ore = .5
+        game.state.mining_difficulty.energy = .5
+        game.state.mining_difficulty_increment.clay = .5
+        game.state.mining_difficulty_increment.ore = .5
+        game.state.mining_difficulty_increment.energy = .5
+
         game.save_file = filename
         save_path, _ = os.path.split(filename)
         if save_path and not os.path.exists(save_path):

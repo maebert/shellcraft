@@ -4,7 +4,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from shellcraft.core import AbstractItem, AbstractCollection
+from shellcraft.core import BaseItem, BaseFactory
 from shellcraft._cli_impl import echo, ask
 from shellcraft.utils import convert_resource_value
 from shellcraft.game_state_pb2 import Mission as MissionPB
@@ -12,7 +12,7 @@ import datetime
 import random
 
 
-class Mission(AbstractItem):
+class Mission(BaseItem):
     """A trade contract, requesting a certain quantity of a resource in a given time."""
 
     def randomize(self, game):
@@ -20,8 +20,8 @@ class Mission(AbstractItem):
         random.shuffle(game.state.resources_enabled)
         demand_type, reward_type = game.state.resources_enabled[:2]
 
-        if game.tools.available_items:
-            best_available_tool = max(game.tools.available_items, key=lambda item: item.mining_bonus.get(demand_type, 0))
+        if game.workshop.available_items:
+            best_available_tool = max(game.workshop.available_items, key=lambda item: item.mining_bonus.get(demand_type, 0))
             efficiency = best_available_tool.mining_bonus.get(demand_type) or 1
         else:
             efficiency = 1
@@ -74,13 +74,13 @@ class Mission(AbstractItem):
         return "<{demand} {demand_type} in {due}s for {reward} {reward_type}>".format(**vars(self))
 
 
-class Missions(AbstractCollection):
+class MissionFactory(BaseFactory):
     FIXTURES = 'missions.yaml'
     ITEM_CLASS = Mission
     PB_CLASS = MissionPB
 
     def make(self, mission):
-        new_mission = super(Missions, self).make(mission)
+        new_mission = super(MissionFactory, self).make(mission)
         if not hasattr(new_mission, "demand"):
             new_mission.randomize(self.game)
         return new_mission

@@ -2,19 +2,13 @@
     "resources": {
         "ore": 120,
         "clay": 30,
-        "energy": 0,
-        "total": {
-            "clay": 30,
-            "ore": 12,
-            "energy": 0
-        }
+        "energy": 0
     },
     "action": {
         "task": "mine",
         "target": "ore",
-        "completion": "2017-04-11T16:01:42.431879"
+        "completion": "2017-04-11T16:01:42Z"
     },
-    "flags": {
         "tutorial_step": 11,
         "debug": true,
         "resources_enabled": [
@@ -35,7 +29,7 @@
             "ore",
             "dynamite"
         ],
-        "items_enabled": [
+        "tools_enabled": [
             "shovel",
             "sturdy_shovel",
             "small_cart",
@@ -55,9 +49,7 @@
             "ore": 0.5,
             "energy": 0.5
         },
-        "total_game_duration": 921.1718207008523
-    },
-    "items": [
+    "tools": [
         {
             "name": "sturdy_shovel",
             "condition": 42.5

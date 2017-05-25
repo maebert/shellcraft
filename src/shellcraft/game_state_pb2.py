@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='data/game_state.proto',
   package='',
   syntax='proto3',
-  serialized_pb=_b('\n\x15\x64\x61ta/game_state.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"V\n\x06\x41\x63tion\x12\x0c\n\x04task\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12.\n\ncompletion\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"6\n\tResources\x12\x0c\n\x04\x63lay\x18\x01 \x01(\x02\x12\x0b\n\x03ore\x18\x02 \x01(\x02\x12\x0e\n\x06\x65nergy\x18\x03 \x01(\x02\"\'\n\x04Item\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\tcondition\x18\x02 \x01(\x02\"\x9c\x01\n\x07Mission\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06\x64\x65mand\x18\x02 \x01(\x05\x12\x0e\n\x06reward\x18\x03 \x01(\x05\x12\x13\n\x0b\x64\x65mand_type\x18\x04 \x01(\t\x12\x13\n\x0breward_type\x18\x05 \x01(\t\x12\x0b\n\x03\x64ue\x18\x06 \x01(\x05\x12,\n\x08\x64\x65\x61\x64line\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"E\n\x05Stats\x12\x1b\n\x13total_game_duration\x18\x01 \x01(\x02\x12\x1f\n\x0btotal_mined\x18\x02 \x01(\x0b\x32\n.Resources\"\xa6\x03\n\tGameState\x12\r\n\x05\x64\x65\x62ug\x18\x01 \x01(\x08\x12\x17\n\x06\x61\x63tion\x18\x02 \x01(\x0b\x32\x07.Action\x12\x14\n\x05items\x18\x03 \x03(\x0b\x32\x05.Item\x12\x1a\n\x08missions\x18\x04 \x03(\x0b\x32\x08.Mission\x12\x1d\n\tresources\x18\x05 \x01(\x0b\x32\n.Resources\x12\x15\n\ritems_enabled\x18\x06 \x03(\t\x12\x19\n\x11resources_enabled\x18\x07 \x03(\t\x12\x18\n\x10\x63ommands_enabled\x18\x08 \x03(\t\x12\x18\n\x10research_enabled\x18\t \x03(\t\x12\x1a\n\x12research_completed\x18\n \x03(\t\x12%\n\x11mining_difficulty\x18\x0b \x01(\x0b\x32\n.Resources\x12/\n\x1bmining_difficulty_increment\x18\x0c \x01(\x0b\x32\n.Resources\x12\x18\n\x10trade_reputation\x18\r \x01(\x02\x12\x15\n\rtutorial_step\x18\x0e \x01(\x05\x12\x15\n\x05stats\x18\x0f \x01(\x0b\x32\x06.Statsb\x06proto3')
+  serialized_pb=_b('\n\x15\x64\x61ta/game_state.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"V\n\x06\x41\x63tion\x12\x0c\n\x04task\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12.\n\ncompletion\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"6\n\tResources\x12\x0c\n\x04\x63lay\x18\x01 \x01(\x02\x12\x0b\n\x03ore\x18\x02 \x01(\x02\x12\x0e\n\x06\x65nergy\x18\x03 \x01(\x02\"\'\n\x04Tool\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x11\n\tcondition\x18\x02 \x01(\x02\"\x9c\x01\n\x07Mission\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06\x64\x65mand\x18\x02 \x01(\x05\x12\x0e\n\x06reward\x18\x03 \x01(\x05\x12\x13\n\x0b\x64\x65mand_type\x18\x04 \x01(\t\x12\x13\n\x0breward_type\x18\x05 \x01(\t\x12\x0b\n\x03\x64ue\x18\x06 \x01(\x05\x12,\n\x08\x64\x65\x61\x64line\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"E\n\x05Stats\x12\x1b\n\x13total_game_duration\x18\x01 \x01(\x02\x12\x1f\n\x0btotal_mined\x18\x02 \x01(\x0b\x32\n.Resources\"\xa6\x03\n\tGameState\x12\r\n\x05\x64\x65\x62ug\x18\x01 \x01(\x08\x12\x17\n\x06\x61\x63tion\x18\x02 \x01(\x0b\x32\x07.Action\x12\x14\n\x05tools\x18\x03 \x03(\x0b\x32\x05.Tool\x12\x1a\n\x08missions\x18\x04 \x03(\x0b\x32\x08.Mission\x12\x1d\n\tresources\x18\x05 \x01(\x0b\x32\n.Resources\x12\x15\n\rtools_enabled\x18\x06 \x03(\t\x12\x19\n\x11resources_enabled\x18\x07 \x03(\t\x12\x18\n\x10\x63ommands_enabled\x18\x08 \x03(\t\x12\x18\n\x10research_enabled\x18\t \x03(\t\x12\x1a\n\x12research_completed\x18\n \x03(\t\x12%\n\x11mining_difficulty\x18\x0b \x01(\x0b\x32\n.Resources\x12/\n\x1bmining_difficulty_increment\x18\x0c \x01(\x0b\x32\n.Resources\x12\x18\n\x10trade_reputation\x18\r \x01(\x02\x12\x15\n\rtutorial_step\x18\x0e \x01(\x05\x12\x15\n\x05stats\x18\x0f \x01(\x0b\x32\x06.Statsb\x06proto3')
   ,
   dependencies=[google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -117,22 +117,22 @@ _RESOURCES = _descriptor.Descriptor(
 )
 
 
-_ITEM = _descriptor.Descriptor(
-  name='Item',
-  full_name='Item',
+_TOOL = _descriptor.Descriptor(
+  name='Tool',
+  full_name='Tool',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='Item.name', index=0,
+      name='name', full_name='Tool.name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='condition', full_name='Item.condition', index=1,
+      name='condition', full_name='Tool.condition', index=1,
       number=2, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
@@ -288,7 +288,7 @@ _GAMESTATE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='items', full_name='GameState.items', index=2,
+      name='tools', full_name='GameState.tools', index=2,
       number=3, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -309,7 +309,7 @@ _GAMESTATE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='items_enabled', full_name='GameState.items_enabled', index=5,
+      name='tools_enabled', full_name='GameState.tools_enabled', index=5,
       number=6, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -398,7 +398,7 @@ _ACTION.fields_by_name['completion'].message_type = google_dot_protobuf_dot_time
 _MISSION.fields_by_name['deadline'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 _STATS.fields_by_name['total_mined'].message_type = _RESOURCES
 _GAMESTATE.fields_by_name['action'].message_type = _ACTION
-_GAMESTATE.fields_by_name['items'].message_type = _ITEM
+_GAMESTATE.fields_by_name['tools'].message_type = _TOOL
 _GAMESTATE.fields_by_name['missions'].message_type = _MISSION
 _GAMESTATE.fields_by_name['resources'].message_type = _RESOURCES
 _GAMESTATE.fields_by_name['mining_difficulty'].message_type = _RESOURCES
@@ -406,7 +406,7 @@ _GAMESTATE.fields_by_name['mining_difficulty_increment'].message_type = _RESOURC
 _GAMESTATE.fields_by_name['stats'].message_type = _STATS
 DESCRIPTOR.message_types_by_name['Action'] = _ACTION
 DESCRIPTOR.message_types_by_name['Resources'] = _RESOURCES
-DESCRIPTOR.message_types_by_name['Item'] = _ITEM
+DESCRIPTOR.message_types_by_name['Tool'] = _TOOL
 DESCRIPTOR.message_types_by_name['Mission'] = _MISSION
 DESCRIPTOR.message_types_by_name['Stats'] = _STATS
 DESCRIPTOR.message_types_by_name['GameState'] = _GAMESTATE
@@ -426,12 +426,12 @@ Resources = _reflection.GeneratedProtocolMessageType('Resources', (_message.Mess
   ))
 _sym_db.RegisterMessage(Resources)
 
-Item = _reflection.GeneratedProtocolMessageType('Item', (_message.Message,), dict(
-  DESCRIPTOR = _ITEM,
+Tool = _reflection.GeneratedProtocolMessageType('Tool', (_message.Message,), dict(
+  DESCRIPTOR = _TOOL,
   __module__ = 'data.game_state_pb2'
-  # @@protoc_insertion_point(class_scope:Item)
+  # @@protoc_insertion_point(class_scope:Tool)
   ))
-_sym_db.RegisterMessage(Item)
+_sym_db.RegisterMessage(Tool)
 
 Mission = _reflection.GeneratedProtocolMessageType('Mission', (_message.Message,), dict(
   DESCRIPTOR = _MISSION,

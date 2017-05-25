@@ -3,6 +3,7 @@ include README.rst
 
 recursive-include src *.yaml
 recursive-include src *.grammar
+recursive-include src *.proto
 recursive-include tests *
 
 recursive-exclude * __pycache__

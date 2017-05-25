@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """CLI implementations."""
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 import click
 from click.termui import get_terminal_size
@@ -71,6 +72,11 @@ def _unformat_str(s):
 
 def _format_cost(cost):
     return ", ".join("*{} {}*".format(v, k) for k, v in cost.items())
+
+
+def ask(msg):
+    """Show a confirmation prompt."""
+    return click.confirm("❯ " + _format_str(msg))
 
 
 def echo(s, *vals, **kwargs):

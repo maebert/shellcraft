@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
 
-"""Basic CLI for ShellCraft."""
-from __future__ import absolute_import
-from shellcraft.core import AbstractItem, AbstractCollection
+"""Events Interface."""
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from shellcraft.core import BaseItem, BaseFactory
 
 
-class Event(AbstractItem):
+class Event(BaseItem):
     def __repr__(self):
         return self.name
 
 
-class Events(AbstractCollection):
+class EventFactory(BaseFactory):
     FIXTURES = 'events.yaml'
     ITEM_CLASS = Event
 

@@ -1,0 +1,11 @@
+trade_proposal:
+  description: A Trade Proposal
+  strings:
+    intro: A trader asks whether you can supply them with *{demand} {demand_type}* in
+        {due} seconds or less. In return, they offer *{reward} {reward_type}*. You need
+        mine another *{deficit:.0f} {demand_type}* to meet the deadline.
+    ask: Do you agree to this trade contract?
+    agree: The *{demand_type}* will be automatically collected as soon as you have enough. Time is of the essence now!
+    disagree: The trader leaves, disappointed.
+    failed: You failed to deliver the goods.
+    completed: The trader takes *{demand} {demand_type}*, hands you *{reward} {reward_type}* and smiles.

@@ -7,6 +7,7 @@ import os
 import yaml
 from copy import copy
 from shellcraft.utils import to_list, to_float
+from builtins import str
 
 RESOURCES = ['clay', 'energy', 'ore']
 

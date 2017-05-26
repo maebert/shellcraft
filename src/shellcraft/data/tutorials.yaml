@@ -101,7 +101,7 @@
         Some items are unlocked simply by having enough resources to craft them. Others need to be
         researched first. A quick look at `shellcraft research` shows you the availabel research projects.
         Researching doesn't cost you anything, but can take a long time that you can't spend mining or
-        crafting anything. So let's embark on your first science project and research the @small_cart@!
+        crafting anything. So let's embark on your first science project and research the %small_cart%!
 
     prerequisites:
         clay: 20

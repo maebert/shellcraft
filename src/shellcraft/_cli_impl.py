@@ -49,7 +49,7 @@ def _color_in(match):
     color = 'white'
     if s.startswith("$"):
         color = RESOURCE_COLORS['craft']
-    elif s.startswith("@"):
+    elif s.startswith("%"):
         color = RESOURCE_COLORS['research']
     elif s.startswith("`"):
         color = RESOURCE_COLORS['command']
@@ -59,15 +59,15 @@ def _color_in(match):
                 color = col
     else:
         color = 'blue'
-    return click.style(s.strip("$*@`"), fg=color)
+    return click.style(s.strip("$*%`"), fg=color)
 
 
 def _format_str(s):
-    return re.sub(r'(([\$\*@`])[{};:.a-z0-9_\- ]+(\2))', _color_in, s)
+    return re.sub(r'(([\$\*%`])[{};:.a-z0-9_\- ]+(\2))', _color_in, s)
 
 
 def _unformat_str(s):
-    return re.sub(r'(([\$\*@`])([{};:.a-z0-9_\- ]+)(\2))', r"\3", s)
+    return re.sub(r'(([\$\*%`])([{};:.a-z0-9_\- ]+)(\2))', r"\3", s)
 
 
 def _format_cost(cost):

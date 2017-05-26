@@ -160,7 +160,7 @@ class Game(object):
 
         for item in self.lab.available_items:
             if item.name not in self.state.research_enabled:
-                self.alert("You can now research @{}@.", item.name)
+                self.alert("You can now research %{}%.", item.name)
                 self.state.research_enabled.append(item.name)
 
     def _act(self, task, target, duration):

@@ -3,6 +3,7 @@
 """CLI implementations."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from shellcraft.grammar import Grammar
 import click
 from click.termui import get_terminal_size
 import time
@@ -28,7 +29,7 @@ VERBS = {
 def echo_alerts(game):
     """Display all alerts that are currently queued up."""
     for m in game._messages:
-        echo("❯ " + m)
+        echo(m, use_cursor=True)
     game._messages = []
 
 
@@ -79,13 +80,21 @@ def ask(msg):
     return click.confirm("❯ " + _format_str(msg))
 
 
-def echo(s, *vals, **kwargs):
+def echo(s, use_cursor=False, *vals, **kwargs):
     """Echo a string with colours.
 
     Options are *resource* to highlight a resource, `code` for tutorials.
     """
     if vals:
         s = s.format(*vals)
+    grammar_match = re.search("^~([a-zA-Z0-9_]+)~ *", s)
+    if grammar_match:
+        grammar_name = grammar_match.group(1)
+        s = s[grammar_match.end():]
+        grammar = Grammar.grammars[grammar_name]
+        s = grammar.generate(s)
+    if use_cursor:
+        s = "❯ " + s
     if kwargs.get("err"):
         click.secho(_unformat_str(s), fg='red', err=True)
         sys.exit(1)

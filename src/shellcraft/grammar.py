@@ -27,13 +27,16 @@ class SymbolNotFound(Exception):
 
 class Grammar(object):
 
+    grammars = {}
+
     def __init__(self, grammar_string):
         self.grammar = self.parse_grammar(grammar_string)
 
     @classmethod
     def load(cls, grammar_file):
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", grammar_file + ".grammar")) as f:
-            return cls(f.read())
+            cls.grammars[grammar_file] = cls(f.read())
+            return cls.grammars[grammar_file]
 
     def weighted_choice(self, options, weights):
         """Choose a random item, according to weights.
@@ -109,6 +112,8 @@ class Grammar(object):
                 parts[-1] = parts[-1].rstrip() + "'"
             else:
                 parts[-1] = parts[-1].rstrip() + "'s"
+        if rule == "initial":
+            return [p[0].upper() for p in parts]
         if rule == "title":
             return [p if p in ("by", "of", "and") else p.capitalize() for p in parts]
         return parts
@@ -132,21 +137,18 @@ class Grammar(object):
             raise MaximumDepthExceeded
         if symbol not in self.grammar:
             raise SymbolNotFound(symbol)
-        result = []
         extension = self.weighted_choice(*zip(*self.grammar[symbol]))
-        for part in extension.split(" "):
+        result = self.extend_sentence(extension, max_depth)
+        return self.transform(result, rule)
+
+    def extend_sentence(self, sentence, max_depth=8):
+        result = []
+        for part in sentence.split(" "):
             if part.startswith("@"):
                 result.extend(self.extend_rule(part, max_depth - 1))
             else:
                 result.append(part)
-        return self.transform(result, rule)
-
-    # def extend_sentence(self, sentence):
-    #     if not sentence:
-    #         return None
-    #     g = self.parse_grammar("@s -> " + sentence)
-    #     g.update(grammar)
-    #     return generate(g)
+        return result
 
     # def extend_all(sentence, grammar, max_depth=8):
     #     if max_depth == 0:
@@ -173,10 +175,11 @@ class Grammar(object):
         """
         sentence = " ".join(parts)
         sentence = re.sub(r" ([,.!?])", r'\1', sentence)
+        sentence = re.sub(r"' ([A-Za-z0-9 ]+) '", r"'\1'", sentence)
         sentence = re.sub(r"  +", r' ', sentence)
         return sentence.strip()
 
-    def generate(self, start_symbol="@s"):
+    def generate(self, sentence=None):
         """Generate a sentence from a grammar string.
 
         Args:
@@ -184,12 +187,10 @@ class Grammar(object):
         Returns:
             str
         """
-        if not start_symbol.startswith("@"):
-            start_symbol = "@" + start_symbol
         parts = None
         while not parts:
             try:
-                parts = self.extend_rule(symbol=start_symbol)
+                parts = self.extend_sentence(sentence)
             except MaximumDepthExceeded:
                 pass
             except SymbolNotFound as e:

@@ -8,6 +8,7 @@ from shellcraft.core import BaseItem, BaseFactory
 from shellcraft._cli_impl import echo, ask
 from shellcraft.utils import convert_resource_value
 from shellcraft.game_state_pb2 import Mission as MissionPB
+from shellcraft.world import NPC
 import datetime
 import random
 
@@ -17,6 +18,9 @@ class Mission(BaseItem):
 
     def randomize(self, game):
         """Generate random mission."""
+        self.writer = NPC.generate()
+        # self.writer.fraction = random.choice(game.fractions._fractions)
+
         random.shuffle(game.state.resources_enabled)
         demand_type, reward_type = game.state.resources_enabled[:2]
 
@@ -38,6 +42,7 @@ class Mission(BaseItem):
 
     def vars(self, game):
         return {
+            "writer": self.writer,
             "demand": self.demand,
             "due": self.due,
             "demand_type": self.demand_type,

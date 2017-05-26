@@ -12,11 +12,19 @@ message Action {
   google.protobuf.Timestamp completion = 3;
 }
 
+message Fraction {
+  string name = 1;
+  float influence = 2;
+  int32 missions_completed = 3;
+  int32 missions_failed = 4;
+}
+
 message Resources {
   float clay = 1;
   float ore = 2;
   float energy = 3;
 }
+
 
 message Tool {
   string name = 1;
@@ -59,4 +67,5 @@ message GameState {
   int32 tutorial_step = 14;
 
   Stats stats = 15;
+  repeated Fraction fractions = 16;
 }

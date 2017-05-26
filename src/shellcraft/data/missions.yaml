@@ -1,7 +1,7 @@
 trade_proposal:
   description: A Trade Proposal
   strings:
-    intro: A trader asks whether you can supply them with *{demand} {demand_type}* in
+    intro: ~names~ A trader named @name asks whether you can supply them with *{demand} {demand_type}* in
         {due} seconds or less. In return, they offer *{reward} {reward_type}*. You need
         mine another *{deficit:.0f} {demand_type}* to meet the deadline.
     ask: Do you agree to this trade contract?

@@ -8,6 +8,7 @@ from shellcraft.research import ResearchFactory
 from shellcraft.tutorial import TutorialFactory
 from shellcraft.events import EventFactory
 from shellcraft.missions import MissionFactory
+from shellcraft.fractions import FractionProxy
 
 from shellcraft.game_state_pb2 import GameState
 from google.protobuf import json_format
@@ -41,6 +42,9 @@ class Game(object):
 
         self.tools = ItemProxy(self.state.tools, self.workshop)
         self.missions = ItemProxy(self.state.missions, self.mission_factory)
+        self.fractions = FractionProxy(self.state.fractions)
+
+        self.save_file = None
 
     def alert(self, msg, *args):
         """Add a message to the alert stack."""
@@ -201,7 +205,7 @@ class Game(object):
         game.save()
         return game
 
-    def save(self):
+    def save(self, filename=None):
         """Save a game to disk."""
-        with open(self.save_file, 'w') as f:
+        with open(filename or self.save_file, 'w') as f:
             f.write(json_format.MessageToJson(self.state))

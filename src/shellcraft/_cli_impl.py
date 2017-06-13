@@ -4,6 +4,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from shellcraft.grammar import Grammar
+from shellcraft._colors import Color, Gradient
 import click
 from click.termui import get_terminal_size
 import time
@@ -12,11 +13,11 @@ import sys
 import textwrap
 
 RESOURCE_COLORS = {
-    "clay": 'yellow',
-    "ore": 'green',
-    "command": 'blue',
-    "craft": 'magenta',
-    "research": 'green',
+    "clay": Color.yellow,
+    "ore": Color.green,
+    "command": Color.grey,
+    "craft": Color.purple,
+    "research": Color.blue,
 }
 
 VERBS = {
@@ -47,7 +48,7 @@ def echo_tutorial(message):
 
 def _color_in(match):
     s = match.group(0)
-    color = 'white'
+    color = Color.white
     if s.startswith("$"):
         color = RESOURCE_COLORS['craft']
     elif s.startswith("%"):
@@ -59,8 +60,8 @@ def _color_in(match):
             if res in s:
                 color = col
     else:
-        color = 'blue'
-    return click.style(s.strip("$*%`"), fg=color)
+        color = Color.grey
+    return color(s.strip("$*%`"))
 
 
 def _format_str(s):
@@ -96,7 +97,7 @@ def echo(s, use_cursor=False, *vals, **kwargs):
     if use_cursor:
         s = "❯ " + s
     if kwargs.get("err"):
-        click.secho(_unformat_str(s), fg='red', err=True)
+        click.echo(Color.red(_unformat_str(s)), err=True)
         sys.exit(1)
     else:
         click.echo(_format_str(s))
@@ -115,6 +116,7 @@ class Action:
         """
         self.duration = duration
         self.color = RESOURCE_COLORS[target] if action == "mine" else RESOURCE_COLORS[action]
+        self.dark_color = self.color.mix(Color.dark, .7)
         target_str = "*{}*".format(target) if action == 'mine' else target
         self.action = _format_str("{} {}".format(VERBS[action], target_str).capitalize())
         self.elapsed = 0.
@@ -134,14 +136,14 @@ class Action:
     def draw(self):
         """Echo the current progress bar."""
         term_width, _ = get_terminal_size()
-        bar_width = term_width - len(self.action) - 20
+        bar_width = term_width - len(self.action) - 10
         blocks = min(bar_width, int(self.elapsed / self.duration * bar_width))
         remaining = bar_width - blocks
         info = self._eta()
         bar = "\r{} {}{} {:<18}".format(
             self.action,
-            click.style('▓' * blocks, fg=self.color),
-            '░' * remaining,
+            self.color('█' * blocks),
+            self.dark_color('░' * remaining),
             info
         )
         click.echo(bar, nl=False)

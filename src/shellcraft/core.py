@@ -206,7 +206,7 @@ class BaseFactory(object):
 
     def _resources_missing_to_craft(self, item_name):
         item = self.get(item_name)
-        return {res: res_cost - self.game.resources.get(res) for res, res_cost in item.cost.items() if res_cost - self.game.resources.get(res) > 0}
+        return {res: int(res_cost - self.game.resources.get(res)) for res, res_cost in item.cost.items() if res_cost - self.game.resources.get(res) > 0}
 
     def can_afford(self, item_name):
         """Return true if we have enough resources to create an item."""

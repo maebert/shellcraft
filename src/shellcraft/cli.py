@@ -116,7 +116,7 @@ def craft(game, items):
 
         if not game.workshop.can_afford(item):
             missing_resources = game.workshop._resources_missing_to_craft(item)
-            e = "Need {} to craft {}.".format(_format_cost(missing_resources), item)
+            e = "Need another {} to craft {}.".format(_format_cost(missing_resources), item)
             echo(e, err=True)
 
         difficulty = game.craft(item)

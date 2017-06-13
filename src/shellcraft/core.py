@@ -230,7 +230,7 @@ class BaseFactory(object):
         # Enable resouces
         for resources in item.effects.get('enable_resources', []):
             if resources not in self.game.state.resources_enabled:
-                self.game.alert("You can now mine ${}$.", resources)
+                self.game.alert("You can now mine *{}*.", resources)
                 self.game.state.resources_enabled.append(resources)
 
         # Enable items
@@ -261,7 +261,7 @@ class BaseFactory(object):
             if change:
                 change = to_float(change)
                 self.game.mining_difficulty.multiply(resource, 1 - change)
-                self.game.alert("*{}* difficulty reduced by {:.0%}.", resource, change)
+                self.game.alert("*{}* mining difficulty reduced by {:.0%}.", resource, change)
 
         # Trigger events
         self.game.events.trigger(*item.effects.get('events', []))

@@ -47,7 +47,8 @@ def main(game_path=None):
         sys.exit(0)
 
     # Remove all commands from the main group that are not enabled in the game yet.
-    cli.commands = {cmd: command for cmd, command in cli.commands.items() if cmd in game.state.commands_enabled}
+    if not game.state.debug:
+        cli.commands = {cmd: command for cmd, command in cli.commands.items() if cmd in game.state.commands_enabled}
 
     for cmd in ('mine', 'craft', 'research'):
         if cmd in cli.commands:

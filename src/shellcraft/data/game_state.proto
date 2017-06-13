@@ -39,11 +39,22 @@ message Mission {
   string reward_type = 5;
   int32 due = 6;
   google.protobuf.Timestamp deadline = 7;
+  NPC writer = 8;
 }
 
 message Stats {
   float total_game_duration = 1;
   Resources total_mined = 2;
+}
+
+message NPC {
+  string first = 1;
+  string middle = 2;
+  string last = 3;
+  string title = 4;
+  string nickname = 5;
+  string display = 6;
+  string fraction_name = 7;
 }
 
 message GameState {

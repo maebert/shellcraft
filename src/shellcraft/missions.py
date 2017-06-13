@@ -6,9 +6,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from shellcraft.core import BaseItem, BaseFactory
 from shellcraft._cli_impl import echo, ask
-from shellcraft.utils import convert_resource_value
+from shellcraft.utils import convert_resource_value, format_name
 from shellcraft.game_state_pb2 import Mission as MissionPB
-from shellcraft.world import NPC
+from shellcraft.world import NPCFactory
 import datetime
 import random
 
@@ -18,7 +18,9 @@ class Mission(BaseItem):
 
     def randomize(self, game):
         """Generate random mission."""
-        self.writer = NPC.generate()
+        self.writer = NPCFactory.make()
+        # print("WRITER IS", self.demand)
+        # self.demand = 23
         # self.writer.fraction = random.choice(game.fractions._fractions)
 
         random.shuffle(game.state.resources_enabled)
@@ -37,12 +39,15 @@ class Mission(BaseItem):
         self.demand = int(game.resources.get(demand_type) + extra_demand)
         self.due = int(extra_demand / efficiency * difficulty * (2 + random.random())) + 10
         self.demand_type = demand_type
-        self.reward = int((game.state.trade_reputation + .3 * random.random()) * convert_resource_value(demand_type, reward_type) * self.demand)
+        self.reward = int((1 + game.state.trade_reputation + .3 * random.random()) * convert_resource_value(demand_type, reward_type) * self.demand)
         self.reward_type = reward_type
+        # a = str(self.writer)
+        # print("DEM", format_name(self.writer))
+        # self.writer.CopyFrom(npc)
 
     def vars(self, game):
         return {
-            "writer": self.writer,
+            "writer": format_name(self.writer),
             "demand": self.demand,
             "due": self.due,
             "demand_type": self.demand_type,
@@ -76,6 +81,7 @@ class Mission(BaseItem):
         return False
 
     def __repr__(self):
+        return "blank"
         return "<{demand} {demand_type} in {due}s for {reward} {reward_type}>".format(**vars(self))
 
 

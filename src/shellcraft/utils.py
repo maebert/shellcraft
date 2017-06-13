@@ -55,3 +55,18 @@ def to_float(s):
         low, high = map(float, s[6:].strip("()").split(","))
         return low + random() * (high - low)
     return float(s)
+
+
+def format_name(npc):
+    """Generate the display name of an NPC."""
+    if not npc or not npc.display:
+        return "Anonymous"
+    return npc.display.format(
+        first=npc.first,
+        middle=npc.middle,
+        last=npc.last,
+        title=npc.title,
+        nickname=npc.nickname,
+        first_initial=npc.first[0] + ".",
+        middle_initial=npc.middle[0] + "."
+    ).strip()

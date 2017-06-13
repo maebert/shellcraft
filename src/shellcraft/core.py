@@ -7,6 +7,7 @@ import os
 import yaml
 from copy import copy
 from shellcraft.utils import to_list, to_float
+from google.protobuf.descriptor import Descriptor
 from builtins import str
 
 RESOURCES = ['clay', 'energy', 'ore']
@@ -100,7 +101,10 @@ class ItemProxy(object):
         new_item = self._factory.make(item)
         for field in self._factory.PB_CLASS.DESCRIPTOR.fields_by_name.keys():
             if hasattr(new_item, field):
-                setattr(pb, field, getattr(new_item, field))
+                if isinstance(self._factory.PB_CLASS.DESCRIPTOR.fields_by_name[field].message_type, Descriptor):
+                    getattr(pb, field).CopyFrom(getattr(new_item, field))
+                else:
+                    setattr(pb, field, getattr(new_item, field))
         new_item._pb = pb
         self._items.append(new_item)
         return new_item

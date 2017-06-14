@@ -40,7 +40,7 @@ def echo_tutorial(message):
     for part in message.splitlines():
         click.echo("")
         part = _format_str(part)
-        for line in textwrap.wrap(part, width=term_width - 2):
+        for line in textwrap.wrap(part, width=min(60, term_width - 2)):
             if line.startswith("`"):
                 line = "\n    " + line + "\n"
             click.echo(line)
@@ -96,11 +96,31 @@ def echo(s, use_cursor=False, *vals, **kwargs):
         s = grammar.generate(s)
     if use_cursor:
         s = "❯ " + s
+
+    result = ""
+    for line in s.splitlines():
+        if not line.startswith(">"):
+            result += line + "\n"
+        else:
+            # Format letter
+
+            line = line.replace("> ", "\n")
+            w = min(50, get_terminal_size()[0] - 12)
+            result += Color.grey("    ╭┄┬┄" + "┄" * w + "┄╮\n")
+            result += Color.grey("    ╰┄┤ " + " " * w + " ┊\n")
+            for paragraph in filter(bool, line.splitlines()):
+                for l in textwrap.wrap(paragraph, width=w, replace_whitespace=False):
+                    result += Color.grey("      ┊ ") + l
+                    result += " " * (w - len(_unformat_str(l))) + Color.grey(" ┊\n")
+                result += Color.grey("      ┊ " + " " * w + " ┊\n")
+            result += Color.grey("      ┊ ╭" + "┄" * w + "┴┄╮\n")
+            result += Color.grey("      ╰┄┴" + "┄" * w + "┄┄╯\n")
+
     if kwargs.get("err"):
-        click.echo(Color.red(_unformat_str(s)), err=True)
+        click.echo(Color.red(_unformat_str(result)), err=True)
         sys.exit(1)
     else:
-        click.echo(_format_str(s))
+        click.echo(_format_str(result))
 
 
 class Action:

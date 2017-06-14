@@ -114,13 +114,14 @@
     prerequisites:
         items: small_cart
 10:
-    description: >
-        Whoa, what's that? Looks like there's a huge clay deposit waiting for us
+    description: "
+        > Whoa, what's that? Looks like there's a huge clay deposit waiting for us
         just below the surface! Some tools will have a chance of giving you bonus
         resources when used, or help you discover new deposits that greatly reduce the
         time it takes to mine, craft, or research things.
-
-        Keep on mining.
+        >
+        > Keep on mining.
+        "
     effects:
         events: new_clay_deposit
     prerequisites:

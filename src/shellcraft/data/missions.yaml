@@ -1,10 +1,18 @@
 trade_proposal:
   description: A Trade Proposal
   strings:
-    intro: A trader named {writer} asks whether you can supply them with *{demand} {demand_type}* in
-        {due} seconds or less. In return, they offer *{reward} {reward_type}*. You need
-        mine another *{deficit:.0f} {demand_type}* to meet the deadline.
-    ask: Do you agree to this trade contract?
+    intro: "~letter~ A letter arrives.
+
+        > @address ,
+        >
+        > We request the shipment of *{demand} {demand_type}* in no more than {due} seconds.
+        > I am delighted to inform you that we will reward your efforts with the payment
+        > of *{reward} {reward_type}* upon completion of this agreement.
+        >
+        > @salutation ,
+        >
+        > {writer}"
+    ask: You need mine another *{deficit:.0f} {demand_type}* to meet the deadline. Do you agree to this trade contract?
     agree: The *{demand_type}* will be automatically collected as soon as you have enough. Time is of the essence now!
     disagree: The trader leaves, disappointed.
     failed: You failed to deliver the goods.

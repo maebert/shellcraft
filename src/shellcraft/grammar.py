@@ -143,7 +143,7 @@ class Grammar(object):
 
     def extend_sentence(self, sentence, max_depth=8):
         result = []
-        for part in sentence.split(" "):
+        for part in sentence.replace("\n", "\n ").split(" "):
             if part.startswith("@"):
                 result.extend(self.extend_rule(part, max_depth - 1))
             else:
@@ -177,6 +177,7 @@ class Grammar(object):
         sentence = re.sub(r" ([,.!?])", r'\1', sentence)
         sentence = re.sub(r"' ([A-Za-z0-9 ]+) '", r"'\1'", sentence)
         sentence = re.sub(r"  +", r' ', sentence)
+        sentence = re.sub(r"\n ", '\n', sentence)
         return sentence.strip()
 
     def generate(self, sentence=None):
@@ -200,3 +201,4 @@ class Grammar(object):
 
 NAMES = Grammar.load("names")
 GUILDS = Grammar.load("guild_names")
+LETTER = Grammar.load("letter")

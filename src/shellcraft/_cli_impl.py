@@ -39,7 +39,6 @@ def grid_echo(*cols):
 
     Args:
         cols: str - columns to print
-        padding: int - space between columns.
     Returns:
         int - max height
     """
@@ -85,6 +84,7 @@ def draw_world(world, automaton, w, h):
 
     result = []
     x, y = automaton.x, automaton.y
+
     for py in range(y - h // 2, y + h // 2 + 1):
         row = ''
         for px in range(x - w // 2, x + w // 2 + 1):

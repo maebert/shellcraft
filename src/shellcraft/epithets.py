@@ -27,8 +27,11 @@ class Epithet(with_metaclass(Library)):
     period = 4
     generative = False
 
+<<<<<<< HEAD
     BLANKS = " *."
 
+=======
+>>>>>>> origin/automata
     def __init__(self, automaton, x, y):
         self.automaton = automaton
         self.x = x
@@ -40,7 +43,11 @@ class Epithet(with_metaclass(Library)):
 
     @property
     def is_special(self):
+<<<<<<< HEAD
         return self.symbol not in self.BLANKS
+=======
+        return self.symbol not in " *"
+>>>>>>> origin/automata
 
     @property
     def neighbours(self):

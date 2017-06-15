@@ -19,6 +19,7 @@ RESOURCE_COLORS = {
     "command": Color.grey,
     "craft": Color.purple,
     "research": Color.blue,
+    "automata": Color.pink
 }
 
 VERBS = {
@@ -30,10 +31,10 @@ VERBS = {
 
 def alen(s):
     """Length of a string without ANSI characters."""
-    return len(s) - len("".join(re.findall(r"((?:\x1b|\033)\[\d+m)", s)))
+    return len(s) - len("".join(re.findall(r"((?:\x1b|\033)\[[\d:;]+m)", s)))
 
 
-def grid_echo(*cols, padding=1):
+def grid_echo(*cols):
     """Align columns into a grid and echo.
 
     Args:
@@ -62,38 +63,33 @@ def box(s, join=True):
     """
     lines = s.splitlines()
     w = max(map(alen, lines))
-    result = ["┌" + "─" * w + "┐"]
+    result = ["╭" + "─" * w + "╮"]
     result += ["│{:{}}│".format(line, w) for line in lines]
-    result += ["└" + "─" * w + "┘"]
+    result += ["╰" + "─" * w + "╯"]
     if join:
         return "\n".join(result)
     return result
 
 
-def draw_world(world, x, y, w, h):
-    def _shade(value):
-        value = max(min(value, 1), .2)
-        return "░▒▓█"[int((value - .21) * 5)]
-
+def draw_world(world, automaton, w, h):
     def _field(**resources):
-        c = None
-        s = '░'
         clay = resources.get('clay', 0)
         ore = resources.get('ore', 0)
+        elevation = resources.get('elevation', 0)
         if ore:
-            c = RESOURCE_COLORS['ore']
-            s = _shade(ore)
+            return Gradient.green('█', ore)
         elif clay:
-            c = RESOURCE_COLORS['clay']
-            s = _shade(clay)
-        return click.style(s, fg=c)
+            return Gradient.yellow('█', clay)
+        else:
+            return Gradient.dark("█", elevation)
 
     result = []
+    x, y = automaton.x, automaton.y
     for py in range(y - h // 2, y + h // 2 + 1):
         row = ''
         for px in range(x - w // 2, x + w // 2 + 1):
             if px == x and py == y:
-                row += click.style("▲", fg='magenta')
+                row += RESOURCE_COLORS['automata']("▲▶▼◀︎"[automaton.direction])
             else:
                 row += _field(**world.get_resources(px, py))
         result.append(row)
@@ -112,8 +108,8 @@ def draw_automaton_state(automaton):
 def animate_automaton(automaton, world):
     while True:
         automaton.step()
-        a = "{}, {}\n".format(automaton.y, automaton.x) + draw_automaton_state(automaton)
-        w = draw_world(world, automaton.x, automaton.y, 15, 9)
+        a = draw_automaton_state(automaton)
+        w = draw_world(world, automaton, 15, 9)
         height = grid_echo(a, w)
         time.sleep(1)
         click.echo("\x1b[{}A".format(height + 2))

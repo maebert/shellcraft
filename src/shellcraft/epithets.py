@@ -27,6 +27,8 @@ class Epithet(with_metaclass(Library)):
     period = 4
     generative = False
 
+    BLANKS = " *."
+
     def __init__(self, automaton, x, y):
         self.automaton = automaton
         self.x = x
@@ -38,7 +40,7 @@ class Epithet(with_metaclass(Library)):
 
     @property
     def is_special(self):
-        return self.symbol not in " *"
+        return self.symbol not in self.BLANKS
 
     @property
     def neighbours(self):
@@ -106,12 +108,31 @@ class Move(Epithet):
     """Epithet that when activated will move the automaton."""
 
     symbol = "M"
-    traversing = False
+    traversing = True
 
     def apply(self):
         if self.state == 2:
             self.automaton.move()
-            self._next_state = 0
+
+class Turn(Epithet):
+    """Epithet that when activated will turn the automaton right."""
+
+    symbol = "D"
+    traversing = True
+
+    def apply(self):
+        if self.state == 2:
+            self.automaton.turn_right()
+
+class LeftTurn(Epithet):
+    """Epithet that when activated will turn the automaton right."""
+
+    symbol = "G"
+    traversing = True
+
+    def apply(self):
+        if self.state == 2:
+            self.automaton.turn_left()
 
 
 class Life(Epithet):

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """Automaton Class."""
 from __future__ import absolute_import
-from shellcraft.epithets import Library
+from shellcraft.epithets import Library, Epithet
 from random import seed, randint, paretovariate, random
 import math
+import re
 
 
 class World(object):
@@ -13,19 +14,23 @@ class World(object):
         self.cache = {}
 
         # Distribute resources
+        hills = width * height // 50
         clay_deposits = width * height // 150
         ore_deposits = width * height // 250
 
         self.deposits = {
             'ore': [(randint(0, width), randint(0, height), random() * math.pi / 2) for _ in range(clay_deposits)],
+            'elevation': [(randint(0, width), randint(0, height), random() * math.pi / 2) for _ in range(hills)],
             'clay': [(randint(0, width), randint(0, height)) for _ in range(ore_deposits)]
         }
 
     def _resource_pr(self, resource, x, y, distance, deposit):
         seed("{}.{}".format(x, y))
         if resource == 'clay':
-            v =  paretovariate(2) / (distance + 1)
+            v = paretovariate(2) / (distance + 1)
             return v if v > .2 else 0
+        if resource == 'elevation':
+            return paretovariate(4) / (distance + 1)
         if resource == 'ore':
             dx, dy, dr = deposit
             angle = math.atan2(dy - y, dx - x) % math.pi
@@ -62,12 +67,16 @@ class World(object):
         return {
             'clay': self._get_resource('clay', x, y),
             'ore': self._get_resource('ore', x, y),
+            'elevation': self._get_resource('elevation', x, y),
         }
 
 
 class Automaton(object):
     def __init__(self, name):
-        self.name = name.splitlines()[:6]
+        if re.search(r"\d", name):
+            self.name = Automaton.shortcode_to_name(name)
+        else:
+            self.name = name.splitlines()[:6]
         self._cells = []
         self._padder = Library.get('S', self, -1, -1)
         for y in range(6):
@@ -78,9 +87,35 @@ class Automaton(object):
         self.x = 0
         self.y = 0
 
+    @property
+    def shortcode(self):
+        return Automaton.name_to_shortcode(self.name)
+
+    @classmethod
+    def shortcode_to_name(cls, shortcode):
+        """Convert a shortcode to a name.
+
+        Example:
+            Automaton.shortcode_to_name("30LA3M26")
+            ['            ', '            ', '      LA   M', ...]
+        """
+        name = re.sub(r'\d+', lambda m: " " * int(m.group(0)), shortcode)
+        return [name[n:n + 12] for n in range(0, 72, 12)]
+
+    @classmethod
+    def name_to_shortcode(cls, name):
+        """Convert a name to a shortcode.
+
+        Example:
+            Automaton.shortcode_to_name(['            ', '            ', '   LA   M   '])
+            "27LA3M3"
+        """
+        shortcode = re.sub(r"[{}]+".format(Epithet.BLANKS), lambda m: str(len(m.group(0))), "".join(name))
+        return shortcode.replace('\n', "")
+
     def move(self):
         """Move one step into the current direction."""
-        delta = [(-1, 0), (0, 1), (1, 0), (-1, 0)][self.direction]
+        delta = [(-1, 0), (0, 1), (1, 0), (0, -1)][self.direction]
         self.y += delta[0]
         self.x += delta[1]
 

@@ -46,6 +46,7 @@ class Color(object):
             other (color)
             ratio (float): Ratio between 0 (100% this) and 1 (100% other)
         """
+        ratio = min(1, max(ratio, 0))
         return Color(*[
             (1 - ratio) * s + ratio * o for s, o in zip(self.rgb, other.rgb)
         ])
@@ -83,3 +84,4 @@ Color.white = Color('ffffff')
 
 Gradient.yellow = Gradient(Color.dark, Color.yellow)
 Gradient.green = Gradient(Color.dark, Color.green)
+Gradient.dark = Gradient(Color.dark, Color('3D495A'))

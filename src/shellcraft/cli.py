@@ -50,6 +50,7 @@ def handle_debug(game):
         name = "".join(sys.stdin.readlines())
         w = World(game, 20, 20)
         a = Automaton(name)
+        print(a.shortcode)
         animate_automaton(a, w)
 
     echo_alerts(game)

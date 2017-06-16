@@ -1,39 +1,102 @@
 # -*- coding: utf-8 -*-
 """Epithet Classes."""
-from __future__ import absolute_import
-from future.utils import with_metaclass
+
+import re
 
 
-class Library(type):
-    _all = {}
+class Name(object):
+    def __init__(self, name_or_shortcode):
+        if re.search(r"\d", name_or_shortcode):
+            self.name = Name.shortcode_to_name(name_or_shortcode)
+        else:
+            self.name = name_or_shortcode.splitlines()[:6]
+        self._cells = []
+        self._padder = Epithet.get('S', self, -1, -1)
+        for y in range(6):
+            row = [Epithet.get(self.name[y][x], self, x, y) for x in range(12)]
+            self._cells.append(row)
 
-    def __new__(cls, name, bases, attrs):
-        epithet = super(Library, cls).__new__(cls, name, bases, attrs)
-        cls._all[epithet.symbol] = epithet
-        return epithet
+    @property
+    def shortcode(self):
+        return Name.name_to_shortcode(self.name)
 
     @classmethod
-    def get(cls, symbol, automaton, x=None, y=None):
-        if symbol not in cls._all:
-            symbol = " "
-        epithet = cls._all[symbol]
-        return epithet(automaton, x, y)
+    def shortcode_to_name(cls, shortcode):
+        """Convert a shortcode to a name.
+
+        Example:
+            Name.shortcode_to_name("30LA3M26")
+            ['            ', '            ', '      LA   M', ...]
+        """
+        name = re.sub(r'\d+', lambda m: " " * int(m.group(0)), shortcode)
+        return [name[n:n + 12] for n in range(0, 72, 12)]
+
+    @classmethod
+    def name_to_shortcode(cls, name):
+        """Convert a name to a shortcode.
+
+        Example:
+            Name.shortcode_to_name(['            ', '            ', '   LA   M   '])
+            "27LA3M3"
+        """
+        shortcode = re.sub(r"[{}]+".format(Epithet.BLANKS), lambda m: str(len(m.group(0))), "".join(name))
+        return shortcode.replace('\n', "")
+
+    @property
+    def epithets(self):
+        """Yield all epithets in the body."""
+        for row in self._cells:
+            for epithet in row:
+                yield epithet
+
+    @property
+    def weak_epithets(self):
+        """Yield all weakly active epithets."""
+        return filter(lambda epithet: epithet.state == 1, self.epithets)
+
+    @property
+    def active_epithets(self):
+        """Yield all active epithets."""
+        return filter(lambda epithet: epithet.state == 2, self.epithets)
+
+    @property
+    def special_epithets(self):
+        """Yield all epithets with non-empty symbols."""
+        return filter(lambda epithet: epithet.is_special, self.epithets)
+
+    def step(self):
+        effects = []
+
+        # Weak epithets die
+        for epithet in self.weak_epithets:
+            epithet._next_state = 0
+
+        # Active epithets transport their energy
+        for epithet in self.active_epithets:
+            epithet.traverse()
+
+        for epithet in self.special_epithets:
+            effects.append(epithet.apply())
+
+        # Apply the next state
+        for epithet in self.epithets:
+            epithet.update()
+
+        # Padders always day
+        self._padder.state = 0
+        return filter(bool, effects)
 
 
-class Epithet(with_metaclass(Library)):
-    __metaclass__ = Library
+class Epithet(object):
     symbol = " "
     traversing = True
     period = 4
     generative = False
 
-<<<<<<< HEAD
     BLANKS = " *."
 
-=======
->>>>>>> origin/automata
-    def __init__(self, automaton, x, y):
-        self.automaton = automaton
+    def __init__(self, name, x, y):
+        self.name = name
         self.x = x
         self.y = y
         self.state = 0
@@ -41,13 +104,16 @@ class Epithet(with_metaclass(Library)):
         self.value = 0
         self._next_value = 0
 
+    @classmethod
+    def get(cls, symbol, name, x=None, y=None):
+        for epithet in cls.__subclasses__():
+            if epithet.symbol == symbol:
+                return epithet(name, x, y)
+        return cls(name, x, y)
+
     @property
     def is_special(self):
-<<<<<<< HEAD
         return self.symbol not in self.BLANKS
-=======
-        return self.symbol not in " *"
->>>>>>> origin/automata
 
     @property
     def neighbours(self):
@@ -61,29 +127,29 @@ class Epithet(with_metaclass(Library)):
     def above(self):
         """Select the cell above."""
         if self.y >= 0:
-            return self.automaton._cells[self.y - 1][self.x]
-        return self.automaton._padder
+            return self.name._cells[self.y - 1][self.x]
+        return self.name._padder
 
     @property
     def below(self):
         """Select the cell below."""
         if self.y < 5:
-            return self.automaton._cells[self.y + 1][self.x]
-        return self.automaton._padder
+            return self.name._cells[self.y + 1][self.x]
+        return self.name._padder
 
     @property
     def right(self):
         """Select the cell right."""
         if self.x < 11:
-            return self.automaton._cells[self.y][self.x + 1]
-        return self.automaton._padder
+            return self.name._cells[self.y][self.x + 1]
+        return self.name._padder
 
     @property
     def left(self):
         """Select the cell left."""
         if self.x >= 0:
-            return self.automaton._cells[self.y][self.x - 1]
-        return self.automaton._padder
+            return self.name._cells[self.y][self.x - 1]
+        return self.name._padder
 
     def apply(self):
         pass
@@ -119,7 +185,8 @@ class Move(Epithet):
 
     def apply(self):
         if self.state == 2:
-            self.automaton.move()
+            return "move"
+
 
 class Turn(Epithet):
     """Epithet that when activated will turn the automaton right."""
@@ -129,7 +196,8 @@ class Turn(Epithet):
 
     def apply(self):
         if self.state == 2:
-            self.automaton.turn_right()
+            return "turn_right"
+
 
 class LeftTurn(Epithet):
     """Epithet that when activated will turn the automaton right."""
@@ -139,7 +207,7 @@ class LeftTurn(Epithet):
 
     def apply(self):
         if self.state == 2:
-            self.automaton.turn_left()
+            return "turn_left"
 
 
 class Life(Epithet):
@@ -210,6 +278,7 @@ class Silence(Epithet):
 
 class Synchronicity(Epithet):
     """Similar to concurrence, but will only traverse if charged from both sides."""
+
     symbol = "Y"
 
     def traverse(self):

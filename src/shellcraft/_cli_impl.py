@@ -98,7 +98,7 @@ def draw_world(world, automaton, w, h):
 
 def draw_automaton_state(automaton):
     s = ""
-    for line in automaton._cells:
+    for line in automaton.name._cells:
         for cell in line:
             s += click.style(cell.symbol.strip() or "·", bg=[None, 'yellow', 'red'][cell.state])
         s += "\n"

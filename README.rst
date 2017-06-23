@@ -1,4 +1,4 @@
-.. image:: https://raw.githubusercontent.com/maebert/shellcraft/HEAD/docs/_static/logo.png
+.. image:: https://raw.githubusercontent.com/maebert/shellcraft/HEAD/docs/_static/cover.png
    :alt: ShellCraft
    :align: center
 

@@ -1,12 +1,8 @@
-===============================
-ShellCraft
-===============================
+.. image:: https://raw.githubusercontent.com/maebert/shellcraft/HEAD/docs/_static/logo.png
+   :alt: ShellCraft
+   :align: center
 
 ShellCraft is a game about mining, crafting, and puzzling, loosely based on Ted Chiang's short story `"Seventy-Two Letters"`_.
-
-
-.. image:: https://github.com/maebert/shellcraft/blob/master/docs/_static/logo.png?raw=true
-   :width: 128 px
 
 .. code-block:: console
 

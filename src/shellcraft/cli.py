@@ -6,6 +6,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import click
 from shellcraft.shellcraft import Game
 from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost, animate_automaton
+import datetime
 import os
 import sys
 
@@ -103,6 +104,10 @@ def mine(game, resource):
     if resource not in game.state.resources_enabled:
         echo("You can't mine {} yet", resource, err=True)
 
+    if game.is_busy:
+        dt = game.state.action.completion.ToDatetime() - datetime.datetime.now()
+        echo("You're busy {} for another {:.0f} seconds.", VERBS[game.state.action.task], dt.total_seconds(), err=True)
+
     duration, quantity = game.mine(resource)
     game.save()
 
@@ -117,6 +122,10 @@ def craft(game, items):
     """Mine a resource."""
     if len(items) > 1:
         echo("Can only craft one project at a time", err=True)
+
+    if game.is_busy:
+        dt = game.state.action.completion.ToDatetime() - datetime.datetime.now()
+        echo("You're busy {} for another {:.0f} seconds.", VERBS[game.state.action.task], dt.total_seconds(), err=True)
 
     elif not items:
         if not game.workshop.available_items:
@@ -187,7 +196,8 @@ def research(game, projects):
     else:
         # Researching something now
         if game.is_busy:
-            echo("You're busy {} until {}.", VERBS[game.action.task], game.action.completion, err=True)
+            dt = game.state.action.completion.ToDatetime() - datetime.datetime.now()
+            echo("You're busy {} for another {:.0f} seconds.", VERBS[game.state.action.task], dt.total_seconds(), err=True)
 
         project = game.lab.get(projects[0])
         if not project:

@@ -154,7 +154,7 @@ def resources(game, resource_types=None):
     types = resource_types or ("clay", "ore", "energy")
     for resource in types:
         if resource in game.state.resources_enabled:
-            echo("*{}: {}*", resource, game.resources.get(resource))
+            echo("*{}: {:.0f}*", resource, game.resources.get(resource))
         elif resource_types:
             echo("*{}* is not available yet.", resource)
 

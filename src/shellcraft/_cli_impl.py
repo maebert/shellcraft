@@ -169,7 +169,7 @@ def ask(msg):
     return click.confirm("❯ " + _format_str(msg))
 
 
-def echo(s, use_cursor=False, *vals, **kwargs):
+def echo(s, *vals, err=False, use_cursor=False):
     """Echo a string with colours.
 
     Options are *resource* to highlight a resource, `code` for tutorials.
@@ -204,7 +204,7 @@ def echo(s, use_cursor=False, *vals, **kwargs):
             result += Color.grey("      ┊ ╭" + "┄" * w + "┴┄╮\n")
             result += Color.grey("      ╰┄┴" + "┄" * w + "┄┄╯\n")
 
-    if kwargs.get("err"):
+    if err:
         click.echo(Color.red(_unformat_str(result)), err=True)
         sys.exit(1)
     else:

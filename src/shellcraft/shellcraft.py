@@ -9,6 +9,7 @@ from shellcraft.tutorial import TutorialFactory
 from shellcraft.events import EventFactory
 from shellcraft.missions import MissionFactory
 from shellcraft.fractions import FractionProxy
+from shellcraft.grammar import VERBS
 
 from shellcraft.game_state_pb2 import GameState
 from google.protobuf import json_format
@@ -17,6 +18,29 @@ from shellcraft.core import ResourceProxy, ItemProxy
 from random import random
 import os
 import datetime
+
+
+class ShellcraftException(RuntimeError):
+    pass
+
+
+class BusyException(ShellcraftException):
+    """Exception that is raised if the parse tree runs too deep."""
+    def __init__(self, game):
+        self._time_left = game.state.action.completion.ToDatetime() - datetime.datetime.now()
+        self._action = game.state.action.task
+
+    def __str__(self):
+        return "You're busy {} for another {:.0f} seconds.".format(VERBS[self._action], self._time_left.total_seconds())
+
+
+class ResourceNotAvailable(ShellcraftException):
+    """Exception that is raised if the parse tree runs too deep."""
+    def __init__(self, resource):
+        self._resource = resource
+
+    def __str__(self):
+        return "You can't mine {} yet".format(self._resource)
 
 
 class Game(object):
@@ -111,7 +135,7 @@ class Game(object):
     def mine(self, resource):
         """Mine a resource."""
         if self.is_busy:
-            return None  # @Todo Raise Exception
+            raise BusyException(self)
 
         difficulty = self.mining_difficulty.get(resource)
 
@@ -169,7 +193,8 @@ class Game(object):
 
     def _act(self, task, target, duration):
         if self.is_busy:
-            return None  # @Todo Raise Exception
+            raise BusyException(self)
+
         self.state.stats.total_game_duration += duration
         if self.state.debug:
             duration = 0

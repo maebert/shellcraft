@@ -3,7 +3,7 @@
 """CLI implementations."""
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from shellcraft.grammar import Grammar
+from shellcraft.grammar import Grammar, VERBS
 from shellcraft._colors import Color, Gradient
 import click
 from click.termui import get_terminal_size
@@ -22,11 +22,14 @@ RESOURCE_COLORS = {
     "automata": Color.pink
 }
 
-VERBS = {
-    "research": "researching",
-    "mine": "mining",
-    "craft": "crafting"
-}
+
+def handle_exception(e):
+    """Echo error message and shut down.
+
+    Args:
+        e: Exception
+    """
+    echo(str(e), err=True)
 
 
 def alen(s):
@@ -169,13 +172,19 @@ def ask(msg):
     return click.confirm("❯ " + _format_str(msg))
 
 
-def echo(s, *vals, err=False, use_cursor=False):
+def echo(s, *vals, **kwargs):
     """Echo a string with colours.
 
-    Options are *resource* to highlight a resource, `code` for tutorials.
+    Args:
+        err (bool): If True, print to stderr
+        use_cursor (bool): If True, use interaction cursor
     """
     if vals:
         s = s.format(*vals)
+
+    err = kwargs.pop("err", False)
+    use_cursor = kwargs.pop("use_cursor", False)
+
     grammar_match = re.search("^~([a-zA-Z0-9_]+)~ *", s)
     if grammar_match:
         grammar_name = grammar_match.group(1)

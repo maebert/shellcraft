@@ -13,6 +13,13 @@ import sys
 import os
 
 
+VERBS = {
+    "research": "researching",
+    "mine": "mining",
+    "craft": "crafting"
+}
+
+
 class MaximumDepthExceeded(Exception):
     """Exception that is raised if the parse tree runs too deep."""
 

@@ -5,7 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import click
 from shellcraft.shellcraft import Game
-from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost, animate_automaton
+from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost, animate_automaton, handle_exception
 import datetime
 import os
 import sys
@@ -29,11 +29,14 @@ def action_step(callback, game):
     """Wrapper around actions."""
     def inner(**kwargs):
         # Do the action
-        callback(**kwargs)
-        game.complete_missions()
-        echo_alerts(game)
-        game.tutorial.cont()
-        game.save()
+        try:
+            callback(**kwargs)
+            game.complete_missions()
+            echo_alerts(game)
+            game.tutorial.cont()
+            game.save()
+        except Exception as e:
+            handle_exception(e)
     return inner
 
 
@@ -102,11 +105,8 @@ def contract(game):
 def mine(game, resource):
     """Mine a resource."""
     if resource not in game.state.resources_enabled:
-        echo("You can't mine {} yet", resource, err=True)
+        raise ResourceNotAvailable(resource)
 
-    if game.is_busy:
-        dt = game.state.action.completion.ToDatetime() - datetime.datetime.now()
-        echo("You're busy {} for another {:.0f} seconds.", VERBS[game.state.action.task], dt.total_seconds(), err=True)
 
     duration, quantity = game.mine(resource)
     game.save()
@@ -122,10 +122,6 @@ def craft(game, items):
     """Mine a resource."""
     if len(items) > 1:
         echo("Can only craft one project at a time", err=True)
-
-    if game.is_busy:
-        dt = game.state.action.completion.ToDatetime() - datetime.datetime.now()
-        echo("You're busy {} for another {:.0f} seconds.", VERBS[game.state.action.task], dt.total_seconds(), err=True)
 
     elif not items:
         if not game.workshop.available_items:

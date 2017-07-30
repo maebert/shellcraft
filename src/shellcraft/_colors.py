@@ -13,7 +13,7 @@ __email__ = 'manuel@1450.me'
 class Color(object):
     """Truecolor."""
 
-    def __init__(self, r=None, g=None, b=None):
+    def __init__(self, r=None, g=None, b=None, underline=False):
         """Initialise the color.
 
         Examples:
@@ -24,10 +24,27 @@ class Color(object):
             self.rgb = int(r[:2], 16), int(r[2:4], 16), int(r[4:], 16)
         elif r and g and b:
             self.rgb = int(r), int(g), int(b)
+        self.underline = "\033[31;4m" if underline else ""
+
+
+    def _to_256(self):
+        def _round(i):
+            if i < 75:
+                return 0
+            return int((i - 75) / 40) + 1
+
+        r, g, b = map(_round, self.rgb)
+        return 16 + r * 36 + g * 6 + b
+
 
     @property
     def ansi(self):
         """Generate ANSI escape sequence for color."""
+        return "\033[38;5;{}m".format(self._to_256())
+
+    @property
+    def truecolor(self):
+        """Generate True Color ANSI escape sequence for color."""
         return "\x1b[38;2;{};{};{}m".format(*self.rgb)
 
     @property
@@ -37,7 +54,7 @@ class Color(object):
 
     def __call__(self, text):
         """Format a text with the given color."""
-        return self.ansi + text + self.clear
+        return self.underline + self.ansi + text + self.clear
 
     def mix(self, other, ratio):
         """Return an RGB blend between this and another color.
@@ -75,10 +92,10 @@ class Gradient(object):
 Color.yellow = Color('F5C065')
 Color.green = Color('58BD86')
 Color.blue = Color('798BDF')
-Color.purple = Color('AB81B8')
+Color.purple = Color('a35bb8')
 Color.red = Color('E8685D')
 Color.pink = Color('F25C80')
-Color.grey = Color('91B1C1')
+Color.grey = Color('8390ab', underline=True)
 Color.dark = Color('2B333F')
 Color.white = Color('ffffff')
 

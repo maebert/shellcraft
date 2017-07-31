@@ -24,23 +24,23 @@ class Color(object):
             self.rgb = int(r[:2], 16), int(r[2:4], 16), int(r[4:], 16)
         elif r and g and b:
             self.rgb = int(r), int(g), int(b)
+        self.ansi256 = self._to_256(self.rgb)
         self.underline = "\033[31;4m" if underline else ""
 
-
-    def _to_256(self):
+    def _to_256(self, rgb):
         def _round(i):
             if i < 75:
                 return 0
             return int((i - 75) / 40) + 1
 
-        r, g, b = map(_round, self.rgb)
+        r, g, b = map(_round, rgb)
         return 16 + r * 36 + g * 6 + b
 
 
     @property
     def ansi(self):
         """Generate ANSI escape sequence for color."""
-        return "\033[38;5;{}m".format(self._to_256())
+        return "\033[38;5;{}m".format(self.ansi256)
 
     @property
     def truecolor(self):

@@ -197,7 +197,7 @@ def echo(s, *vals, **kwargs):
     result = ""
     for line in s.splitlines():
         if not line.startswith(">"):
-            result += line + "\n"
+            result += line
         else:
             # Format letter
 
@@ -212,7 +212,8 @@ def echo(s, *vals, **kwargs):
                 result += Color.grey("      ┊ " + " " * w + " ┊\n")
             result += Color.grey("      ┊ ╭" + "┄" * w + "┴┄╮\n")
             result += Color.grey("      ╰┄┴" + "┄" * w + "┄┄╯\n")
-
+    if not use_cursor:
+        result += "\n"
     if err:
         click.echo(Color.red(_unformat_str(result)), err=True)
         sys.exit(1)
@@ -271,7 +272,9 @@ class Action:
             return
         term_width, _ = get_terminal_size()
         blocks = (term_width - len(self.action) - 20.0)
-        delta = self.duration / blocks
+        delta = min(1, self.duration / blocks)
+        if self.duration - self.elapsed <= 2:
+            delta = min(delta, 0.85)
         while self.elapsed < self.duration:
             self.draw()
             time.sleep(delta)

@@ -12,8 +12,8 @@ ShellCraft is a game about mining, crafting, and puzzling, loosely based on Ted 
     # Run ShellCraft:
     $ shellcraft
 
-Full documentation can be found over at `Read The Docs`_.
 
+Full documentation can be found over at `Read The Docs`_.
 
 .. image:: https://img.shields.io/pypi/v/shellcraft.svg
         :target: https://pypi.python.org/pypi/shellcraft

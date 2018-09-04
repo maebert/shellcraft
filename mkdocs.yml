@@ -1,0 +1,14 @@
+site_name: Shellcraft
+theme: material
+markdown_extensions:
+  - admonition
+  - codehilite
+repo_url: https://github.com/maebert/shellcraft/
+site_author: Manuel Ebert
+site_description: ShellCraft is a hackable game about mining, crafting, and puzzling, loosely based on Ted Chiang's short story "Seventy-Two Letters".
+nav:
+    - Introduction: index.md
+    - Installation: installation.md
+    - Nomenclature: nomenclature.md
+    - Fractions: fractions.md
+    - Development: dev.md

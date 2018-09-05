@@ -53,7 +53,7 @@ class ResourceProxy(object):
 class ItemProxy(object):
     """Proxy for accessing serializable items."""
 
-    def __init__(self, field, factory):
+    def __init__(self, field, factory, filter=None):
         """Initialise the Proxy.
 
         Args:
@@ -63,10 +63,15 @@ class ItemProxy(object):
         self._field = field
         self._factory = factory
         self._items = [factory.make(pb) for pb in field]
+        self.filter = filter
+
+    @property
+    def _filtered_items(self):
+        return filter(self.filter, self._items)
 
     def __iter__(self):
         """Iterate over items."""
-        return self._items.__iter__()
+        return self._filtered_items.__iter__()
 
     def remove(self, item):
         """Remove an item."""
@@ -80,11 +85,11 @@ class ItemProxy(object):
     @property
     def is_empty(self):
         """True if the proxy does not contain any items."""
-        return not self._items
+        return not self._filtered_items
 
     def __repr__(self):
         """String representation of item proxy."""
-        return str(self._items)
+        return str(self._filtered_items)
 
     def add(self, item):
         """Add a new item.

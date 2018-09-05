@@ -44,3 +44,14 @@ axe:
       ore: 40
     prerequisites:
       ore: 20
+
+crawler:
+    description: The easiest possible automaton
+    durability: 6000
+    difficulty: 60
+    type: automaton
+    cost:
+      clay: 40
+      ore: 40
+    prerequisites:
+      research: automata

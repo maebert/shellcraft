@@ -143,7 +143,7 @@
         clay: 10
 12:
     description: >
-        Shortly after delivering the clay, another letter comes in,
+        Shortly after delivering the clay, another letter comes in:
 
         > Esteemed citizen,
         >
@@ -163,3 +163,11 @@
         clay: -50
     prerequisites:
         clay: 70
+
+13:
+    description: >
+        You completed your first automaton!
+    prerequisites:
+        autoamta: crawler
+    effects:
+        enable_commands: automata

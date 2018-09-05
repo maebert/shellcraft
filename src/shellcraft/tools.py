@@ -12,6 +12,7 @@ class Tool(BaseItem):
     @classmethod
     def from_dict(cls, name, data):
         tool = super(Tool, cls).from_dict(name, data)
+        tool.type = data.get("type", "tool")
         tool.durability = data.get("durability", -1)
         tool.mining_bonus = data.get("mining_bonus", {})
         tool.event_bonus = data.get("event_bonus", {})

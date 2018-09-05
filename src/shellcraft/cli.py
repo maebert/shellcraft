@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import click
 from shellcraft.shellcraft import Game
+from shellcraft.exceptions import ResourceNotAvailable
 from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost, animate_automaton, handle_exception
 import datetime
 import os
@@ -178,6 +179,16 @@ def inventory(game):
             echo(str(item))
             # echo("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
+@cli.command(options_metavar='')
+@click.pass_obj
+def automata(game):
+    """Show owned automata and their condition."""
+    if not game.tools:
+        echo("You don't own any automata", err=True)
+    else:
+        for item in game.automata:
+            echo(str(item))
+            # echo("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
 @cli.command(options_metavar='')
 @click.argument("projects", nargs=-1, type=str, metavar="<project>")

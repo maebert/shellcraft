@@ -96,6 +96,8 @@ Color.purple = Color('a35bb8')
 Color.red = Color('E8685D')
 Color.pink = Color('F25C80')
 Color.grey = Color('8390ab', underline=True)
+Color.paper = Color('aba483')
+Color.ink = Color('6f6b55')
 Color.dark = Color('2B333F')
 Color.white = Color('ffffff')
 

@@ -19,3 +19,6 @@ dynamite:
     ore: 120
   effects:
     enable_items: dynamite
+automata:
+  description: Machines that can be animated with names
+  difficulty: 1200

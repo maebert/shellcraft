@@ -11,4 +11,5 @@ nav:
     - Installation: installation.md
     - Nomenclature: nomenclature.md
     - Fractions: fractions.md
+    - Command reference: cli.md
     - Development: dev.md

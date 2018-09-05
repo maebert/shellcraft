@@ -10,6 +10,8 @@ The government has pledged to protect its subject from foreign interference, and
 
 Sculptors and nomenclators work hand in hand in producing the latest and best automata. The sculptor's union is a political heavyweight far beyond the direct interest of just sculptors.
 
+The union is under tight control of Lord Mannings.
+
 ## The Kabbalists
 
 Rarely interested in worldy affairs, Kabbalists study Names and employ *golems* as a form of ecstatic meditation. To most modern nomenclators, Kabbalists are obscure relics of bygone days, but they still hold considerable influence in aristocratic circles.

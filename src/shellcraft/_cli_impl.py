@@ -125,18 +125,6 @@ def echo_alerts(game):
     game._messages = []
 
 
-def echo_tutorial(message):
-    """Pretty-print a tutoria step."""
-    term_width, _ = get_terminal_size()
-    for part in message.splitlines():
-        click.echo("")
-        part = _format_str(part)
-        for line in textwrap.wrap(part, width=min(60, term_width - 2)):
-            if line.startswith("`"):
-                line = "\n    " + line + "\n"
-            click.echo(line)
-
-
 def _color_in(match):
     s = match.group(0)
     color = Color.white
@@ -194,26 +182,34 @@ def echo(s, *vals, **kwargs):
     if use_cursor:
         s = "❯ " + s
 
+    term_width, _ = get_terminal_size()
+
     result = ""
     for line in s.splitlines():
         if not line.startswith(">"):
-            result += line
+            for l in textwrap.wrap(line, width=min(60, term_width - 2)):
+                if l.startswith("`"):
+                    l = "\n    " + l + "\n"
+                result += l + "\n"
+            result += "\n"
         else:
             # Format letter
 
-            line = line.replace("> ", "\n")
-            w = min(50, get_terminal_size()[0] - 12)
-            result += Color.grey("    ╭┄┬┄" + "┄" * w + "┄╮\n")
-            result += Color.grey("    ╰┄┤ " + " " * w + " ┊\n")
+            line = line.replace("> > ", "\n")
+            line = line.replace("> ", "")
+            w = min(50, term_width - 12)
+            result += Color.paper(" ╭┄┬┄" + "┄" * w + "┄╮\n")
+            result += Color.paper(" ╰┄┤ " + " " * w + " ┊\n")
             for paragraph in filter(bool, line.splitlines()):
                 for l in textwrap.wrap(paragraph, width=w, replace_whitespace=False):
-                    result += Color.grey("      ┊ ") + l
-                    result += " " * (w - len(_unformat_str(l))) + Color.grey(" ┊\n")
-                result += Color.grey("      ┊ " + " " * w + " ┊\n")
-            result += Color.grey("      ┊ ╭" + "┄" * w + "┴┄╮\n")
-            result += Color.grey("      ╰┄┴" + "┄" * w + "┄┄╯\n")
-    if not use_cursor:
-        result += "\n"
+                    result += Color.paper("   ┊ ") + Color.ink(l)
+                    result += " " * (w - len(_unformat_str(l))) + Color.paper(" ┊\n")
+                result += Color.paper("   ┊ " + " " * w + " ┊\n")
+            result += Color.paper("   ┊ ╭" + "┄" * w + "┴┄╮\n")
+            result += Color.paper("   ╰┄┴" + "┄" * w + "┄┄╯\n")
+    result = result.rstrip("\n")
+    # if not use_cursor:
+    #     result += "\n"
     if err:
         click.echo(Color.red(_unformat_str(result)), err=True)
         sys.exit(1)

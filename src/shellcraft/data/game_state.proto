@@ -40,6 +40,7 @@ message Mission {
   int32 due = 6;
   google.protobuf.Timestamp deadline = 7;
   NPC writer = 8;
+  int32 reward_factor = 9;
 }
 
 message Stats {

@@ -51,7 +51,7 @@ def to_float(s):
         >>> to_float('random(1, 9)')
         6
     """
-    if s.startswith("random"):
+    if isinstance(s, str) and s.startswith("random"):
         low, high = map(float, s[6:].strip("()").split(","))
         return low + random() * (high - low)
     return float(s)

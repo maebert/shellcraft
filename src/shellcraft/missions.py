@@ -19,12 +19,11 @@ class Mission(BaseItem):
     def randomize(self, game):
         """Generate random mission."""
         self.writer = NPCFactory.make()
-        # print("WRITER IS", self.demand)
-        # self.demand = 23
-        # self.writer.fraction = random.choice(game.fractions._fractions)
-
         random.shuffle(game.state.resources_enabled)
-        demand_type, reward_type = game.state.resources_enabled[:2]
+        if not self.reward_type or self.reward_type == 'resource':
+            demand_type, reward_type = game.state.resources_enabled[:2]
+        elif self.reward_type == 'reputation':
+            demand_type = game.state.resources_enabled[1]
 
         if game.workshop.available_items:
             best_available_tool = max(game.workshop.available_items, key=lambda item: item.mining_bonus.get(demand_type, 0))

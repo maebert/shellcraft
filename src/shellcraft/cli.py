@@ -42,13 +42,16 @@ def action_step(callback, game):
 
 def handle_debug(game):
     if sys.argv[2] == "off":  # Disable hyperlapse
-        game.flags.debug = False
+        game.state.debug = False
         echo("Debug mode is `off`")
     elif sys.argv[2] == "on":  # Enable hyperlapse
-        game.flags.debug = True
+        game.state.debug = True
         echo("Debug mode is `on`")
     elif sys.argv[2] == "trigger":  # Trigger an event
         game.events.trigger(sys.argv[3])
+    elif sys.argv[2] == "contract":  # Trigger an event
+        game.add_mission('trade_proposal')
+        game.save()
     elif sys.argv[2] == "automata":  # Trigger an event
         from shellcraft.automata import Automaton, World
         name = "".join(sys.stdin.readlines())

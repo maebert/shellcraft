@@ -257,7 +257,7 @@ class BaseFactory(object):
                 if value > 0:
                     self.game.alert("You found *{} {}*.", value, resource)
                 else:
-                    self.game.alert("You lost *{} {}*.", value, resource)
+                    self.game.alert("You lost *{} {}*.", -value, resource)
 
         # Change mining difficulty
         for resource in RESOURCES:

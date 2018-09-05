@@ -122,3 +122,44 @@
         events: new_clay_deposit
     prerequisites:
         clay: 4
+11:
+    description: >
+        ~names~ Look, we've received a letter from the Sculptor's Union:
+
+        > Esteemed citizen,
+        >
+        > We kindly ask for your assistance to our causes by supplying the Union
+        > with *150 clay* at your earliest convenience. Your continued support will not
+        > go unnoticed.
+        >
+        > With highest regards,
+        >
+        > D. H. Ramsbottom
+        >
+        > Assistant to Undersecretary Pierce
+
+        That's a lot of clay, but it's probably worth making some friends within the Union.
+    prerequisites:
+        clay: 10
+12:
+    description: >
+        Shortly after delivering the clay, another letter comes in,
+
+        > Esteemed citizen,
+        >
+        > In light of your generous contribution to the Sculptor's Union, it is
+        > my please to let it be known that by degree of Chairman Manings, you
+        > are herewith bestowed with the title of Nomenclator. As such, you are free
+        > to conduct research in, produce, and vend automata. I'd like to express my
+        > personal congratulations and wish you success.
+        >
+        > With highest regards,
+        >
+        > D. H. Ramsbottom
+        >
+        > Assistant to Undersecretary Pierce
+    effects:
+        enable_research: automata
+        clay: -50
+    prerequisites:
+        clay: 70

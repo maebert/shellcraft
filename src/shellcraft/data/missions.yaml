@@ -17,3 +17,24 @@ trade_proposal:
     disagree: The trader leaves, disappointed.
     failed: You failed to deliver the goods.
     completed: The trader takes *{demand} {demand_type}*, hands you *{reward} {reward_type}* and smiles.
+trade_proposal:
+  description: A Trade Proposal
+  reward_factor: 0
+  reward_type: reputation
+  strings:
+    intro: "~letter~ A letter arrives.
+
+        > @address ,
+        >
+        > We request the shipment of *{demand} {demand_type}* in no more than {due} seconds.
+        > I am delighted to inform you that we will reward your efforts with the payment
+        > of *{reward} {reward_type}* upon completion of this agreement.
+        >
+        > @salutation ,
+        >
+        > {writer}"
+    ask: You need mine another *{deficit:.0f} {demand_type}* to meet the deadline. Do you agree to this trade contract?
+    agree: The *{demand_type}* will be automatically collected as soon as you have enough. Time is of the essence now!
+    disagree: The trader leaves, disappointed.
+    failed: You failed to deliver the goods.
+    completed: The trader takes *{demand} {demand_type}*, hands you *{reward} {reward_type}* and smiles.

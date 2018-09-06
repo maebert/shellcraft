@@ -7,7 +7,7 @@ import re
 class Name(object):
     def __init__(self, name_or_shortcode):
         if re.search(r"\d", name_or_shortcode):
-            self.name = Name.shortcode_to_name(name_or_shortcode)
+            self.name = Name.shortcode_to_name(name_or_shortcode.replace("\n", ""))
         else:
             self.name = name_or_shortcode.splitlines()[:6]
         self._cells = []
@@ -29,7 +29,7 @@ class Name(object):
             ['            ', '            ', '      LA   M', ...]
         """
         name = re.sub(r'\d+', lambda m: " " * int(m.group(0)), shortcode)
-        return [name[n:n + 12] for n in range(0, 72, 12)]
+        return ["{:12}".format(name[n:n + 12]) for n in range(0, 72, 12)]
 
     @classmethod
     def name_to_shortcode(cls, name):

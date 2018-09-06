@@ -35,21 +35,21 @@
       
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
-      <link rel="shortcut icon" href="/assets/images/favicon.png">
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.0.3, mkdocs-material-3.0.4">
     
     
       
-        <title>Shellcraft</title>
+        <title>Command reference - Shellcraft</title>
       
     
     
-      <link rel="stylesheet" href="/assets/stylesheets/application.451f80e5.css">
+      <link rel="stylesheet" href="../assets/stylesheets/application.451f80e5.css">
       
       
     
     
-      <script src="/assets/javascripts/modernizr.1aa3b519.js"></script>
+      <script src="../assets/javascripts/modernizr.1aa3b519.js"></script>
     
     
       
@@ -58,7 +58,7 @@
         <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
       
     
-    <link rel="stylesheet" href="/assets/fonts/material-icons.css">
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
     
     
   </head>
@@ -94,12 +94,16 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
+      <a href="../#command-line-reference" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="/." title="Shellcraft" class="md-header-nav__button md-logo">
+        <a href=".." title="Shellcraft" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -116,7 +120,7 @@
                 Shellcraft
               </span>
               <span class="md-header-nav__topic">
-                
+                Command reference
               </span>
             
           
@@ -195,7 +199,7 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="/." title="Shellcraft" class="md-nav__button md-logo">
+    <a href=".." title="Shellcraft" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
@@ -233,7 +237,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/." title="Introduction" class="md-nav__link">
+    <a href=".." title="Introduction" class="md-nav__link">
       Introduction
     </a>
   </li>
@@ -245,7 +249,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/installation/" title="Installation" class="md-nav__link">
+    <a href="../installation/" title="Installation" class="md-nav__link">
       Installation
     </a>
   </li>
@@ -257,7 +261,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/nomenclature/" title="Nomenclature" class="md-nav__link">
+    <a href="../nomenclature/" title="Nomenclature" class="md-nav__link">
       Nomenclature
     </a>
   </li>
@@ -269,7 +273,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/fractions/" title="Fractions" class="md-nav__link">
+    <a href="../fractions/" title="Fractions" class="md-nav__link">
       Fractions
     </a>
   </li>
@@ -279,11 +283,77 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="/cli/" title="Command reference" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Command reference
+      </label>
+    
+    <a href="./" title="Command reference" class="md-nav__link md-nav__link--active">
       Command reference
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#getting-help" title="Getting help" class="md-nav__link">
+    Getting help
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mining" title="Mining" class="md-nav__link">
+    Mining
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#crafting-items" title="Crafting items" class="md-nav__link">
+    Crafting items
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#research" title="Research" class="md-nav__link">
+    Research
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seeing-your-inventory" title="Seeing your inventory" class="md-nav__link">
+    Seeing your inventory
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -293,7 +363,7 @@
 
 
   <li class="md-nav__item">
-    <a href="/dev/" title="Development" class="md-nav__link">
+    <a href="../dev/" title="Development" class="md-nav__link">
       Development
     </a>
   </li>
@@ -306,12 +376,98 @@
               </div>
             
             
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#getting-help" title="Getting help" class="md-nav__link">
+    Getting help
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mining" title="Mining" class="md-nav__link">
+    Mining
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#crafting-items" title="Crafting items" class="md-nav__link">
+    Crafting items
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#research" title="Research" class="md-nav__link">
+    Research
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seeing-your-inventory" title="Seeing your inventory" class="md-nav__link">
+    Seeing your inventory
+  </a>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
-  <h1>404 - Not found</h1>
-
+                
+                  <a href="https://github.com/maebert/shellcraft/edit/master/docs/cli.md" title="Edit this page" class="md-icon md-content__icon">&#xE3C9;</a>
+                
+                
+                <h1 id="command-line-reference">Command Line Reference</h1>
+<h2 id="getting-help">Getting help</h2>
+<p>You can allways use <code>shellcraft --help</code> to see all available commands, or <code>shellcraft &lt;command&gt; --help</code> to get help on a particular command.</p>
+<p>Additionally, <code>shellcraft tutorial</code> will display the last tutorial message.</p>
+<h2 id="mining">Mining</h2>
+<p>Use <code>shellcraft mine &lt;resource&gt;</code> to mine a resource.</p>
+<h2 id="crafting-items">Crafting items</h2>
+<p>See a list of available items to craft with <code>shellcraft craft</code>, and craft an item with <code>shellcraft craft &lt;item&gt;</code>. The resources required will be immediately consumed.</p>
+<h2 id="research">Research</h2>
+<p>Like crafting items, <code>shellcraft research</code> lists available project, and <code>shellcraft research &lt;project&gt;</code> starts research on a particular one.</p>
+<h2 id="seeing-your-inventory">Seeing your inventory</h2>
+<p>You can see all available resources with <code>shellcraft resources</code>, or only how much of a particular resource you have with <code>shellcraft resources &lt;resource&gt;</code>.</p>
+<p>Use <code>shellcraft inventory</code> to see items in your posession.</p>
+<h1 id="automating-the-game">Automating the game</h1>
+<p>"Hacking" the game with command line scripts is not only possible, but encouraged. Many people include an <code>alias sc=shellcraft</code> into their <code>.bashrc</code> or <code>.bash_profile</code>.</p>
+<p>You can write scripts like this one to e.g. automatically mine 10 ore with <code>./mine.sh ore 10</code>:</p>
+<div class="codehilite"><pre><span></span><span class="ch">#!/usr/bin/env sh</span>
+<span class="k">for</span> i in <span class="sb">`</span>seq <span class="m">1</span> <span class="nv">$2</span><span class="sb">`</span><span class="p">;</span> <span class="k">do</span>
+    shellcraft mine <span class="nv">$1</span>
+<span class="k">done</span>
+</pre></div>
+                
+                  
+                
+              
               
                 
 
@@ -324,6 +480,41 @@
       
         
 <footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../fractions/" title="Fractions" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Fractions
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../dev/" title="Development" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Development
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -344,9 +535,9 @@
       
     </div>
     
-      <script src="/assets/javascripts/application.583bbe55.js"></script>
+      <script src="../assets/javascripts/application.583bbe55.js"></script>
       
-      <script>app.initialize({version:"1.0.3",url:{base:"/"}})</script>
+      <script>app.initialize({version:"1.0.3",url:{base:".."}})</script>
       
     
     

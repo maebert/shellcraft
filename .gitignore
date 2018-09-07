@@ -67,3 +67,5 @@ docs/modules.rst
 
 test.json
 site/
+
+.DS_Store

@@ -36,7 +36,6 @@ class Color(object):
         r, g, b = map(_round, rgb)
         return 16 + r * 36 + g * 6 + b
 
-
     @property
     def ansi(self):
         """Generate ANSI escape sequence for color."""
@@ -88,6 +87,7 @@ class Gradient(object):
         """Format a text with the given color."""
         mix = self._generate(ratio)
         return mix.ansi + text + mix.clear
+
 
 Color.yellow = Color('F5C065')
 Color.green = Color('58BD86')

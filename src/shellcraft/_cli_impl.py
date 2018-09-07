@@ -189,8 +189,9 @@ def echo(s, *vals, **kwargs):
         if not line.startswith(">"):
             for l in textwrap.wrap(line, width=min(60, term_width - 2)):
                 if l.startswith("`"):
-                    l = "\n    " + l + "\n"
-                result += l + "\n"
+                    result += "\n    " + l + "\n"
+                else:
+                    result += l + "\n"
             result += "\n"
         else:
             # Format letter

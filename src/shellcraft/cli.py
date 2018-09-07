@@ -10,6 +10,7 @@ from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost,
 import datetime
 import os
 import sys
+import traceback
 
 click.disable_unicode_literals_warning = True
 
@@ -37,7 +38,10 @@ def action_step(callback, game):
             game.tutorial.cont()
             game.save()
         except Exception as e:
-            handle_exception(e)
+            if game.state.debug:
+                traceback.print_exc()
+            else:
+                handle_exception(e)
     return inner
 
 
@@ -111,7 +115,6 @@ def mine(game, resource):
     if resource not in game.state.resources_enabled:
         raise ResourceNotAvailable(resource)
 
-
     duration, quantity = game.mine(resource)
     game.save()
 
@@ -179,6 +182,7 @@ def inventory(game):
             echo(str(item))
             # echo("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
+
 @cli.command(options_metavar='')
 @click.pass_obj
 def automata(game):
@@ -189,6 +193,7 @@ def automata(game):
         for item in game.automata:
             echo(str(item))
             # echo("${}$ ({:.0%})", item.name, item.condition / item.durability)
+
 
 @cli.command(options_metavar='')
 @click.argument("projects", nargs=-1, type=str, metavar="<project>")

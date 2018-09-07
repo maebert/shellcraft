@@ -85,7 +85,7 @@ class ItemProxy(object):
     @property
     def is_empty(self):
         """True if the proxy does not contain any items."""
-        return not self._filtered_items
+        return not list(self._filtered_items)
 
     def __repr__(self):
         """String representation of item proxy."""

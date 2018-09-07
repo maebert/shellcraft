@@ -4,4 +4,4 @@
 
 __author__ = 'Manuel Ebert'
 __email__ = 'manuel@1450.me'
-__version__ = '0.9.8'
+__version__ = '0.9.9'

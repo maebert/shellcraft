@@ -9,6 +9,7 @@ site_description: ShellCraft is a hackable game about mining, crafting, and puzz
 nav:
     - Introduction: index.md
     - Installation: installation.md
+    - Seventy-Two Letters: 72letters.md
     - Nomenclature: nomenclature.md
     - Fractions: fractions.md
     - Command reference: cli.md

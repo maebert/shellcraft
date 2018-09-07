@@ -1,4 +1,4 @@
-.. image:: https://raw.githubusercontent.com/maebert/shellcraft/HEAD/docs/_static/cover.png
+.. image:: https://raw.githubusercontent.com/maebert/shellcraft/HEAD/docs/img/cover.png
    :alt: ShellCraft
    :align: center
 
@@ -13,7 +13,7 @@ ShellCraft is a game about mining, crafting, and puzzling, loosely based on Ted 
     $ shellcraft
 
 
-Full documentation can be found over at `Read The Docs`_.
+Read the full documentation `here`_.
 
 .. image:: https://img.shields.io/pypi/v/shellcraft.svg
         :target: https://pypi.python.org/pypi/shellcraft
@@ -31,4 +31,4 @@ Full documentation can be found over at `Read The Docs`_.
 
 
 .. _"Seventy-Two Letters": https://archive.org/details/TedChiangSeventyTwoLetters
-.. _Read The Docs: https://shellcraft.readthedocs.io.
+.. _here: https://maebert.github.io/shellcraft

@@ -8,7 +8,7 @@ import re
 with open("src/shellcraft/__init__.py") as f:
     VERSION = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", f.read(), re.M).group(1)
 
-with open('README.rst') as readme_file:
+with open('README.md') as readme_file:
     readme = readme_file.read()
 
 requirements = ['Click>=6.0', 'protobuf>=3.3.0', 'future>=0.16.0', 'PyYAML>=3.12']
@@ -24,7 +24,7 @@ setup(
     long_description=readme,
     author="Manuel Ebert",
     author_email='manuel@1450.me',
-    url='https://github.com/maebert/shellcraft',
+    url='https://maebert.github.io/shellcraft',
     packages=find_packages("src"),
     package_dir={'': 'src'},
     entry_points={

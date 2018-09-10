@@ -144,7 +144,7 @@ def _color_in(match):
 
 
 def _format_str(s):
-    return re.sub(r'(([\$\*%`])[{};:.a-z0-9_\- ]+(\2))', _color_in, s)
+    return re.sub(r'(([\$\*%`])[{};:.a-z0-9_\- \n]+(\2))', _color_in, s)
 
 
 def _unformat_str(s):
@@ -187,9 +187,7 @@ def echo(s, *vals, **kwargs):
     result = ""
     for line in s.splitlines():
         if not line.startswith(">"):
-            for l in textwrap.wrap(line, width=min(60, term_width - 2)):
-                if l.startswith("`"):
-                    l = "\n    " + l + "\n"
+            for l in textwrap.wrap(line, width=min(80, term_width - 2)):
                 result += l + "\n"
             result += "\n"
         else:
@@ -197,7 +195,7 @@ def echo(s, *vals, **kwargs):
 
             line = line.replace("> > ", "\n")
             line = line.replace("> ", "")
-            w = min(50, term_width - 12)
+            w = min(60, term_width - 12)
             result += Color.paper(" ╭┄┬┄" + "┄" * w + "┄╮\n")
             result += Color.paper(" ╰┄┤ " + " " * w + " ┊\n")
             for paragraph in filter(bool, line.splitlines()):

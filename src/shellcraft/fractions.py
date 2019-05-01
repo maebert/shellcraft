@@ -14,7 +14,7 @@ class FractionProxy(object):
         self._fractions = {f.name: f for f in field}
 
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES)) as f:
-            for name, fraction in yaml.load(f).items():
+            for name, fraction in yaml.safe_load(f).items():
                 if name not in self._fractions:
                     f = self._field.add(name=name, influence=fraction['influence'])
                     self._fractions[name] = f

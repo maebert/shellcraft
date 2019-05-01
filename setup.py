@@ -22,6 +22,7 @@ setup(
     version=VERSION,
     description="ShellCraft is a command line based crafting game.",
     long_description=readme,
+    long_description_content_type='text/markdown',
     author="Manuel Ebert",
     author_email='manuel@1450.me',
     url='https://maebert.github.io/shellcraft',

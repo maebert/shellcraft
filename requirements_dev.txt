@@ -7,3 +7,7 @@ coverage>=4.1
 pytest>=2.9.2
 mkdocs==1.0.4
 twine>=1.11.0
+Click>=7.0
+protobuf>=3.7.1
+future>=0.16.0
+PyYAML>=5.1

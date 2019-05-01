@@ -78,6 +78,9 @@ release: dist ## package and upload a release
 	twine upload dist/*
 	mkdocs gh-deploy
 
+virtualenv: ## Creates a virtual environment
+	mkvirtualenv -p python3.7 -a . -r requirements_dev.txt -r requirements_dev.txt shellcraft
+
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 

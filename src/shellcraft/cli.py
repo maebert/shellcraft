@@ -134,7 +134,7 @@ def craft(game, items):
         if not game.workshop.available_items:
             echo("There's nothing you can craft right now.", err=True)
         for item in game.workshop.available_items:
-            echo("{} ({})\n  {}", item, _format_cost(item.cost), item.description)
+            echo("{} ({}) - {}", item, _format_cost(item.cost), item.description)
     else:
         item = game.workshop.get(items[0])
 
@@ -205,7 +205,7 @@ def research(game, projects):
 
     elif not projects:
         for item in game.lab.available_items:
-            echo("{} ({} sec)\n  {}", item, item.difficulty, item.description)
+            echo("{} ({} sec) - {}", item, item.difficulty, item.description)
         if not game.lab.available_items:
             echo("There are currently no projects available for research.", err=True)
     else:

@@ -142,10 +142,11 @@ class BaseItem(object):
         item.prerequisites = data.get("prerequisites", {})
         item.prerequisites['items'] = to_list(item.prerequisites.get('items'))
         item.prerequisites['research'] = to_list(item.prerequisites.get('research'))
+        item.prerequisites['triggers'] = to_list(item.prerequisites.get('triggers'))
         item.cost = data.get("cost", {})
         item.strings = data.get("strings", {})
         item.effects = data.get("effects", {})
-        for effect in ('enable_commands', 'enable_items', 'enable_resources', 'events'):
+        for effect in ('enable_commands', 'enable_items', 'enable_resources', 'events', 'triggers'):
             item.effects[effect] = to_list(item.effects.get(effect))
         return item
 
@@ -249,10 +250,15 @@ class BaseFactory(object):
                 self.game.state.tools_enabled.append(item_name)
 
         # Enable research
-        for item_name in item.effects.get('enable_research', []):
-            if item_name not in self.game.state.research_enabled:
-                self.game.alert("You can now research @{}@.", item_name)
-                self.game.state.research_enabled.append(item_name)
+        for research in item.effects.get('enable_research', []):
+            if research not in self.game.state.research_enabled:
+                self.game.alert("You can now research @{}@.", research)
+                self.game.state.research_enabled.append(research)
+
+        # Trigger flags
+        for trigger in item.effects.get('triggers', []):
+            if trigger not in self.game.state.triggers:
+                self.game.state.triggers.append(trigger)
 
         # Grant resources
         for resource in RESOURCES:
@@ -288,5 +294,8 @@ class BaseFactory(object):
                 return False
         for research in item.prerequisites['research']:
             if research not in self.game.state.research_completed:
+                return False
+        for trigger in item.prerequisites['triggers']:
+            if trigger not in self.game.state.triggers:
                 return False
         return True

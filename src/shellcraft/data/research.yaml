@@ -22,3 +22,5 @@ dynamite:
 automata:
   description: Machines that can be animated with names
   difficulty: 1200
+  prerequisites:
+    triggers: nomenclator

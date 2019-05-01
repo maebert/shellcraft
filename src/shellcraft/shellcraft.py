@@ -164,10 +164,10 @@ class Game(object):
                 self.alert("You can now craft {}.", item)
                 self.state.tools_enabled.append(item.name)
 
-        for item in self.lab.available_items:
-            if item.name not in self.state.research_enabled:
-                self.alert("You can now research %{}%.", item.name)
-                self.state.research_enabled.append(item.name)
+        for research in self.lab.available_items:
+            if research.name not in self.state.research_enabled:
+                self.alert("You can now research %{}%.", research.name)
+                self.state.research_enabled.append(research.name)
 
     def _act(self, task, target, duration):
         if self.is_busy:

@@ -71,13 +71,15 @@ message GameState {
   repeated string commands_enabled = 8;
   repeated string research_enabled = 9;
   repeated string research_completed = 10;
+  repeated string triggers = 11;
 
-  Resources mining_difficulty = 11;
-  Resources mining_difficulty_increment = 12;
+  Resources mining_difficulty = 12;
+  Resources mining_difficulty_increment = 13;
 
-  float trade_reputation = 13;
-  int32 tutorial_step = 14;
+  float trade_reputation = 14;
+  int32 tutorial_step = 15;
 
-  Stats stats = 15;
-  repeated Fraction fractions = 16;
+  Stats stats = 16;
+  repeated Fraction fractions = 17;
+
 }

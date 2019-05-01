@@ -159,15 +159,15 @@
         >
         > Assistant to Undersecretary Pierce
     effects:
-        enable_research: automata
+        triggers: nomenclator
         clay: -50
     prerequisites:
-        clay: 70
+        clay: 150
 
 13:
     description: >
         You completed your first automaton!
     prerequisites:
-        autoamta: crawler
+        items: crawler
     effects:
         enable_commands: automata

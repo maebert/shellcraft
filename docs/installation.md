@@ -8,7 +8,7 @@ To install ShellCraft, run this command in your terminal:
 $ pip install shellcraft
 ```
 
-This is the preferred method to install ShellCraft, as it will always install the most recent stable release. This requires Python 2.7, or Python 3.3 or newer.
+This is the preferred method to install ShellCraft, as it will always install the most recent stable release. This requires Python 2.7, or Python 3.6 or newer.
 
 If you don't have [pip](pip) installed, this [Python installation guide](python-guide) can guide you through the process.
 

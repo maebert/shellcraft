@@ -198,11 +198,11 @@ def automata(game):
 
 
 @cli.command(options_metavar='')
-@click.argument("projects", required=False, type=str, metavar="<project>")
+@click.argument("project", required=False, type=str, metavar="<project>")
 @click.pass_obj
-def research(game, projects=None):
+def research(game, project=None):
     """Show owned items and their condition."""
-    if not projects:
+    if not project:
         for item in game.lab.available_items:
             echo("{} ({} sec) - {}", item, item.difficulty, item.description)
         if not game.lab.available_items:
@@ -213,7 +213,7 @@ def research(game, projects=None):
             dt = game.state.action.completion.ToDatetime() - datetime.datetime.now()
             echo("You're busy {} for another {:.0f} seconds.", VERBS[game.state.action.task], dt.total_seconds(), err=True)
 
-        project = game.lab.get(projects[0])
+        project = game.lab.get(project)
         if not project:
             echo("No such research project. Use 'shellcraft research' to see a list of available projects.", err=True)
 

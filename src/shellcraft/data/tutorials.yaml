@@ -55,8 +55,8 @@
 5:
     description: >
         See how we're getting a lot more clay now? You can see which $items$ are currently
-        in your posession by running `shellcraft inventory`. You can also find out much *clay*
-        (and later, other resources) you have by running `shellcraft resources`.
+        in your posession by running `shellcraft inventory`. You can also find out how much
+        *clay* (and later, other resources) you have by running `shellcraft resources`.
 
         When you're ready, continue mining until you have *10 clay*.
     prerequisites:

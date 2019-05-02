@@ -65,7 +65,6 @@ def handle_debug(game):
         name = "".join(sys.stdin.readlines())
         w = World(game, 20, 20)
         a = Automaton(name)
-        print(a.name.shortcode)
         animate_automaton(a, w)
 
     echo_alerts(game)
@@ -98,7 +97,7 @@ def cli(ctx, version):
     ctx.obj = game = get_game()
 
     if version:
-        click.echo(f"{APP_NAME} {__version__} (Python {PYTHON_VERSION})")
+        click.echo("{} {} (Python {})".format(APP_NAME, __version__, PYTHON_VERSION))
     elif ctx.invoked_subcommand is None:
         if game.state.tutorial_step == 0:
             game.tutorial.cont()
@@ -129,20 +128,17 @@ def mine(game, resource):
 
 
 @cli.command(options_metavar='')
-@click.argument("items", nargs=-1, type=str, metavar='<item>')
+@click.argument("item", required=False, type=str, metavar='<item>')
 @click.pass_obj
-def craft(game, items):
+def craft(game, item):
     """Mine a resource."""
-    if len(items) > 1:
-        echo("Can only craft one project at a time", err=True)
-
-    elif not items:
+    if not item:
         if not game.workshop.available_items:
             echo("There's nothing you can craft right now.", err=True)
         for item in game.workshop.available_items:
             echo("{} ({}) - {}", item, _format_cost(item.cost), item.description)
     else:
-        item = game.workshop.get(items[0])
+        item = game.workshop.get(item)
 
         if not item:
             echo("No such item. Use 'shellcraft craft' to see a list of available items.", err=True)
@@ -174,7 +170,7 @@ def resources(game, resource_types=None):
         if resource in game.state.resources_enabled:
             echo("*{}: {:.0f}*", resource, game.resources.get(resource))
         elif resource_types:
-            echo("*{}* is not available yet.", resource)
+            echo("*{}* is not available yet.", resource, err=True, cont=True)
 
 
 @cli.command(options_metavar='')
@@ -202,14 +198,11 @@ def automata(game):
 
 
 @cli.command(options_metavar='')
-@click.argument("projects", nargs=-1, type=str, metavar="<project>")
+@click.argument("projects", required=False, type=str, metavar="<project>")
 @click.pass_obj
-def research(game, projects):
+def research(game, projects=None):
     """Show owned items and their condition."""
-    if len(projects) > 1:
-        echo("Can only research one project at a time", err=True)
-
-    elif not projects:
+    if not projects:
         for item in game.lab.available_items:
             echo("{} ({} sec) - {}", item, item.difficulty, item.description)
         if not game.lab.available_items:

@@ -171,6 +171,7 @@ def echo(s, *vals, **kwargs):
         s = s.format(*vals)
 
     err = kwargs.pop("err", False)
+    cont = kwargs.pop("cont", False)
     use_cursor = kwargs.pop("use_cursor", False)
 
     grammar_match = re.search("^~([a-zA-Z0-9_]+)~ *", s)
@@ -210,7 +211,8 @@ def echo(s, *vals, **kwargs):
     #     result += "\n"
     if err:
         click.echo(Color.red(_unformat_str(result)), err=True)
-        sys.exit(1)
+        if not cont:
+            sys.exit(1)
     else:
         click.echo(_format_str(result))
 

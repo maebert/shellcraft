@@ -12,6 +12,7 @@ from __future__ import unicode_literals
 import os
 import pytest
 from click.testing import CliRunner
+from shellcraft import __version__
 from shellcraft.cli import get_game, cli
 from shellcraft.shellcraft import Game
 
@@ -41,8 +42,11 @@ def test_basic_cli(game):
 
     help_result = runner.invoke(cli, ['--help'])
     assert help_result.exit_code == 0
-    assert '--help  Show this message and exit.' in help_result.output
+    assert 'Show this message and exit.' in help_result.output
 
+    version_result = runner.invoke(cli, ['--version'])
+    assert version_result.exit_code == 0
+    assert __version__ in version_result.output
 
 def test_contract(game):
     game = load_game("save1.json")

@@ -4,17 +4,20 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import click
+from shellcraft import __version__
 from shellcraft.shellcraft import Game
 from shellcraft.exceptions import ResourceNotAvailable
 from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost, animate_automaton, handle_exception
 import datetime
 import os
 import sys
+import platform
 import traceback
 
 click.disable_unicode_literals_warning = True
 
 APP_NAME = 'ShellCraft'
+PYTHON_VERSION = platform.python_version()
 GAME = None
 
 
@@ -88,12 +91,15 @@ def main(game_path=None):
 
 
 @click.group(invoke_without_command=True, options_metavar='', subcommand_metavar='<command>')
+@click.option("--version", is_flag=True, help="Prints the version number and exits.")
 @click.pass_context
-def cli(ctx):
+def cli(ctx, version):
     """ShellCraft is a command line based crafting game."""
     ctx.obj = game = get_game()
 
-    if ctx.invoked_subcommand is None:
+    if version:
+        click.echo(f"{APP_NAME} {__version__} (Python {PYTHON_VERSION})")
+    elif ctx.invoked_subcommand is None:
         if game.state.tutorial_step == 0:
             game.tutorial.cont()
         else:
@@ -139,7 +145,7 @@ def craft(game, items):
         item = game.workshop.get(items[0])
 
         if not item:
-            echo("No such item", err=True)
+            echo("No such item. Use 'shellcraft craft' to see a list of available items.", err=True)
             return None
 
         if not game.workshop.is_available(item):
@@ -216,7 +222,7 @@ def research(game, projects):
 
         project = game.lab.get(projects[0])
         if not project:
-            echo("No such research project.", err=True)
+            echo("No such research project. Use 'shellcraft research' to see a list of available projects.", err=True)
 
         if project.name in game.state.research_completed:
             echo("You've already researched {}.", project, err=True)

@@ -1,5 +1,4 @@
-* ShellCraft version:
-* Python version:
+* Output of `shellcraft --version`:
 * Operating System:
 
 ### Description

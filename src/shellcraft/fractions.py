@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """Basic CLI for ShellCraft."""
-from __future__ import absolute_import
 import os
 import yaml
 

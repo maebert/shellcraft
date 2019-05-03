@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """Item Classes."""
-from __future__ import absolute_import
-
 from shellcraft.core import BaseItem, BaseFactory
 from shellcraft.game_state_pb2 import Tool as ToolPB
 

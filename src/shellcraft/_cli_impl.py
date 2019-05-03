@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """CLI implementations."""
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from shellcraft.grammar import Grammar, VERBS
 from shellcraft._colors import Color, Gradient
 import click
@@ -11,7 +9,7 @@ import time
 import re
 import sys
 import textwrap
-from future.moves.itertools import zip_longest
+from itertools import zip_longest
 
 RESOURCE_COLORS = {
     "clay": Color.yellow,

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """Basic CLI for ShellCraft."""
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import click
 from shellcraft import __version__
 from shellcraft.shellcraft import Game

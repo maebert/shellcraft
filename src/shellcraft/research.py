@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 """Basic CLI for ShellCraft."""
-from __future__ import absolute_import
 from shellcraft.core import BaseItem, BaseFactory
 
 

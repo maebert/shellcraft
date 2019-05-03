@@ -2,8 +2,6 @@
 
 """Events Interface."""
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from shellcraft.core import BaseItem, BaseFactory
 from shellcraft._cli_impl import echo, ask
 from shellcraft.utils import convert_resource_value, format_name

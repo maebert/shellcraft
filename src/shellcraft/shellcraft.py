@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Game Classes."""
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 from shellcraft.tools import ToolFactory
 from shellcraft.research import ResearchFactory
 from shellcraft.tutorial import TutorialFactory

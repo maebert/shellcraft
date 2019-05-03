@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 """Core Classes."""
 
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import os
-import yaml
 from copy import copy
 from shellcraft.utils import to_list, to_float
 from google.protobuf.descriptor import Descriptor

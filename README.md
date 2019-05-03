@@ -3,8 +3,8 @@
 ShellCraft is a game about mining, crafting, and puzzling, loosely based on Ted Chiang's short story *[Seventy-Two Letters](https://maebert.github.io/shellcraft/72letters)*.
 
 ```sh
-# Install ShellCraft
-$ pip install shellcraft
+# Install ShellCraft (requires python 3)
+$ pip3 install shellcraft
 
 # Run ShellCraft:
 $ shellcraft

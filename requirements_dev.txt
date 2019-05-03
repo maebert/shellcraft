@@ -10,5 +10,4 @@ mkdocs-material>=4.2.0
 twine>=1.11.0
 Click>=7.0
 protobuf>=3.7.1
-future>=0.16.0
 PyYAML>=5.1

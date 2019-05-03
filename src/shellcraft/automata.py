@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Automaton Class."""
-from __future__ import absolute_import
 from shellcraft.epithets import Name
 from random import seed, randint, paretovariate, random
 import math

@@ -11,7 +11,7 @@ with open("src/shellcraft/__init__.py") as f:
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-requirements = ['Click>=7.0', 'protobuf>=3.7.1', 'future>=0.16.0', 'PyYAML>=5.1']
+requirements = ['Click>=7.0', 'protobuf>=3.7.1', 'future>=0.16.0', 'poyo>=0.5.0']
 
 test_requirements = [
     # TODO: put package test requirements here

@@ -1,7 +1,8 @@
 trade_proposal:
   description: A Trade Proposal
   strings:
-    intro: "~letter~ A letter arrives.
+    intro: >
+        ~letter~ A letter arrives.
 
         > @address ,
         >
@@ -11,7 +12,7 @@ trade_proposal:
         >
         > @salutation ,
         >
-        > {writer}"
+        > {writer}
     ask: You need mine another *{deficit:.0f} {demand_type}* to meet the deadline. Do you agree to this trade contract?
     agree: The *{demand_type}* will be automatically collected as soon as you have enough. Time is of the essence now!
     disagree: The trader leaves, disappointed.
@@ -22,7 +23,8 @@ trade_proposal:
   reward_factor: 0
   reward_type: reputation
   strings:
-    intro: "~letter~ A letter arrives.
+    intro: >
+        ~letter~ A letter arrives.
 
         > @address ,
         >
@@ -32,7 +34,7 @@ trade_proposal:
         >
         > @salutation ,
         >
-        > {writer}"
+        > {writer}
     ask: You need mine another *{deficit:.0f} {demand_type}* to meet the deadline. Do you agree to this trade contract?
     agree: The *{demand_type}* will be automatically collected as soon as you have enough. Time is of the essence now!
     disagree: The trader leaves, disappointed.

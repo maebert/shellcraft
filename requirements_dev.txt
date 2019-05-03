@@ -10,4 +10,4 @@ mkdocs-material>=4.2.0
 twine>=1.11.0
 Click>=7.0
 protobuf>=3.7.1
-PyYAML>=5.1
+git+git://github.com/maebert/poyo@master

@@ -2,6 +2,7 @@
 """Core Classes."""
 
 import os
+import poyo
 from copy import copy
 from shellcraft.utils import to_list, to_float
 from google.protobuf.descriptor import Descriptor
@@ -179,7 +180,8 @@ class BaseFactory(object):
             game (shellcraft.shellcraft.Game): Game object.
         """
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES)) as f:
-            self.all_items = {name: self.ITEM_CLASS.from_dict(name, data) for name, data in yaml.safe_load(f).items()}
+            contents = f.read()
+            self.all_items = {name: self.ITEM_CLASS.from_dict(name, data) for name, data in poyo.parse_string(contents).items()}
         self.game = game
 
     def get(self, item_name):

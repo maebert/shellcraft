@@ -198,7 +198,7 @@ class Grammar(object):
             except MaximumDepthExceeded:
                 pass
             except SymbolNotFound as e:
-                print("WARNING: Symbol {} not found".format(e.args[0]), file=sys.stderr)
+                print(f"WARNING: Symbol {e.args[0]} not found", file=sys.stderr)
         return self.assemble_sentence(parts)
 
 

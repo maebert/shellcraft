@@ -16,7 +16,7 @@ class BusyException(ShellcraftException):
         self._action = game.state.action.task
 
     def __str__(self):
-        return "You're busy {} for another {:.0f} seconds.".format(VERBS[self._action], self._time_left.total_seconds())
+        return f"You're busy {VERBS[self._action]} for another { self._time_left.total_seconds():.0f} seconds."
 
 
 class ResourceNotAvailable(ShellcraftException):
@@ -25,4 +25,4 @@ class ResourceNotAvailable(ShellcraftException):
         self._resource = resource
 
     def __str__(self):
-        return "You can't mine {} yet".format(self._resource)
+        return f"You can't mine {self._resource} yet"

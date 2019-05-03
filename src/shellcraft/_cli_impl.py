@@ -64,7 +64,7 @@ def box(s, join=True):
     lines = s.splitlines()
     w = max(map(alen, lines))
     result = ["╭" + "─" * w + "╮"]
-    result += ["│{:{}}│".format(line, w) for line in lines]
+    result += [f"│{line:{w}}│" for line in lines]
     result += ["╰" + "─" * w + "╯"]
     if join:
         return "\n".join(result)
@@ -113,7 +113,7 @@ def animate_automaton(automaton, world):
         w = draw_world(world, automaton, 15, 9)
         height = grid_echo(a, w)
         time.sleep(1)
-        click.echo("\x1b[{}A".format(height + 2))
+        click.echo(f"\x1b[{height + 2}A")
 
 
 def echo_alerts(game):
@@ -150,7 +150,7 @@ def _unformat_str(s):
 
 
 def _format_cost(cost):
-    return ", ".join("*{} {}*".format(v, k) for k, v in cost.items())
+    return ", ".join(f"*{v} {k}*" for k, v in cost.items())
 
 
 def ask(msg):
@@ -229,21 +229,21 @@ class Action:
         self.duration = duration
         self.color = RESOURCE_COLORS[target] if action == "mine" else RESOURCE_COLORS[action]
         self.dark_color = self.color.mix(Color.dark, .7)
-        target_str = "*{}*".format(target) if action == 'mine' else target
-        self.action = _format_str("{} {}".format(VERBS[action], target_str).capitalize())
+        target_str = f"*{target}*" if action == 'mine' else target
+        self.action = _format_str(f"{VERBS[action]} {target_str}".capitalize())
         self.elapsed = 0.
 
     def _eta(self):
         """Friendly formatted ETA."""
         t = self.duration - self.elapsed
         if t < 1:
-            return "{:.2f}s".format(t)
+            return f"{t:.2f}s"
         elif t < 60:
-            return "{:.0f}s".format(t)
+            return f"{t:.0f}s"
         elif t < 3600:
-            return "{:.0f}m {:.0f}s".format(t // 60, t % 60)
+            return f"{t // 60:.0f}m {t % 60:.0f}s"
         else:
-            return "{:.0f}h {:.0f}m".format(t // 3600, (t % 3600) / 60)
+            return f"{t // 3600:.0f}h {(t % 3600) / 60:.0f}m"
 
     def draw(self):
         """Echo the current progress bar."""

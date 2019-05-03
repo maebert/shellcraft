@@ -271,7 +271,7 @@ class BaseFactory(object):
 
         # Change mining difficulty
         for resource in RESOURCES:
-            change = item.effects.get("{}_mining_difficulty".format(resource), None)
+            change = item.effects.get(f"{resource}_mining_difficulty", None)
             if change:
                 change = to_float(change)
                 self.game.mining_difficulty.multiply(resource, 1 - change)

@@ -6,7 +6,7 @@ from shellcraft.core import BaseItem, BaseFactory
 
 class ResearchProject(BaseItem):
     def __repr__(self):
-        return "%{}%".format(self.name)
+        return f"%{self.name}%"
 
 
 class ResearchFactory(BaseFactory):

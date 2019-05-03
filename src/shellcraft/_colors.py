@@ -36,7 +36,7 @@ class Color(object):
     @property
     def ansi(self):
         """Generate ANSI escape sequence for color."""
-        return "\033[38;5;{}m".format(self.ansi256)
+        return f"\033[38;5;{self.ansi256}m"
 
     @property
     def truecolor(self):

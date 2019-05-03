@@ -125,7 +125,7 @@ class Game(object):
                 contribution = tool.condition / difficulty
                 total_wear += tool.condition
                 efficiency += tool.condition * tool.mining_bonus.get(resource, 1) / difficulty
-                self.alert("Destroyed ${}$ while mining *{}*.".format(tool.name, resource))
+                self.alert(f"Destroyed ${tool.name}$ while mining *{resource}*.")
                 self.tools.remove(tool)
             else:
                 contribution = (difficulty - total_wear) / difficulty
@@ -152,7 +152,7 @@ class Game(object):
         self.total_mined.add(resource, efficiency)
 
         self._unlock_items()
-        self.alert("Mined *{} {}*.".format(efficiency, resource))
+        self.alert(f"Mined *{efficiency} {resource}*.")
         self.events.trigger(*events)
         return difficulty, efficiency
 

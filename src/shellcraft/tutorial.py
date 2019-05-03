@@ -7,7 +7,7 @@ from shellcraft._cli_impl import echo, echo_alerts
 
 class Step(BaseItem):
     def __repr__(self):
-        return "<Tutorial {}>".format(self.name)
+        return f"<Tutorial {self.name}>"
 
 
 class TutorialFactory(BaseFactory):

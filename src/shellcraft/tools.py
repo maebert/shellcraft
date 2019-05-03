@@ -21,7 +21,7 @@ class Tool(BaseItem):
     def __repr__(self):
         """Representation, e.g. 'clay_shovel (worn)'."""
         if not hasattr(self, "condition") or self.durability == -1 or self.durability == self.condition:
-            return "${}$".format(self.name)
+            return f"${self.name}$"
 
         wear = 1.0 * self.condition / self.durability
         descriptions = {
@@ -34,7 +34,7 @@ class Tool(BaseItem):
         }
         for thresh, des in sorted(descriptions.items()):
             if wear < thresh:
-                return "${}$ ({})".format(self.name, des)
+                return f"${self.name}$ ({des})"
 
 
 class ToolFactory(BaseFactory):

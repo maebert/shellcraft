@@ -95,7 +95,7 @@ def cli(ctx, version):
     ctx.obj = game = get_game()
 
     if version:
-        click.echo("{} {} (Python {})".format(APP_NAME, __version__, PYTHON_VERSION))
+        click.echo(f"{APP_NAME} {__version__} (Python {PYTHON_VERSION})")
     elif ctx.invoked_subcommand is None:
         if game.state.tutorial_step == 0:
             game.tutorial.cont()
@@ -148,7 +148,7 @@ def craft(game, item):
 
         if not game.workshop.can_afford(item):
             missing_resources = game.workshop._resources_missing_to_craft(item)
-            e = "Need another {} to craft {}.".format(_format_cost(missing_resources), item)
+            e = f"Need another {_format_cost(missing_resources)} to craft {item}."
             echo(e, err=True)
 
         difficulty = game.craft(item)

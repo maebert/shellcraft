@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "shellcraft"
-version = "0.11.0"
+version = "0.11.1"
 description = "ShellCraft is a command line based crafting game."
 authors = ["Manuel Ebert <manuel@1450.me>"]
 license = "MIT"
@@ -22,7 +22,7 @@ flake8 = "^3.7"
 black = {version = "^18.3-alpha.0", allows-prereleases = true}
 
 [tool.poetry.scripts]
-shellcraft = 'src.shellcraft.cli:main'
+shellcraft = 'shellcraft.cli:main'
 
 [tool.flake8]
 exclude = ["docs", "*pb2.py"]

@@ -2,10 +2,10 @@
 
 """Basic CLI for ShellCraft."""
 import click
-from shellcraft import __version__
 from shellcraft.shellcraft import Game
 from shellcraft.exceptions import ResourceNotAvailable
 from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost, animate_automaton, handle_exception
+import pkg_resources
 import datetime
 import os
 import sys
@@ -16,6 +16,7 @@ click.disable_unicode_literals_warning = True
 
 APP_NAME = 'ShellCraft'
 PYTHON_VERSION = platform.python_version()
+APP_VERSION = pkg_resources.get_distribution('shellcraft').version
 GAME = None
 
 
@@ -95,7 +96,7 @@ def cli(ctx, version):
     ctx.obj = game = get_game()
 
     if version:
-        click.echo(f"{APP_NAME} {__version__} (Python {PYTHON_VERSION})")
+        click.echo(f"{APP_NAME} {APP_VERSION} (Python {PYTHON_VERSION})")
     elif ctx.invoked_subcommand is None:
         if game.state.tutorial_step == 0:
             game.tutorial.cont()

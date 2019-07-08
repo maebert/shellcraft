@@ -29,7 +29,7 @@ class Name(object):
             ['            ', '            ', '      LA   M', ...]
         """
         name = re.sub(r'\d+', lambda m: " " * int(m.group(0)), shortcode)
-        return ["{:12}".format(name[n:n + 12]) for n in range(0, 72, 12)]
+        return [f"{name[n:n + 12]:12}" for n in range(0, 72, 12)]
 
     @classmethod
     def name_to_shortcode(cls, name):
@@ -86,14 +86,42 @@ class Name(object):
         self._padder.state = 0
         return filter(bool, effects)
 
+    def reset(self):
+        """Resets the state of all epithets to their default."""
+        for e in self.epithets:
+            e.state = e.value = 0
+
+    @property
+    def _state(self):
+        """Returns a tuple with the state of each epithet."""
+        return tuple((e.state for e in self.epithets))
+
+
+    @property
+    def cycle_length(self):
+        """Returns the length of one cycle of the name."""
+        states = [self._state]
+        self.step()
+        for n in range(20):
+            self.step()
+            if len(states) >= 5 and self._state in states:
+                cycle = len(states) - states.index(self._state)
+                self.reset()
+                return cycle
+            else:
+                states.append(self._state)
+        self.reset()
+        return -1
+
+
 
 class Epithet(object):
     symbol = " "
     traversing = True
-    period = 4
+    period = 5
     generative = False
 
-    BLANKS = " *."
+    BLANKS = " *.·"
 
     def __init__(self, name, x, y):
         self.name = name
@@ -126,7 +154,7 @@ class Epithet(object):
     @property
     def above(self):
         """Select the cell above."""
-        if self.y >= 0:
+        if self.y > 0:
             return self.name._cells[self.y - 1][self.x]
         return self.name._padder
 
@@ -147,7 +175,7 @@ class Epithet(object):
     @property
     def left(self):
         """Select the cell left."""
-        if self.x >= 0:
+        if self.x > 0:
             return self.name._cells[self.y][self.x - 1]
         return self.name._padder
 
@@ -157,6 +185,9 @@ class Epithet(object):
     def traverse(self, force=False):
         """Apply activity to neighbouring cells."""
         if not self.traversing and not force:
+            return
+        # Only traverse if we're active
+        if not self.state == 2:
             return
         if self.above.state == 1:
             self.below._next_state = 2
@@ -200,7 +231,7 @@ class Turn(Epithet):
 
 
 class LeftTurn(Epithet):
-    """Epithet that when activated will turn the automaton right."""
+    """Epithet that when activated will turn the automaton left."""
 
     symbol = "G"
     traversing = True
@@ -274,6 +305,10 @@ class Silence(Epithet):
 
     symbol = "S"
     traversing = False
+
+    def apply(self):
+        self.state = 0
+        self._next_state = 0
 
 
 class Synchronicity(Epithet):

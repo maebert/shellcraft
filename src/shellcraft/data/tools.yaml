@@ -46,12 +46,24 @@ axe:
       ore: 20
 
 crawler:
-    description: The easiest possible automaton
+    description: The easiest possible automaton.
     durability: 6000
     difficulty: 60
     type: automaton
+    body: 14L40M
     cost:
       clay: 40
       ore: 40
     prerequisites:
       research: automata
+
+digger:
+    description: A simple mining automaton.
+    durability: 6000
+    difficulty: 300
+    type: automaton
+    cost:
+      clay: 200
+      ore: 120
+    prerequisites:
+      research: digger

@@ -8,6 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+pip-wheel-metadata/
 env/
 build/
 develop-eggs/
@@ -60,11 +61,7 @@ target/
 
 # pyenv python configuration file
 .python-version
-
-docs/shellcraft.rst
-
-docs/modules.rst
-
+Shellcraft.sublime-workspace
 test.json
 site/
 

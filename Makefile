@@ -47,42 +47,40 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 
+format: ## check style with flake8
+	poetry run black shellcraft tests src
+
 lint: ## check style with flake8
-	flake8 shellcraft tests src
+	poetry run flake8 shellcraft tests src
 
 test:
-	pytest
+	poetry run pytest
 
 test-all: ## run tests on every Python version with tox
-	tox
+	poetry run tox
 
 coverage: ## check code coverage quickly with the default Python
-		coverage run --source shellcraft -m pytest
-		coverage report -m
-		coverage html
+		poetry run coverage run --source shellcraft -m pytest
+		poetry run coverage report -m
+		poetry run coverage html
 		$(BROWSER) htmlcov/index.html
 
 docs:
-	mkdocs build --clean
+	poetry run mkdocs build --clean
 	$(BROWSER) site/index.html
 
 servedocs:
-	mkdocs serve
+	poetry run mkdocs serve
 
 dist: clean lint test## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
-	ls -l dist
+	poetry build
 
 release: dist ## package and upload a release
-	twine upload dist/*
+	poetry publish
 	mkdocs gh-deploy
 
-virtualenv: ## Creates a virtual environment
-	mkvirtualenv -p python3.7 -a . -r requirements_dev.txt -r requirements_dev.txt shellcraft
-
 install: clean ## install the package to the active Python's site-packages
-	python setup.py install
+	poetry install
 
 proto: clean
 	protoc -I src/shellcraft/data src/shellcraft/data/game_state.proto --python_out=src/shellcraft

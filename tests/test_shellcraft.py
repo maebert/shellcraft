@@ -12,7 +12,7 @@ from __future__ import unicode_literals
 import os
 import pytest
 from click.testing import CliRunner
-from shellcraft import __version__
+import pkg_resources
 from shellcraft.cli import get_game, cli
 from shellcraft.shellcraft import Game
 
@@ -46,7 +46,7 @@ def test_basic_cli(game):
 
     version_result = runner.invoke(cli, ['--version'])
     assert version_result.exit_code == 0
-    assert __version__ in version_result.output
+    assert pkg_resources.get_distribution('shellcraft').version in version_result.output
 
 def test_contract(game):
     game = load_game("save1.json")

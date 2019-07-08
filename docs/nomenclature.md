@@ -61,3 +61,23 @@ The *Silence* epithet, designated by a *S*, is non-traversing and can never be c
 ### Restraint
 
 The *Restraint* epithet, designated by a *R*, will only traverse every second time it gets strongly charged. Every other time, it will disperse che charge.
+
+
+## Writing Names in ShellCraft
+
+Each name is a string of 72 characters, usually given as 6 rows of 12 epithets. An example of a simple mover would be this:
+
+```
+············
+············
+·LA···M·M·D·
+············
+············
+············
+```
+
+The Life epithet (`L`) generates a charge, and Amplify (`A`) send it traversing to the right. There it will hit two Movement (`M`) Epithets which could send the automaton forward before hitting the Turn epithet `D` that will turn the automaton to the left. Note that ` `, `*`, `.`, and `·` are all valid blank characters.
+
+## Short codes
+
+For convenience, all names may be expressed with short codes. In short codes, all blank characters are replaced by a number indicating the number of blank characters. The example above contains 27 blank characters before the Life epithet, 37 after the Turn epithet, and a few single blanks in between, so we could express it as `27LA3M1M1D37`. Trailing blank characters can also be ignored, and we can use a space or blank character instead of numbers where it improves clarity, so the previous expression is identical to `27LA3M·M·D`, or `27LA3M M*D` for that matter.

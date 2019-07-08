@@ -3,8 +3,8 @@
 
 """Module documentation."""
 
-__author__ = 'Manuel Ebert'
-__email__ = 'manuel@1450.me'
+__author__ = "Manuel Ebert"
+__email__ = "manuel@1450.me"
 
 
 class Color(object):
@@ -60,9 +60,9 @@ class Color(object):
             ratio (float): Ratio between 0 (100% this) and 1 (100% other)
         """
         ratio = min(1, max(ratio, 0))
-        return Color(*[
-            (1 - ratio) * s + ratio * o for s, o in zip(self.rgb, other.rgb)
-        ])
+        return Color(
+            *[(1 - ratio) * s + ratio * o for s, o in zip(self.rgb, other.rgb)]
+        )
 
 
 class Gradient(object):
@@ -72,7 +72,7 @@ class Gradient(object):
         self.start = start
         self.end = end
 
-    def _generate(self, ratio=.5):
+    def _generate(self, ratio=0.5):
         """Generate a color given a value.
 
         Args:
@@ -80,24 +80,24 @@ class Gradient(object):
         """
         return self.start.mix(self.end, ratio)
 
-    def __call__(self, text, ratio=.5):
+    def __call__(self, text, ratio=0.5):
         """Format a text with the given color."""
         mix = self._generate(ratio)
         return mix.ansi + text + mix.clear
 
 
-Color.yellow = Color('F5C065')
-Color.green = Color('58BD86')
-Color.blue = Color('798BDF')
-Color.purple = Color('a35bb8')
-Color.red = Color('E8685D')
-Color.pink = Color('F25C80')
-Color.grey = Color('8390ab', underline=True)
-Color.paper = Color('aba483')
-Color.ink = Color('6f6b55')
-Color.dark = Color('2B333F')
-Color.white = Color('ffffff')
+Color.yellow = Color("F5C065")
+Color.green = Color("58BD86")
+Color.blue = Color("798BDF")
+Color.purple = Color("a35bb8")
+Color.red = Color("E8685D")
+Color.pink = Color("F25C80")
+Color.grey = Color("8390ab", underline=True)
+Color.paper = Color("aba483")
+Color.ink = Color("6f6b55")
+Color.dark = Color("2B333F")
+Color.white = Color("ffffff")
 
 Gradient.yellow = Gradient(Color.dark, Color.yellow)
 Gradient.green = Gradient(Color.dark, Color.green)
-Gradient.dark = Gradient(Color.dark, Color('3D495A'))
+Gradient.dark = Gradient(Color.dark, Color("3D495A"))

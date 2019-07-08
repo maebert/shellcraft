@@ -20,17 +20,21 @@ class Tool(BaseItem):
 
     def __repr__(self):
         """Representation, e.g. 'clay_shovel (worn)'."""
-        if not hasattr(self, "condition") or self.durability == -1 or self.durability == self.condition:
+        if (
+            not hasattr(self, "condition")
+            or self.durability == -1
+            or self.durability == self.condition
+        ):
             return f"${self.name}$"
 
         wear = 1.0 * self.condition / self.durability
         descriptions = {
             1: "new",
-            .9: "slightly used",
-            .8: "used",
-            .6: "worn",
-            .3: "damaged",
-            .15: "about to break",
+            0.9: "slightly used",
+            0.8: "used",
+            0.6: "worn",
+            0.3: "damaged",
+            0.15: "about to break",
         }
         for thresh, des in sorted(descriptions.items()):
             if wear < thresh:
@@ -50,4 +54,6 @@ class ToolFactory(BaseFactory):
 
     def is_available(self, item_name):
         item = self.get(item_name)
-        return item.name in self.game.state.tools_enabled or super(ToolFactory, self).is_available(item)
+        return item.name in self.game.state.tools_enabled or super(
+            ToolFactory, self
+        ).is_available(item)

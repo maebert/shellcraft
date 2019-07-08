@@ -11,8 +11,11 @@ class ShellcraftException(RuntimeError):
 
 class BusyException(ShellcraftException):
     """Exception that is raised if the parse tree runs too deep."""
+
     def __init__(self, game):
-        self._time_left = game.state.action.completion.ToDatetime() - datetime.datetime.now()
+        self._time_left = (
+            game.state.action.completion.ToDatetime() - datetime.datetime.now()
+        )
         self._action = game.state.action.task
 
     def __str__(self):
@@ -21,6 +24,7 @@ class BusyException(ShellcraftException):
 
 class ResourceNotAvailable(ShellcraftException):
     """Exception that is raised if the parse tree runs too deep."""
+
     def __init__(self, resource):
         self._resource = resource
 

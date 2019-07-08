@@ -8,7 +8,7 @@ from shellcraft.utils import to_list, to_float
 from google.protobuf.descriptor import Descriptor
 from builtins import str
 
-RESOURCES = ['clay', 'energy', 'ore']
+RESOURCES = ["clay", "energy", "ore"]
 
 
 class ResourceProxy(object):
@@ -33,7 +33,9 @@ class ResourceProxy(object):
             resource (str)
             value (float)
         """
-        setattr(self._resources, resource, getattr(self._resources, resource, 0) + value)
+        setattr(
+            self._resources, resource, getattr(self._resources, resource, 0) + value
+        )
 
     def get(self, resource, default=0):
         """Get value of resource."""
@@ -41,7 +43,9 @@ class ResourceProxy(object):
 
     def multiply(self, resource, factor):
         """Multiply resource by factor."""
-        setattr(self._resources, resource, getattr(self._resources, resource, 0) * factor)
+        setattr(
+            self._resources, resource, getattr(self._resources, resource, 0) * factor
+        )
 
     def __repr__(self):
         """String representation of resources."""
@@ -104,7 +108,12 @@ class ItemProxy(object):
         new_item = self._factory.make(item)
         for field in self._factory.PB_CLASS.DESCRIPTOR.fields_by_name.keys():
             if hasattr(new_item, field):
-                if isinstance(self._factory.PB_CLASS.DESCRIPTOR.fields_by_name[field].message_type, Descriptor):
+                if isinstance(
+                    self._factory.PB_CLASS.DESCRIPTOR.fields_by_name[
+                        field
+                    ].message_type,
+                    Descriptor,
+                ):
                     getattr(pb, field).CopyFrom(getattr(new_item, field))
                 else:
                     setattr(pb, field, getattr(new_item, field))
@@ -138,13 +147,19 @@ class BaseItem(object):
         item.difficulty = data.get("difficulty", 0)
 
         item.prerequisites = data.get("prerequisites", {})
-        item.prerequisites['items'] = to_list(item.prerequisites.get('items'))
-        item.prerequisites['research'] = to_list(item.prerequisites.get('research'))
-        item.prerequisites['triggers'] = to_list(item.prerequisites.get('triggers'))
+        item.prerequisites["items"] = to_list(item.prerequisites.get("items"))
+        item.prerequisites["research"] = to_list(item.prerequisites.get("research"))
+        item.prerequisites["triggers"] = to_list(item.prerequisites.get("triggers"))
         item.cost = data.get("cost", {})
         item.strings = data.get("strings", {})
         item.effects = data.get("effects", {})
-        for effect in ('enable_commands', 'enable_items', 'enable_resources', 'events', 'triggers'):
+        for effect in (
+            "enable_commands",
+            "enable_items",
+            "enable_resources",
+            "events",
+            "triggers",
+        ):
             item.effects[effect] = to_list(item.effects.get(effect))
         return item
 
@@ -154,14 +169,22 @@ class BaseItem(object):
 
     def __setattr__(self, key, value):
         """Override attribute setter for items with attached Protobuf message."""
-        if key != "_pb" and self._pb and key in self._pb.__class__.DESCRIPTOR.fields_by_name.keys():
+        if (
+            key != "_pb"
+            and self._pb is not None
+            and key in self._pb.__class__.DESCRIPTOR.fields_by_name.keys()
+        ):
             setattr(self._pb, key, value)
         else:
             self.__dict__[key] = value
 
     def __getattr__(self, key):
         """Override attribute getter for items with attached Protobuf message."""
-        if key != "_pb" and self._pb and key in self._pb.__class__.DESCRIPTOR.fields_by_name.keys():
+        if (
+            key != "_pb"
+            and self._pb
+            and key in self._pb.__class__.DESCRIPTOR.fields_by_name.keys()
+        ):
             return getattr(self._pb, key)
         raise AttributeError(key)
 
@@ -179,9 +202,16 @@ class BaseFactory(object):
         Args:
             game (shellcraft.shellcraft.Game): Game object.
         """
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES)) as f:
+        with open(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES
+            )
+        ) as f:
             contents = f.read()
-            self.all_items = {name: self.ITEM_CLASS.from_dict(name, data) for name, data in poyo.parse_string(contents).items()}
+            self.all_items = {
+                name: self.ITEM_CLASS.from_dict(name, data)
+                for name, data in poyo.parse_string(contents).items()
+            }
         self.game = game
 
     def get(self, item_name):
@@ -215,7 +245,11 @@ class BaseFactory(object):
 
     def _resources_missing_to_craft(self, item_name):
         item = self.get(item_name)
-        return {res: int(res_cost - self.game.resources.get(res)) for res, res_cost in item.cost.items() if res_cost - self.game.resources.get(res) > 0}
+        return {
+            res: int(res_cost - self.game.resources.get(res))
+            for res, res_cost in item.cost.items()
+            if res_cost - self.game.resources.get(res) > 0
+        }
 
     def can_afford(self, item_name):
         """Return true if we have enough resources to create an item."""
@@ -231,31 +265,31 @@ class BaseFactory(object):
         item = self.get(item_name)
 
         # Enable commands
-        for command in item.effects.get('enable_commands', []):
+        for command in item.effects.get("enable_commands", []):
             if command not in self.game.state.commands_enabled:
                 self.game.alert("You unlocked the `{}` command", command)
                 self.game.state.commands_enabled.append(command)
 
         # Enable resouces
-        for resources in item.effects.get('enable_resources', []):
+        for resources in item.effects.get("enable_resources", []):
             if resources not in self.game.state.resources_enabled:
                 self.game.alert("You can now mine *{}*.", resources)
                 self.game.state.resources_enabled.append(resources)
 
         # Enable items
-        for item_name in item.effects.get('enable_items', []):
+        for item_name in item.effects.get("enable_items", []):
             if item_name not in self.game.state.tools_enabled:
                 self.game.alert("You can now craft ${}$.", item_name)
                 self.game.state.tools_enabled.append(item_name)
 
         # Enable research
-        for research in item.effects.get('enable_research', []):
+        for research in item.effects.get("enable_research", []):
             if research not in self.game.state.research_enabled:
                 self.game.alert("You can now research @{}@.", research)
                 self.game.state.research_enabled.append(research)
 
         # Trigger flags
-        for trigger in item.effects.get('triggers', []):
+        for trigger in item.effects.get("triggers", []):
             if trigger not in self.game.state.triggers:
                 self.game.state.triggers.append(trigger)
 
@@ -275,10 +309,12 @@ class BaseFactory(object):
             if change:
                 change = to_float(change)
                 self.game.mining_difficulty.multiply(resource, 1 - change)
-                self.game.alert("*{}* mining difficulty reduced by {:.0%}.", resource, change)
+                self.game.alert(
+                    "*{}* mining difficulty reduced by {:.0%}.", resource, change
+                )
 
         # Trigger events
-        self.game.events.trigger(*item.effects.get('events', []))
+        self.game.events.trigger(*item.effects.get("events", []))
 
     def is_available(self, item_name):
         """Return true if the prerequisites for an item are met."""
@@ -288,13 +324,13 @@ class BaseFactory(object):
         for resource in RESOURCES:
             if self.game.resources.get(resource) < item.prerequisites.get(resource, 0):
                 return False
-        for required_item in item.prerequisites['items']:
+        for required_item in item.prerequisites["items"]:
             if not self.game.has_item(required_item):
                 return False
-        for research in item.prerequisites['research']:
+        for research in item.prerequisites["research"]:
             if research not in self.game.state.research_completed:
                 return False
-        for trigger in item.prerequisites['triggers']:
+        for trigger in item.prerequisites["triggers"]:
             if trigger not in self.game.state.triggers:
                 return False
         return True

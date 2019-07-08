@@ -4,7 +4,15 @@
 import click
 from shellcraft.shellcraft import Game
 from shellcraft.exceptions import ResourceNotAvailable
-from shellcraft._cli_impl import echo, Action, VERBS, echo_alerts, _format_cost, animate_automaton, handle_exception
+from shellcraft._cli_impl import (
+    echo,
+    Action,
+    VERBS,
+    echo_alerts,
+    _format_cost,
+    animate_automaton,
+    handle_exception,
+)
 import pkg_resources
 import datetime
 import os
@@ -14,9 +22,9 @@ import traceback
 
 click.disable_unicode_literals_warning = True
 
-APP_NAME = 'ShellCraft'
+APP_NAME = "ShellCraft"
 PYTHON_VERSION = platform.python_version()
-APP_VERSION = pkg_resources.get_distribution('shellcraft').version
+APP_VERSION = pkg_resources.get_distribution("shellcraft").version
 GAME = None
 
 
@@ -24,13 +32,14 @@ def get_game(path=None):
     global GAME
     if GAME:
         return GAME
-    path = path or os.path.join(click.get_app_dir(APP_NAME), 'config.json')
+    path = path or os.path.join(click.get_app_dir(APP_NAME), "config.json")
     GAME = Game.load(path) if os.path.exists(path) else Game.create(path)
     return GAME
 
 
 def action_step(callback, game):
     """Wrapper around actions."""
+
     def inner(**kwargs):
         # Do the action
         try:
@@ -44,6 +53,7 @@ def action_step(callback, game):
                 traceback.print_exc()
             else:
                 handle_exception(e)
+
     return inner
 
 
@@ -57,10 +67,11 @@ def handle_debug(game):
     elif sys.argv[2] == "trigger":  # Trigger an event
         game.events.trigger(sys.argv[3])
     elif sys.argv[2] == "contract":  # Trigger an event
-        game.add_mission('trade_proposal')
+        game.add_mission("trade_proposal")
         game.save()
     elif sys.argv[2] == "automata":  # Trigger an event
         from shellcraft.automata import Automaton, World
+
         name = "".join(sys.stdin.readlines())
         w = World(game, 20, 20)
         a = Automaton(name)
@@ -80,15 +91,21 @@ def main(game_path=None):
 
     # Remove all commands from the main group that are not enabled in the game yet.
     if not game.state.debug:
-        cli.commands = {cmd: command for cmd, command in cli.commands.items() if cmd in game.state.commands_enabled}
+        cli.commands = {
+            cmd: command
+            for cmd, command in cli.commands.items()
+            if cmd in game.state.commands_enabled
+        }
 
-    for cmd in ('mine', 'craft', 'research'):
+    for cmd in ("mine", "craft", "research"):
         if cmd in cli.commands:
             cli.commands[cmd].callback = action_step(cli.commands[cmd].callback, game)
     cli()
 
 
-@click.group(invoke_without_command=True, options_metavar='', subcommand_metavar='<command>')
+@click.group(
+    invoke_without_command=True, options_metavar="", subcommand_metavar="<command>"
+)
 @click.option("--version", is_flag=True, help="Prints the version number and exits.")
 @click.pass_context
 def cli(ctx, version):
@@ -104,15 +121,15 @@ def cli(ctx, version):
             echo(ctx.get_help())
 
 
-@cli.command(options_metavar='')
+@cli.command(options_metavar="")
 @click.pass_obj
 def contract(game):
-    game.add_mission('trade_proposal')
+    game.add_mission("trade_proposal")
     game.save()
 
 
-@cli.command(options_metavar='')
-@click.argument("resource", metavar='<resource>')
+@cli.command(options_metavar="")
+@click.argument("resource", metavar="<resource>")
 @click.pass_obj
 def mine(game, resource):
     """Mine a resource."""
@@ -126,8 +143,8 @@ def mine(game, resource):
     action.do(skip=game.state.debug)
 
 
-@cli.command(options_metavar='')
-@click.argument("item", required=False, type=str, metavar='<item>')
+@cli.command(options_metavar="")
+@click.argument("item", required=False, type=str, metavar="<item>")
 @click.pass_obj
 def craft(game, item):
     """Mine a resource."""
@@ -140,7 +157,10 @@ def craft(game, item):
         item = game.workshop.get(item)
 
         if not item:
-            echo("No such item. Use 'shellcraft craft' to see a list of available items.", err=True)
+            echo(
+                "No such item. Use 'shellcraft craft' to see a list of available items.",
+                err=True,
+            )
             return None
 
         if not game.workshop.is_available(item):
@@ -159,7 +179,7 @@ def craft(game, item):
         action.do(skip=game.state.debug)
 
 
-@cli.command(options_metavar='')
+@cli.command(options_metavar="")
 @click.argument("resource_types", nargs=-1, type=str, metavar="<resource>")
 @click.pass_obj
 def resources(game, resource_types=None):
@@ -172,7 +192,7 @@ def resources(game, resource_types=None):
             echo("*{}* is not available yet.", resource, err=True, cont=True)
 
 
-@cli.command(options_metavar='')
+@cli.command(options_metavar="")
 @click.pass_obj
 def inventory(game):
     """Show owned items and their condition."""
@@ -184,7 +204,7 @@ def inventory(game):
             # echo("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
 
-@cli.command(options_metavar='')
+@cli.command(options_metavar="")
 @click.pass_obj
 def automata(game):
     """Show owned automata and their condition."""
@@ -196,7 +216,7 @@ def automata(game):
             # echo("${}$ ({:.0%})", item.name, item.condition / item.durability)
 
 
-@cli.command(options_metavar='')
+@cli.command(options_metavar="")
 @click.argument("project", required=False, type=str, metavar="<project>")
 @click.pass_obj
 def research(game, project=None):
@@ -210,11 +230,19 @@ def research(game, project=None):
         # Researching something now
         if game.is_busy:
             dt = game.state.action.completion.ToDatetime() - datetime.datetime.now()
-            echo("You're busy {} for another {:.0f} seconds.", VERBS[game.state.action.task], dt.total_seconds(), err=True)
+            echo(
+                "You're busy {} for another {:.0f} seconds.",
+                VERBS[game.state.action.task],
+                dt.total_seconds(),
+                err=True,
+            )
 
         project = game.lab.get(project)
         if not project:
-            echo("No such research project. Use 'shellcraft research' to see a list of available projects.", err=True)
+            echo(
+                "No such research project. Use 'shellcraft research' to see a list of available projects.",
+                err=True,
+            )
 
         if project.name in game.state.research_completed:
             echo("You've already researched {}.", project, err=True)
@@ -231,12 +259,16 @@ def research(game, project=None):
         action.do(skip=game.state.debug)
 
 
-@cli.command(options_metavar='')
-@click.option("--force", is_flag=True, help="Don't question my orders, just execute them!")
+@cli.command(options_metavar="")
+@click.option(
+    "--force", is_flag=True, help="Don't question my orders, just execute them!"
+)
 @click.pass_obj
 def reset(game, force):
     """Reset all progress."""
-    if force or click.confirm("Do you really want to reset the game and start over again?"):
+    if force or click.confirm(
+        "Do you really want to reset the game and start over again?"
+    ):
         Game.create(game.save_file)
         echo("Tohu wa-bohu.")
     else:

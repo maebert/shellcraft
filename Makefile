@@ -50,10 +50,10 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr htmlcov/
 
 format: ## check style with flake8
-	poetry run black shellcraft tests src
+	poetry run black tests src
 
 lint: ## check style with flake8
-	poetry run flake8 shellcraft tests src
+	poetry run flake8 tests src --ignore E501,W503
 
 test:
 	poetry run pytest

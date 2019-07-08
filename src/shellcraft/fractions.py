@@ -6,17 +6,21 @@ import poyo
 
 
 class FractionProxy(object):
-    FIXTURES = 'fractions.yaml'
+    FIXTURES = "fractions.yaml"
 
     def __init__(self, field):
         self._field = field
         self._fractions = {f.name: f for f in field}
 
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES)) as f:
+        with open(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES
+            )
+        ) as f:
             contents = f.read()
             for name, fraction in poyo.parse_string(contents).items():
                 if name not in self._fractions:
-                    f = self._field.add(name=name, influence=fraction['influence'])
+                    f = self._field.add(name=name, influence=fraction["influence"])
                     self._fractions[name] = f
 
     def get(self, name):

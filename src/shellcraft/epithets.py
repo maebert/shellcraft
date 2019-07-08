@@ -11,7 +11,7 @@ class Name(object):
         else:
             self.name = name_or_shortcode.splitlines()[:6]
         self._cells = []
-        self._padder = Epithet.get('S', self, -1, -1)
+        self._padder = Epithet.get("S", self, -1, -1)
         for y in range(6):
             row = [Epithet.get(self.name[y][x], self, x, y) for x in range(12)]
             self._cells.append(row)
@@ -28,7 +28,7 @@ class Name(object):
             Name.shortcode_to_name("30LA3M26")
             ['            ', '            ', '      LA   M', ...]
         """
-        name = re.sub(r'\d+', lambda m: " " * int(m.group(0)), shortcode)
+        name = re.sub(r"\d+", lambda m: " " * int(m.group(0)), shortcode)
         return [f"{name[n:n + 12]:12}" for n in range(0, 72, 12)]
 
     @classmethod
@@ -39,8 +39,12 @@ class Name(object):
             Name.shortcode_to_name(['            ', '            ', '   LA   M   '])
             "27LA3M3"
         """
-        shortcode = re.sub(r"[{}]+".format(Epithet.BLANKS), lambda m: str(len(m.group(0))), "".join(name))
-        return shortcode.replace('\n', "")
+        shortcode = re.sub(
+            r"[{}]+".format(Epithet.BLANKS),
+            lambda m: str(len(m.group(0))),
+            "".join(name),
+        )
+        return shortcode.replace("\n", "")
 
     @property
     def epithets(self):
@@ -96,7 +100,6 @@ class Name(object):
         """Returns a tuple with the state of each epithet."""
         return tuple((e.state for e in self.epithets))
 
-
     @property
     def cycle_length(self):
         """Returns the length of one cycle of the name."""
@@ -112,7 +115,6 @@ class Name(object):
                 states.append(self._state)
         self.reset()
         return -1
-
 
 
 class Epithet(object):
@@ -293,7 +295,7 @@ class Restraint(Epithet):
     def apply(self):
         self._next_value = self.value
         if self.state == 2:
-            self._next_value = (self.value + 1)
+            self._next_value = self.value + 1
             self._next_state = 0
             if self.value == 1:
                 self._next_value = 0

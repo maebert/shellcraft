@@ -17,7 +17,7 @@ from shellcraft.cli import get_game, cli
 from shellcraft.shellcraft import Game
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def game():
     """Create a local game."""
     runner = CliRunner()
@@ -28,7 +28,9 @@ def game():
 
 def load_game(filename):
     """Load game from fixtures."""
-    filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures", filename)
+    filename = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "fixtures", filename
+    )
     print(filename)
     return Game.load(filename)
 
@@ -38,15 +40,16 @@ def test_basic_cli(game):
     runner = CliRunner()
     result = runner.invoke(cli)
     assert result.exit_code == 0
-    assert 'Welcome to ShellCraft' in result.output
+    assert "Welcome to ShellCraft" in result.output
 
-    help_result = runner.invoke(cli, ['--help'])
+    help_result = runner.invoke(cli, ["--help"])
     assert help_result.exit_code == 0
-    assert 'Show this message and exit.' in help_result.output
+    assert "Show this message and exit." in help_result.output
 
-    version_result = runner.invoke(cli, ['--version'])
+    version_result = runner.invoke(cli, ["--version"])
     assert version_result.exit_code == 0
-    assert pkg_resources.get_distribution('shellcraft').version in version_result.output
+    assert pkg_resources.get_distribution("shellcraft").version in version_result.output
+
 
 def test_contract(game):
     game = load_game("save1.json")
@@ -83,9 +86,11 @@ def test_game_run(game):
     runner = CliRunner()
     game.state.debug = True
     for command in commands.splitlines():
-        assert not command or command.split()[0] in list(game.state.commands_enabled), "{} not in {}".format(command.split()[0], list(game.state.commands_enabled))
+        assert not command or command.split()[0] in list(
+            game.state.commands_enabled
+        ), "{} not in {}".format(command.split()[0], list(game.state.commands_enabled))
         runner.invoke(cli, command.split())
         game.tutorial.cont()
-    assert 'small_cart' in game.state.research_completed
+    assert "small_cart" in game.state.research_completed
     assert game.state.tutorial_step == 11
     assert game.resources.get("clay") == 4

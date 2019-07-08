@@ -17,24 +17,32 @@ class World(object):
         ore_deposits = width * height // 250
 
         self.deposits = {
-            'ore': [(randint(0, width), randint(0, height), random() * math.pi / 2) for _ in range(clay_deposits)],
-            'elevation': [(randint(0, width), randint(0, height), random() * math.pi / 2) for _ in range(hills)],
-            'clay': [(randint(0, width), randint(0, height)) for _ in range(ore_deposits)]
+            "ore": [
+                (randint(0, width), randint(0, height), random() * math.pi / 2)
+                for _ in range(clay_deposits)
+            ],
+            "elevation": [
+                (randint(0, width), randint(0, height), random() * math.pi / 2)
+                for _ in range(hills)
+            ],
+            "clay": [
+                (randint(0, width), randint(0, height)) for _ in range(ore_deposits)
+            ],
         }
 
     def _resource_pr(self, resource, x, y, distance, deposit):
         seed("{}.{}".format(x, y))
-        if resource == 'clay':
+        if resource == "clay":
             v = paretovariate(2) / (distance + 1)
-            return v if v > .2 else 0
-        if resource == 'elevation':
+            return v if v > 0.2 else 0
+        if resource == "elevation":
             return paretovariate(4) / (distance + 1)
-        if resource == 'ore':
+        if resource == "ore":
             dx, dy, dr = deposit
             angle = math.atan2(dy - y, dx - x) % math.pi
-            diff = .5 / (angle - dr + .5)
+            diff = 0.5 / (angle - dr + 0.5)
             v = paretovariate(2) / (distance + 1) * diff
-            return v if v > .4 else 0
+            return v if v > 0.4 else 0
 
     def _nearest_deposit(self, resource, x, y):
         bd = 9999999
@@ -57,15 +65,17 @@ class World(object):
             return self.cache[(x, y, resource)]
 
         distance, deposit = self._nearest_deposit(resource, x, y)
-        self.cache[(x, y, resource)] = self._resource_pr(resource, x, y, distance, deposit)
+        self.cache[(x, y, resource)] = self._resource_pr(
+            resource, x, y, distance, deposit
+        )
         return self.cache[(x, y, resource)]
 
     def get_resources(self, x, y):
         x, y = x % self.width, y % self.height
         return {
-            'clay': self._get_resource('clay', x, y),
-            'ore': self._get_resource('ore', x, y),
-            'elevation': self._get_resource('elevation', x, y),
+            "clay": self._get_resource("clay", x, y),
+            "ore": self._get_resource("ore", x, y),
+            "elevation": self._get_resource("elevation", x, y),
         }
 
 

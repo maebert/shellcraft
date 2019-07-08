@@ -9,11 +9,7 @@ import sys
 import os
 
 
-VERBS = {
-    "research": "researching",
-    "mine": "mining",
-    "craft": "crafting"
-}
+VERBS = {"research": "researching", "mine": "mining", "craft": "crafting"}
 
 
 class MaximumDepthExceeded(Exception):
@@ -37,7 +33,13 @@ class Grammar(object):
 
     @classmethod
     def load(cls, grammar_file):
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", grammar_file + ".grammar")) as f:
+        with open(
+            os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "data",
+                grammar_file + ".grammar",
+            )
+        ) as f:
             cls.grammars[grammar_file] = cls(f.read())
             return cls.grammars[grammar_file]
 
@@ -177,10 +179,10 @@ class Grammar(object):
             str
         """
         sentence = " ".join(parts)
-        sentence = re.sub(r" ([,.!?])", r'\1', sentence)
+        sentence = re.sub(r" ([,.!?])", r"\1", sentence)
         sentence = re.sub(r"' ([A-Za-z0-9 ]+) '", r"'\1'", sentence)
-        sentence = re.sub(r"  +", r' ', sentence)
-        sentence = re.sub(r"\n ", '\n', sentence)
+        sentence = re.sub(r"  +", r" ", sentence)
+        sentence = re.sub(r"\n ", "\n", sentence)
         return sentence.strip()
 
     def generate(self, sentence=None):

@@ -17,7 +17,7 @@ RESOURCE_COLORS = {
     "command": Color.grey,
     "craft": Color.purple,
     "research": Color.blue,
-    "automata": Color.pink
+    "automata": Color.pink,
 }
 
 
@@ -73,13 +73,13 @@ def box(s, join=True):
 
 def draw_world(world, automaton, w, h):
     def _field(**resources):
-        clay = resources.get('clay', 0)
-        ore = resources.get('ore', 0)
-        elevation = resources.get('elevation', 0)
+        clay = resources.get("clay", 0)
+        ore = resources.get("ore", 0)
+        elevation = resources.get("elevation", 0)
         if ore:
-            return Gradient.green('█', ore)
+            return Gradient.green("█", ore)
         elif clay:
-            return Gradient.yellow('█', clay)
+            return Gradient.yellow("█", clay)
         else:
             return Gradient.dark("█", elevation)
 
@@ -87,10 +87,10 @@ def draw_world(world, automaton, w, h):
     x, y = automaton.x, automaton.y
 
     for py in range(y - h // 2, y + h // 2 + 1):
-        row = ''
+        row = ""
         for px in range(x - w // 2, x + w // 2 + 1):
             if px == x and py == y:
-                row += RESOURCE_COLORS['automata']("▲▶▼◀︎"[automaton.direction])
+                row += RESOURCE_COLORS["automata"]("▲▶▼◀︎"[automaton.direction])
             else:
                 row += _field(**world.get_resources(px, py))
         result.append(row)
@@ -101,7 +101,9 @@ def draw_automaton_state(automaton):
     s = ""
     for line in automaton.name._cells:
         for cell in line:
-            s += click.style(cell.symbol.strip() or "·", bg=[None, 'yellow', 'red'][cell.state])
+            s += click.style(
+                cell.symbol.strip() or "·", bg=[None, "yellow", "red"][cell.state]
+            )
         s += "\n"
     return s
 
@@ -127,11 +129,11 @@ def _color_in(match):
     s = match.group(0)
     color = Color.white
     if s.startswith("$"):
-        color = RESOURCE_COLORS['craft']
+        color = RESOURCE_COLORS["craft"]
     elif s.startswith("%"):
-        color = RESOURCE_COLORS['research']
+        color = RESOURCE_COLORS["research"]
     elif s.startswith("`"):
-        color = RESOURCE_COLORS['command']
+        color = RESOURCE_COLORS["command"]
     elif s.startswith("*"):
         for res, col in RESOURCE_COLORS.items():
             if res in s:
@@ -142,11 +144,11 @@ def _color_in(match):
 
 
 def _format_str(s):
-    return re.sub(r'(([\$\*%`])[{};:.a-z0-9_\- \n]+(\2))', _color_in, s)
+    return re.sub(r"(([\$\*%`])[{};:.a-z0-9_\- \n]+(\2))", _color_in, s)
 
 
 def _unformat_str(s):
-    return re.sub(r'(([\$\*%`])([{};:.a-z0-9_\- ]+)(\2))', r"\3", s)
+    return re.sub(r"(([\$\*%`])([{};:.a-z0-9_\- ]+)(\2))", r"\3", s)
 
 
 def _format_cost(cost):
@@ -227,11 +229,13 @@ class Action:
             color (str): color representing the action if progress bar is used.
         """
         self.duration = duration
-        self.color = RESOURCE_COLORS[target] if action == "mine" else RESOURCE_COLORS[action]
-        self.dark_color = self.color.mix(Color.dark, .7)
-        target_str = f"*{target}*" if action == 'mine' else target
+        self.color = (
+            RESOURCE_COLORS[target] if action == "mine" else RESOURCE_COLORS[action]
+        )
+        self.dark_color = self.color.mix(Color.dark, 0.7)
+        target_str = f"*{target}*" if action == "mine" else target
         self.action = _format_str(f"{VERBS[action]} {target_str}".capitalize())
-        self.elapsed = 0.
+        self.elapsed = 0.0
 
     def _eta(self):
         """Friendly formatted ETA."""
@@ -254,9 +258,9 @@ class Action:
         info = self._eta()
         bar = "\r{} {}{} {:<18}".format(
             self.action,
-            self.color('█' * blocks),
-            self.dark_color('░' * remaining),
-            info
+            self.color("█" * blocks),
+            self.dark_color("░" * remaining),
+            info,
         )
         click.echo(bar, nl=False)
 
@@ -265,7 +269,7 @@ class Action:
         if skip:
             return
         term_width, _ = get_terminal_size()
-        blocks = (term_width - len(self.action) - 20.0)
+        blocks = term_width - len(self.action) - 20.0
         delta = min(1, self.duration / blocks)
         if self.duration - self.elapsed <= 2:
             delta = min(delta, 0.85)

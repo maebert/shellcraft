@@ -10,9 +10,11 @@ class ResearchProject(BaseItem):
 
 
 class ResearchFactory(BaseFactory):
-    FIXTURES = 'research.yaml'
+    FIXTURES = "research.yaml"
     ITEM_CLASS = ResearchProject
 
     def is_available(self, item_name):
         project = self.get(item_name)
-        return project.name not in self.game.state.research_completed and super(ResearchFactory, self).is_available(project)
+        return project.name not in self.game.state.research_completed and super(
+            ResearchFactory, self
+        ).is_available(project)

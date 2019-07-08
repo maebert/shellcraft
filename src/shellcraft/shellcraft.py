@@ -37,10 +37,18 @@ class Game(object):
         self.total_mined = ResourceProxy(self.state.stats.total_mined)
 
         self.mining_difficulty = ResourceProxy(self.state.mining_difficulty)
-        self.mining_difficulty_increment = ResourceProxy(self.state.mining_difficulty_increment)
+        self.mining_difficulty_increment = ResourceProxy(
+            self.state.mining_difficulty_increment
+        )
 
-        self.tools = ItemProxy(self.state.tools, self.workshop, filter=lambda tool: tool.type == "tool")
-        self.automata = ItemProxy(self.state.tools, self.workshop, filter=lambda tool: tool.type == "automaton")
+        self.tools = ItemProxy(
+            self.state.tools, self.workshop, filter=lambda tool: tool.type == "tool"
+        )
+        self.automata = ItemProxy(
+            self.state.tools,
+            self.workshop,
+            filter=lambda tool: tool.type == "automaton",
+        )
         self.missions = ItemProxy(self.state.missions, self.mission_factory)
         self.fractions = FractionProxy(self.state.fractions)
 
@@ -124,12 +132,14 @@ class Game(object):
             if tool.condition <= (difficulty - total_wear):
                 contribution = tool.condition / difficulty
                 total_wear += tool.condition
-                efficiency += tool.condition * tool.mining_bonus.get(resource, 1) / difficulty
+                efficiency += (
+                    tool.condition * tool.mining_bonus.get(resource, 1) / difficulty
+                )
                 self.alert(f"Destroyed ${tool.name}$ while mining *{resource}*.")
                 self.tools.remove(tool)
             else:
                 contribution = (difficulty - total_wear) / difficulty
-                tool.condition -= (difficulty - total_wear)
+                tool.condition -= difficulty - total_wear
                 total_wear = difficulty
 
             efficiency += contribution * tool.mining_bonus.get(resource, 1)
@@ -144,7 +154,9 @@ class Game(object):
         # Can only ever get integer results
         efficiency = int(efficiency)
 
-        self.mining_difficulty.add(resource, self.mining_difficulty_increment.get(resource))
+        self.mining_difficulty.add(
+            resource, self.mining_difficulty_increment.get(resource)
+        )
 
         self._act("mine", resource, difficulty)
         self.resources.add(resource, efficiency)
@@ -176,7 +188,9 @@ class Game(object):
             duration = 0
         self.state.action.task = task
         self.state.action.target = str(target)
-        self.state.action.completion.FromDatetime(datetime.datetime.now() + datetime.timedelta(seconds=duration))
+        self.state.action.completion.FromDatetime(
+            datetime.datetime.now() + datetime.timedelta(seconds=duration)
+        )
 
     @classmethod
     def load(cls, filename):
@@ -192,12 +206,12 @@ class Game(object):
         """Create a new game."""
         game = Game()
 
-        game.state.mining_difficulty.clay = .5
-        game.state.mining_difficulty.ore = .5
-        game.state.mining_difficulty.energy = .5
-        game.state.mining_difficulty_increment.clay = .5
-        game.state.mining_difficulty_increment.ore = .5
-        game.state.mining_difficulty_increment.energy = .5
+        game.state.mining_difficulty.clay = 0.5
+        game.state.mining_difficulty.ore = 0.5
+        game.state.mining_difficulty.energy = 0.5
+        game.state.mining_difficulty_increment.clay = 0.5
+        game.state.mining_difficulty_increment.ore = 0.5
+        game.state.mining_difficulty_increment.energy = 0.5
 
         game.save_file = filename
         save_path, _ = os.path.split(filename)
@@ -208,5 +222,5 @@ class Game(object):
 
     def save(self, filename=None):
         """Save a game to disk."""
-        with open(filename or self.save_file, 'w') as f:
+        with open(filename or self.save_file, "w") as f:
             f.write(json_format.MessageToJson(self.state))

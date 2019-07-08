@@ -10,16 +10,14 @@ __author__ = "Manuel Ebert"
 __email__ = "manuel@1450.me"
 
 
-RESOURCE_WORTH = {
-    'clay': 1,
-    'ore': 2,
-    'energy': 4
-}
+RESOURCE_WORTH = {"clay": 1, "ore": 2, "energy": 4}
 
 
 def to_date(delta_seconds=0):
     """Convert delta in seconds to ISO-8601 string."""
-    return (datetime.datetime.now() + datetime.timedelta(seconds=delta_seconds)).isoformat()
+    return (
+        datetime.datetime.now() + datetime.timedelta(seconds=delta_seconds)
+    ).isoformat()
 
 
 def parse_isoformat(s):
@@ -67,5 +65,5 @@ def format_name(npc):
         title=npc.title,
         nickname=npc.nickname,
         first_initial=npc.first[0] + ".",
-        middle_initial=npc.middle[0] + "."
+        middle_initial=npc.middle[0] + ".",
     ).strip()

@@ -3,21 +3,14 @@
 
 dist: xenial
 language: python
-matrix:
-  include:
-    - python: "3.6"
-      env: TOXENV=py36
-    - python: "3.7"
-      env: TOXENV=py37
-    - python: "3.8-dev"
-      env: TOXENV=py38
+python: "3.7"
 before_install:
   - pip install poetry
 install:
   - poetry install
 script:
  - poetry run python --version
- - poetry run tox -e ${TOXENV}
+ - poetry run pytest
 before_deploy:
   - pip install poetry
   - poetry config http-basic.pypi $PYPI_USER $PYPI_PASS

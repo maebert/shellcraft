@@ -11,7 +11,7 @@ shovel:
 
 sturdy_shovel:
     description: Better clay mining tool.
-    durability: 80
+    durability: 96
     difficulty: 30
     mining_bonus:
       clay: 2

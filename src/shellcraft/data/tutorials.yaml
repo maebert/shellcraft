@@ -148,7 +148,7 @@
         > Esteemed citizen,
         >
         > In light of your generous contribution to the Sculptor's Union, it is
-        > my please to let it be known that by degree of Chairman Manings, you
+        > my pleaseure to let it be known that by degree of Chairman Manings, you
         > are herewith bestowed with the title of Nomenclator. As such, you are free
         > to conduct research in, produce, and vend automata. I'd like to express my
         > personal congratulations and wish you success.
@@ -158,9 +158,11 @@
         > D. H. Ramsbottom
         >
         > Assistant to Undersecretary Pierce
+
+        Let's pick a new project to research (type `shellcraft research` too see what's available)
     effects:
         triggers: nomenclator
-        clay: -50
+        clay: -150
     prerequisites:
         clay: 150
 

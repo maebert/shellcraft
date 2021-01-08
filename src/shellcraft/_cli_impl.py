@@ -253,12 +253,15 @@ class Action:
         """Echo the current progress bar."""
         term_width, _ = get_terminal_size()
         bar_width = term_width - len(self.action) - 10
-        blocks = min(bar_width, int(self.elapsed / self.duration * bar_width))
+        progress = self.elapsed / self.duration * bar_width
+        blocks = min(bar_width, int(progress)) - 1
+        current_block = int(progress % 1 * 4)
         remaining = bar_width - blocks
         info = self._eta()
-        bar = "\r{} {}{} {:<18}".format(
+        bar = "\r{} {}{}{} {:<18}".format(
             self.action,
             self.color("█" * blocks),
+            self.color("░▒▓█"[current_block]),
             self.dark_color("░" * remaining),
             info,
         )
@@ -270,7 +273,7 @@ class Action:
             return
         term_width, _ = get_terminal_size()
         blocks = term_width - len(self.action) - 20.0
-        delta = min(1, self.duration / blocks)
+        delta = min(1, self.duration / blocks * .25)
         if self.duration - self.elapsed <= 2:
             delta = min(delta, 0.85)
         while self.elapsed < self.duration:

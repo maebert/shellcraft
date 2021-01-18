@@ -1,10 +1,10 @@
 ![Cover Image](https://raw.githubusercontent.com/maebert/shellcraft/HEAD/docs/img/cover.png)
 
-ShellCraft is a game about mining, crafting, and puzzling, loosely based on Ted Chiang's short story *[Seventy-Two Letters](https://maebert.github.io/shellcraft/72letters)*.
+ShellCraft is a game about mining, crafting, and puzzling, loosely based on Ted Chiang's short story _[Seventy-Two Letters](https://maebert.github.io/shellcraft/72letters)_.
 
 ```sh
-# Install ShellCraft (requires python 3)
-$ pip3 install shellcraft
+# Install ShellCraft with pipx or pip:
+$ pipx install shellcraft
 
 # Run ShellCraft:
 $ shellcraft

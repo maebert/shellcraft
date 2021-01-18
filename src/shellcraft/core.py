@@ -222,7 +222,7 @@ class BaseFactory(object):
         """Create a new unique item from a source.
 
         The source may be a string, in which case the item is created from
-        the item library defined in a YAML file, or it may be a Protobuf message,
+        the item library defined in a TOML file, or it may be a Protobuf message,
         which is typically the case when loading a saved game and instantiating
         serialized items (such as tools or missions), or it may be another Item
         instance which will be copied.

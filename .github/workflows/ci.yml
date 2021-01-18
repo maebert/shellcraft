@@ -18,8 +18,8 @@ jobs:
       - name: Set up Python 3.7
         uses: actions/setup-python@v1
         with:
-        python-version: ${{ matrix.python-version }}
-        architecture: x64
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
 
       - name: Upgrade pip
         run: |

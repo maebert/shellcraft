@@ -14,14 +14,15 @@ class TutorialFactory(BaseFactory):
     FIXTURES = "tutorials.toml"
     ITEM_CLASS = Step
 
+
     def get_next_step(self):
-        step = self.get(self.game.state.tutorial_step)
+        step = self.get(str(self.game.state.tutorial_step))
         if not step or not self.is_available(step):
             return None
         return step
 
     def print_last_step(self):
-        step = self.get(self.game.state.tutorial_step - 1)
+        step = self.get(str(self.game.state.tutorial_step - 1))
         if step:
             echo(step.description)
 

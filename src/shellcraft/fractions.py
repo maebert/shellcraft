@@ -13,8 +13,8 @@ class FractionProxy(object):
         self._fractions = {f.name: f for f in field}
 
         path = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES
-            )
+            os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES
+        )
         data = toml.load(path)
         for name, fraction in data.items():
             if name not in self._fractions:

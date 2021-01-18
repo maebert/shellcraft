@@ -203,12 +203,11 @@ class BaseFactory(object):
             game (shellcraft.shellcraft.Game): Game object.
         """
         path = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES
-            )
+            os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES
+        )
         data = toml.load(path)
         self.all_items = {
-            name: self.ITEM_CLASS.from_dict(name, data)
-            for name, data in data.items()
+            name: self.ITEM_CLASS.from_dict(name, data) for name, data in data.items()
         }
         self.game = game
 

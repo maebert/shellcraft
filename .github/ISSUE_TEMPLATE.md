@@ -1,5 +1,5 @@
-* Output of `shellcraft --version`:
-* Operating System:
+- Output of `shellcraft --version`:
+- Operating System:
 
 ### Description
 

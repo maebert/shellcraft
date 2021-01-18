@@ -33,8 +33,6 @@ clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
-	find . -name '*.egg-info' -exec rm -fr {} +
-	find . -name '*.egg' -exec rm -f {} +
 	rm -fr pip-wheel-metadata/
 	rm -fr site/
 
@@ -53,7 +51,7 @@ format: ## check style with flake8
 	poetry run black tests src
 
 lint: ## check style with flake8
-	poetry run flake8 tests src --ignore E501,W503
+	poetry run flake8 tests src --ignore E501,W503,E741
 
 test:
 	poetry run pytest
@@ -74,7 +72,7 @@ docs:
 servedocs:
 	poetry run mkdocs serve
 
-dist: clean lint test## builds source and wheel package
+dist: clean install lint test## builds source and wheel package
 	poetry build
 
 release: dist ## package and upload a release

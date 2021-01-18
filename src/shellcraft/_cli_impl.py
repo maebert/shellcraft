@@ -177,7 +177,8 @@ def echo(s, *vals, **kwargs):
     grammar_match = re.search("^~([a-zA-Z0-9_]+)~ *", s)
     if grammar_match:
         grammar_name = grammar_match.group(1)
-        s = s[grammar_match.end():]
+        end = grammar_match.end()
+        s = s[end:]
         grammar = Grammar.grammars[grammar_name]
         s = grammar.generate(s)
     if use_cursor:
@@ -273,7 +274,7 @@ class Action:
             return
         term_width, _ = get_terminal_size()
         blocks = term_width - len(self.action) - 20.0
-        delta = min(1, self.duration / blocks * .25)
+        delta = min(1, self.duration / blocks * 0.25)
         if self.duration - self.elapsed <= 2:
             delta = min(delta, 0.85)
         while self.elapsed < self.duration:

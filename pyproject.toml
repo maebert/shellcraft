@@ -9,6 +9,9 @@ homepage = "https://maebert.github.io/shellcraft"
 repository = "https://github.com/maebert/shellcraft"
 include = ["src/*.yaml", "src/*.grammar", "src/*.proto"]
 
+[tool.poetry.urls]
+Changelog = "https://github.com/maebert/shellcraft/releases"
+
 [tool.poetry.dependencies]
 python = "^3.6"
 click = "^7.0"
@@ -16,18 +19,19 @@ protobuf = "^3.8"
 poyo = {git = "https://github.com/maebert/poyo.git"}
 
 [tool.poetry.dev-dependencies]
-mkdocs = "^1.0"
-pytest = "^5.0"
-flake8 = "^3.7"
-black = "^19.10b0"
+mkdocs = "^1.1"
+pytest = "^6.1.2"
+flake8 = "^3.8.4"
+black = "^20.8b1"
 vprof = "^0.38"
+pylint = "^2.6.0"
 
 [tool.poetry.scripts]
 shellcraft = 'shellcraft.cli:main'
 
 [tool.flake8]
 exclude = ["docs", "*pb2.py"]
-ignore = ["E501"]
+ignore = ["E501", "E741"]
 
 [build-system]
 requires = ["poetry>=1.0.10"]

@@ -14,7 +14,6 @@ class TutorialFactory(BaseFactory):
     FIXTURES = "tutorials.toml"
     ITEM_CLASS = Step
 
-
     def get_next_step(self):
         step = self.get(str(self.game.state.tutorial_step))
         if not step or not self.is_available(step):

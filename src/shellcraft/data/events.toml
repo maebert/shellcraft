@@ -1,0 +1,3 @@
+[new_clay_deposit]
+description = "You found a new *clay* deposit."
+effects.clay_mining_difficulty = 'random(.2, .5)'

@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "shellcraft"
-version = "0.11.1"
+version = "0.12.0"
 description = "ShellCraft is a command line based crafting game."
 authors = ["Manuel Ebert <manuel@1450.me>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://maebert.github.io/shellcraft"
 repository = "https://github.com/maebert/shellcraft"
-include = ["src/*.yaml", "src/*.grammar", "src/*.proto"]
+include = ["src/*.toml", "src/*.grammar", "src/*.proto"]
 
 [tool.poetry.urls]
 Changelog = "https://github.com/maebert/shellcraft/releases"
@@ -16,7 +16,7 @@ Changelog = "https://github.com/maebert/shellcraft/releases"
 python = "^3.6"
 click = "^7.0"
 protobuf = "^3.8"
-poyo = {git = "https://github.com/maebert/poyo.git"}
+toml = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
 mkdocs = "^1.1"

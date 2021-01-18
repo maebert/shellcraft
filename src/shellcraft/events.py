@@ -11,7 +11,7 @@ class Event(BaseItem):
 
 
 class EventFactory(BaseFactory):
-    FIXTURES = "events.yaml"
+    FIXTURES = "events.toml"
     ITEM_CLASS = Event
 
     def trigger(self, *events):

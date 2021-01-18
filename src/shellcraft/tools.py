@@ -42,7 +42,7 @@ class Tool(BaseItem):
 
 
 class ToolFactory(BaseFactory):
-    FIXTURES = "tools.yaml"
+    FIXTURES = "tools.toml"
     ITEM_CLASS = Tool
     PB_CLASS = ToolPB
 

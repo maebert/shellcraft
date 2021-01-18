@@ -96,7 +96,7 @@ class Mission(BaseItem):
 
 
 class MissionFactory(BaseFactory):
-    FIXTURES = "missions.yaml"
+    FIXTURES = "missions.toml"
     ITEM_CLASS = Mission
     PB_CLASS = MissionPB
 

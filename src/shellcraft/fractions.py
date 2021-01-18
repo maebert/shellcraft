@@ -2,26 +2,24 @@
 
 """Basic CLI for ShellCraft."""
 import os
-import poyo
+import toml
 
 
 class FractionProxy(object):
-    FIXTURES = "fractions.yaml"
+    FIXTURES = "fractions.toml"
 
     def __init__(self, field):
         self._field = field
         self._fractions = {f.name: f for f in field}
 
-        with open(
-            os.path.join(
+        path = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES
             )
-        ) as f:
-            contents = f.read()
-            for name, fraction in poyo.parse_string(contents).items():
-                if name not in self._fractions:
-                    f = self._field.add(name=name, influence=fraction["influence"])
-                    self._fractions[name] = f
+        data = toml.load(path)
+        for name, fraction in data.items():
+            if name not in self._fractions:
+                f = self._field.add(name=name, influence=fraction["influence"])
+                self._fractions[name] = f
 
     def get(self, name):
         return self._fractions[name]

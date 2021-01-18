@@ -2,7 +2,7 @@
 """Core Classes."""
 
 import os
-import poyo
+import toml
 from copy import copy
 from shellcraft.utils import to_list, to_float
 from google.protobuf.descriptor import Descriptor
@@ -192,7 +192,7 @@ class BaseItem(object):
 class BaseFactory(object):
     """Factory pattern to instantiate items."""
 
-    FIXTURES = "collection.yaml"
+    FIXTURES = "collection.toml"
     ITEM_CLASS = BaseItem
     PB_CLASS = None
 
@@ -202,16 +202,14 @@ class BaseFactory(object):
         Args:
             game (shellcraft.shellcraft.Game): Game object.
         """
-        with open(
-            os.path.join(
+        path = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES
             )
-        ) as f:
-            contents = f.read()
-            self.all_items = {
-                name: self.ITEM_CLASS.from_dict(name, data)
-                for name, data in poyo.parse_string(contents).items()
-            }
+        data = toml.load(path)
+        self.all_items = {
+            name: self.ITEM_CLASS.from_dict(name, data)
+            for name, data in data.items()
+        }
         self.game = game
 
     def get(self, item_name):

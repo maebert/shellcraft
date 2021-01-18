@@ -1,0 +1,12 @@
+[crown]
+description = "The Crown"
+influence = 1
+
+[kabbalists]
+description = "The Kabbalists"
+influence = 1
+
+[union]
+description = "The Sculptor's Union"
+influence = 1.5
+

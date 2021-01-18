@@ -10,7 +10,7 @@ class ResearchProject(BaseItem):
 
 
 class ResearchFactory(BaseFactory):
-    FIXTURES = "research.yaml"
+    FIXTURES = "research.toml"
     ITEM_CLASS = ResearchProject
 
     def is_available(self, item_name):

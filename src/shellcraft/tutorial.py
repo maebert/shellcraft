@@ -11,7 +11,7 @@ class Step(BaseItem):
 
 
 class TutorialFactory(BaseFactory):
-    FIXTURES = "tutorials.yaml"
+    FIXTURES = "tutorials.toml"
     ITEM_CLASS = Step
 
     def get_next_step(self):

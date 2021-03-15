@@ -17,6 +17,9 @@ python = "^3.6"
 click = "^7.0"
 protobuf = "^3.8"
 toml = "^0.10.2"
+rich = "^9.10.0"
+dataclasses-json = "^0.5.2"
+arrow = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
 mkdocs = "^1.1"

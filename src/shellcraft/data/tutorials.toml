@@ -1,5 +1,5 @@
 [0]
-description              = """Welcome to ShellCraft.
+description = """Welcome to ShellCraft.
 
 ShellCraft is a game about mining, crafting, and puzzling, loosely based
 on Ted Chiang's short story "72 letters". But all of that doesn't matter
@@ -10,7 +10,7 @@ effects.enable_resources = 'clay'
 effects.enable_commands  = ['mine', 'reset']
 
 [1]
-description             = """Excellent! Mining resources (like everything in ShellCraft) takes some time,
+description = """Excellent! Mining resources (like everything in ShellCraft) takes some time,
 but you're rewarded with this warm, moist, delicate... well, *clay*. Time to
 stock up on *clay* some more:
 
@@ -19,11 +19,11 @@ prerequisites.clay      = 1
 effects.enable_commands = 'tutorial'
 
 [2]
-description        = "Well done. Let's continue this until we have *4 clay*."
+description = "Well done. Let's continue this until we have *4 clay*."
 prerequisites.clay = 2
 
 [3]
-description             = """Notice how every time you run `shellcraft mine clay`, it takes a little longer?
+description = """Notice how every time you run `shellcraft mine clay`, it takes a little longer?
 That's because the resources on the surface are easy to reach, but the more you
 mine them, the harder it is to get more. For now, there's not much you can do about it,
 however you can increase the yield of your mining operations with tools! Try crafting
@@ -34,11 +34,11 @@ prerequisites.clay      = 4
 effects.enable_commands = 'craft'
 
 [4]
-description         = "Whoop whoop! Let's put this to use by running `shellcraft mine clay` again."
+description = "Whoop whoop! Let's put this to use by running `shellcraft mine clay` again."
 prerequisites.items = 'shovel'
 
 [5]
-description             = """See how we're getting a lot more clay now? You can see which $items$ are currently
+description = """See how we're getting a lot more clay now? You can see which $items$ are currently
 in your posession by running `shellcraft inventory`. You can also find out how much
 *clay* (and later, other resources) you have by running `shellcraft resources`.
 
@@ -48,7 +48,7 @@ prerequisites.items     = 'shovel'
 effects.enable_commands = ['inventory', 'resources']
 
 [6]
-description        = """Oh no, our $shovel$ broke! All items have a certain durability, which is the number
+description = """Oh no, our $shovel$ broke! All items have a certain durability, which is the number
 of seconds you can use them before they break. When mining, shellcraft will always pick
 the best tool for the job until it breaks, and then continue with the next-best tool.
 In this case, your bare hands.
@@ -57,7 +57,7 @@ Let's invest a little bit into our tools and craft a $sturdy_shovel$."""
 prerequisites.clay = 10
 
 [7]
-description         = """The $sturdy_shovel$ costs a little more than the good ol' $shovel$ and doens't
+description = """The $sturdy_shovel$ costs a little more than the good ol' $shovel$ and doens't
 give us any better bonus, but it lasts five times as long! That means we can get some serious
 mining done.
 
@@ -70,7 +70,7 @@ For example, let's mine *clay* ten times in a row by using this little bash scri
 prerequisites.items = 'sturdy_shovel'
 
 [8]
-description             = """Have a look at `shellcraft inventory` - our $sturdy_shovel$ is still in pretty good shape.
+description = """Have a look at `shellcraft inventory` - our $sturdy_shovel$ is still in pretty good shape.
 
 Some items are unlocked simply by having enough resources to craft them. Others need to be
 researched first. A quick look at `shellcraft research` shows you the available research projects.
@@ -80,11 +80,11 @@ prerequisites.clay      = 20
 effects.enable_commands = 'research'
 
 [9]
-description         = "This should make our job a little easier. Keep on mining now!"
+description = "This should make our job a little easier. Keep on mining now!"
 prerequisites.items = "small_cart"
 
 [10]
-description        = """Whoa, what's that? Looks like there's a huge clay deposit waiting for us
+description = """Whoa, what's that? Looks like there's a huge clay deposit waiting for us
 just below the surface! Some tools will have a chance of giving you bonus
 resources when used, or help you discover new deposits that greatly reduce the
 time it takes to mine, craft, or research things.
@@ -136,6 +136,6 @@ effects.clay       = -150
 prerequisites.clay = 150
 
 [13]
-description             = "You completed your first automaton!"
+description = "You completed your first automaton!"
 prerequisites.items     = "crawler"
 effects.enable_commands = "automata"

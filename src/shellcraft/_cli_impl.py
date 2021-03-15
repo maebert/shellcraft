@@ -187,6 +187,10 @@ def echo(s, *vals, **kwargs):
     term_width, _ = get_terminal_size()
 
     result = ""
+
+    # Replace double new lines with single new lines
+    s = re.sub(r"(?<!\n)\n", " ", s)
+
     for line in s.splitlines():
         if not line.startswith(">"):
             for l in textwrap.wrap(line, width=min(80, term_width - 2)):
@@ -198,15 +202,15 @@ def echo(s, *vals, **kwargs):
             line = line.replace("> > ", "\n")
             line = line.replace("> ", "")
             w = min(60, term_width - 12)
-            result += Color.paper(" ╭┄┬┄" + "┄" * w + "┄╮\n")
-            result += Color.paper(" ╰┄┤ " + " " * w + " ┊\n")
+            result += Color.paper(" ╭─┬─" + "─" * w + "─╮\n")
+            result += Color.paper(" ╰─┤ " + " " * w + " │\n")
             for paragraph in filter(bool, line.splitlines()):
                 for l in textwrap.wrap(paragraph, width=w, replace_whitespace=False):
-                    result += Color.paper("   ┊ ") + Color.ink(l)
-                    result += " " * (w - len(_unformat_str(l))) + Color.paper(" ┊\n")
-                result += Color.paper("   ┊ " + " " * w + " ┊\n")
-            result += Color.paper("   ┊ ╭" + "┄" * w + "┴┄╮\n")
-            result += Color.paper("   ╰┄┴" + "┄" * w + "┄┄╯\n")
+                    result += Color.paper("   │ ") + Color.paper(l)
+                    result += " " * (w - len(_unformat_str(l))) + Color.paper(" │\n")
+                result += Color.paper("   │ " + " " * w + " │\n")
+            result += Color.paper("   │ ╭" + "─" * w + "┴─╮\n")
+            result += Color.paper("   ╰─┴" + "─" * w + "──╯\n")
     result = result.rstrip("\n")
     # if not use_cursor:
     #     result += "\n"
@@ -252,6 +256,7 @@ class Action:
 
     def draw(self):
         """Echo the current progress bar."""
+        # ━╺━━
         term_width, _ = get_terminal_size()
         bar_width = term_width - len(self.action) - 10
         progress = self.elapsed / self.duration * bar_width

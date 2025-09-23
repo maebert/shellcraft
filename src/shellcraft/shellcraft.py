@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
 """Game Classes."""
 
-from shellcraft.tools import ToolFactory
-from shellcraft.research import ResearchFactory
-from shellcraft.tutorial import TutorialFactory
-from shellcraft.events import EventFactory
-from shellcraft.missions import MissionFactory
-from shellcraft.fractions import FractionProxy
-from shellcraft.exceptions import BusyException
-
-from shellcraft.game_state import GameState
-from shellcraft.core import ResourceProxy, ItemProxy
-
-from random import random
-import os
 import datetime
+import os
+from random import random
+
+from shellcraft.core import ItemProxy, ResourceProxy
+from shellcraft.events import EventFactory
+from shellcraft.exceptions import BusyException
+from shellcraft.fractions import FractionProxy
+from shellcraft.game_state import GameState
+from shellcraft.missions import MissionFactory
+from shellcraft.research import ResearchFactory
+from shellcraft.tools import ToolFactory
+from shellcraft.tutorial import TutorialFactory
 
 
 class Game(object):
@@ -95,7 +94,9 @@ class Game(object):
     def craft(self, tool_name):
         """Craft a new tool by expending resources and time."""
         item = self.workshop.get(tool_name)
-        for resource, res_cost in item.cost.items():
+        assert item
+
+        for resource, res_cost in item.cost:
             self.resources.add(resource, -res_cost)
         self.tools.add(item)
         self._act("craft", tool_name, item.difficulty)
@@ -105,6 +106,8 @@ class Game(object):
     def research(self, project_name):
         """Research a new project by expending time."""
         project = self.lab.get(project_name)
+        assert project
+
         self.state.research_completed.append(project.name)
         self._act("research", project_name, project.difficulty)
         self.alert("Researched {}.", project)
@@ -196,10 +199,11 @@ class Game(object):
             duration = 0
 
         from shellcraft.game_state import Action
+
         self.state.action = Action(
             task=task,
             target=str(target),
-            completion=datetime.datetime.now() + datetime.timedelta(seconds=duration)
+            completion=datetime.datetime.now() + datetime.timedelta(seconds=duration),
         )
 
     @classmethod

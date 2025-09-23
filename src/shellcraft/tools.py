@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Item Classes."""
+from typing import Dict
+from pydantic import Field
 from shellcraft.core import BaseItem, BaseFactory
 from shellcraft.game_state import Tool as ToolPB
 
@@ -7,16 +9,42 @@ from shellcraft.game_state import Tool as ToolPB
 class Tool(BaseItem):
     """Concept denoting any tool that the player can produce."""
 
+    type: str = "tool"
+    durability: float = -1
+    mining_bonus: Dict[str, float] = Field(default_factory=dict)
+    event_bonus: Dict[str, float] = Field(default_factory=dict)
+    crafting_bonus: Dict[str, float] = Field(default_factory=dict)
+    research_bonus: float = 0
+
+    # Tool condition (runtime only, not in template)
+    condition: float = Field(default=0, exclude=True)
+
     @classmethod
     def from_dict(cls, name, data):
+        # Process base item data first
         tool = super(Tool, cls).from_dict(name, data)
-        tool.type = data.get("type", "tool")
-        tool.durability = data.get("durability", -1)
-        tool.mining_bonus = data.get("mining_bonus", {})
-        tool.event_bonus = data.get("event_bonus", {})
-        tool.crafting_bonus = data.get("crafting_bonus", {})
-        tool.research_bonus = data.get("research_bonus", 0)
-        return tool
+
+        # Update with tool-specific data
+        tool_data = {
+            'type': data.get("type", "tool"),
+            'durability': data.get("durability", -1),
+            'mining_bonus': data.get("mining_bonus", {}),
+            'event_bonus': data.get("event_bonus", {}),
+            'crafting_bonus': data.get("crafting_bonus", {}),
+            'research_bonus': data.get("research_bonus", 0),
+        }
+
+        # Create new Tool instance with all data
+        return cls(
+            name=tool.name,
+            description=tool.description,
+            difficulty=tool.difficulty,
+            prerequisites=tool.prerequisites,
+            cost=tool.cost,
+            effects=tool.effects,
+            strings=tool.strings,
+            **tool_data
+        )
 
     def __repr__(self):
         """Representation, e.g. 'clay_shovel (worn)'."""

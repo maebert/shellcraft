@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """CLI implementations."""
-from shellcraft.grammar import Grammar, VERBS
-from shellcraft._colors import Color, Gradient
-import click
-from click.termui import get_terminal_size
-import time
+
 import re
 import sys
 import textwrap
+import time
 from itertools import zip_longest
+from shutil import get_terminal_size
+
+import click
+
+from shellcraft._colors import Color, Gradient
+from shellcraft.grammar import VERBS, Grammar
 
 RESOURCE_COLORS = {
     "clay": Color.yellow,

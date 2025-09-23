@@ -1,14 +1,10 @@
-# coding=utf-8
-
 """Utility methods."""
 
+import datetime
+import os
 from random import random
 
-import datetime
-
-__author__ = "Manuel Ebert"
-__email__ = "manuel@1450.me"
-
+import toml
 
 RESOURCE_WORTH = {"clay": 1, "ore": 2, "energy": 4}
 
@@ -67,3 +63,31 @@ def format_name(npc):
         first_initial=npc.first[0] + ".",
         middle_initial=npc.middle[0] + ".",
     ).strip()
+
+
+def get_project_version():
+    """
+    Reads the project version from the pyproject.toml file.
+
+    Returns:
+        str: The project version.
+
+    Raises:
+        FileNotFoundError: If the pyproject.toml file is not found.
+        ValueError: If the version is not found in the pyproject.toml file.
+    """
+
+    pyproject_path = os.path.join(
+        os.path.dirname(__file__), "..", "..", "pyproject.toml"
+    )
+
+    if not os.path.exists(pyproject_path):  # pragma: no cover
+        raise FileNotFoundError("pyproject.toml file not found.")
+
+    with open(pyproject_path, "r") as f:
+        pyproject_data = toml.load(f)
+
+    try:
+        return pyproject_data["project"]["version"]
+    except KeyError:  # pragma: no cover
+        raise ValueError("Version not found in pyproject.toml file.")

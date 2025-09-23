@@ -1,30 +1,34 @@
 # -*- coding: utf-8 -*-
 
 """Basic CLI for ShellCraft."""
-import click
-from shellcraft.shellcraft import Game
-from shellcraft.exceptions import ResourceNotAvailable
-from shellcraft._cli_impl import (
-    echo,
-    Action,
-    VERBS,
-    echo_alerts,
-    _format_cost,
-    animate_automaton,
-    handle_exception,
-)
-import pkg_resources
+
 import datetime
 import os
-import sys
 import platform
+import sys
 import traceback
+
+import click
+
+from shellcraft._cli_impl import (
+    VERBS,
+    Action,
+    _format_cost,
+    animate_automaton,
+    echo,
+    echo_alerts,
+    handle_exception,
+)
+from shellcraft.exceptions import ResourceNotAvailable
+from shellcraft.shellcraft import Game
+from shellcraft.utils import get_project_version
 
 click.disable_unicode_literals_warning = True
 
+
 APP_NAME = "ShellCraft"
 PYTHON_VERSION = platform.python_version()
-APP_VERSION = pkg_resources.get_distribution("shellcraft").version
+APP_VERSION = get_project_version()
 GAME = None
 
 

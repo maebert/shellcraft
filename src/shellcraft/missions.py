@@ -5,7 +5,7 @@
 from shellcraft.core import BaseItem, BaseFactory
 from shellcraft._cli_impl import echo, ask
 from shellcraft.utils import convert_resource_value, format_name
-from shellcraft.game_state_pb2 import Mission as MissionPB
+from shellcraft.game_state import Mission as MissionPB
 from shellcraft.world import NPCFactory
 import datetime
 import random

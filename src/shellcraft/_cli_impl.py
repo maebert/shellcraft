@@ -192,9 +192,12 @@ def echo(s, *vals, **kwargs):
     result = ""
     for line in s.splitlines():
         if not line.startswith(">"):
-            for l in textwrap.wrap(line, width=min(80, term_width - 2)):
-                result += l + "\n"
-            result += "\n"
+            wrapped_lines = textwrap.wrap(line, width=min(80, term_width - 2))
+            if wrapped_lines:  # If there are wrapped lines
+                for l in wrapped_lines:
+                    result += l + "\n"
+            else:  # If it's an empty line
+                result += "\n"
         else:
             # Format letter
 

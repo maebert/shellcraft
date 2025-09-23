@@ -2,11 +2,12 @@
 """Core Classes."""
 
 import os
-import toml
-from copy import copy
-from shellcraft.utils import to_list, to_float
-from google.protobuf.descriptor import Descriptor
 from builtins import str
+from copy import copy
+
+import toml
+
+from shellcraft.utils import to_float, to_list
 
 RESOURCES = ["clay", "energy", "ore"]
 
@@ -18,13 +19,13 @@ class ResourceProxy(object):
         """Initialise the Proxy.
 
         Args:
-            field (shellcraft.game_state_pb2.Resources): Resource message.
+            field (shellcraft.game_state.Resources): Resource message.
         """
         self._resources = field
 
     @property
     def _fields(self):
-        return self._resources.__class__.DESCRIPTOR.fields_by_name.keys()
+        return ["clay", "ore", "energy"]
 
     def add(self, resource, value):
         """Add resource.
@@ -96,27 +97,23 @@ class ItemProxy(object):
     def add(self, item):
         """Add a new item.
 
-        This is achieved by first adding a Protobuf message to the field,
-        then using the factory to make a new item from a given template,
-        setting all fields on the Protobuf message and attaching it to the
-        newly generated item.
+        This creates a new Pydantic model instance and adds it to the field,
+        then creates a corresponding game item instance.
 
         Args:
             item: Item name or Item instance to copy from
         """
+        # Create a new Pydantic model instance for serialization
         pb = self._field.add()
         new_item = self._factory.make(item)
-        for field in self._factory.PB_CLASS.DESCRIPTOR.fields_by_name.keys():
-            if hasattr(new_item, field):
-                if isinstance(
-                    self._factory.PB_CLASS.DESCRIPTOR.fields_by_name[
-                        field
-                    ].message_type,
-                    Descriptor,
-                ):
-                    getattr(pb, field).CopyFrom(getattr(new_item, field))
-                else:
+
+        # Copy fields from game item to Pydantic model
+        if hasattr(self._factory.PB_CLASS, "model_fields"):
+            # Pydantic model
+            for field in self._factory.PB_CLASS.model_fields.keys():
+                if hasattr(new_item, field):
                     setattr(pb, field, getattr(new_item, field))
+
         new_item._pb = pb
         self._items.append(new_item)
         return new_item
@@ -168,24 +165,36 @@ class BaseItem(object):
         return self.name
 
     def __setattr__(self, key, value):
-        """Override attribute setter for items with attached Protobuf message."""
-        if (
-            key != "_pb"
-            and self._pb is not None
-            and key in self._pb.__class__.DESCRIPTOR.fields_by_name.keys()
-        ):
-            setattr(self._pb, key, value)
+        """Override attribute setter for items with attached message (Protobuf or Pydantic)."""
+        if key != "_pb" and self._pb is not None:
+            # Check if it's a protobuf object
+            if hasattr(self._pb.__class__, "DESCRIPTOR"):
+                if key in self._pb.__class__.DESCRIPTOR.fields_by_name.keys():
+                    setattr(self._pb, key, value)
+                else:
+                    self.__dict__[key] = value
+            # Check if it's a Pydantic model
+            elif hasattr(self._pb, "model_fields"):
+                if key in self._pb.model_fields:
+                    setattr(self._pb, key, value)
+                else:
+                    self.__dict__[key] = value
+            else:
+                self.__dict__[key] = value
         else:
             self.__dict__[key] = value
 
     def __getattr__(self, key):
-        """Override attribute getter for items with attached Protobuf message."""
-        if (
-            key != "_pb"
-            and self._pb
-            and key in self._pb.__class__.DESCRIPTOR.fields_by_name.keys()
-        ):
-            return getattr(self._pb, key)
+        """Override attribute getter for items with attached message (Protobuf or Pydantic)."""
+        if key != "_pb" and self._pb:
+            # Check if it's a protobuf object
+            if hasattr(self._pb.__class__, "DESCRIPTOR"):
+                if key in self._pb.__class__.DESCRIPTOR.fields_by_name.keys():
+                    return getattr(self._pb, key)
+            # Check if it's a Pydantic model
+            elif hasattr(self._pb, "model_fields"):
+                if key in self._pb.model_fields:
+                    return getattr(self._pb, key)
         raise AttributeError(key)
 
 

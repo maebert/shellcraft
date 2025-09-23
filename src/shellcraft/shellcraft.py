@@ -9,8 +9,7 @@ from shellcraft.missions import MissionFactory
 from shellcraft.fractions import FractionProxy
 from shellcraft.exceptions import BusyException
 
-from shellcraft.game_state_pb2 import GameState
-from google.protobuf import json_format
+from shellcraft.game_state import GameState
 from shellcraft.core import ResourceProxy, ItemProxy
 
 from random import random
@@ -61,9 +60,18 @@ class Game(object):
     @property
     def is_busy(self):
         """True if the player is currently mining or crafting."""
-        if self.state.action.task:
-            if datetime.datetime.now() > self.state.action.completion.ToDatetime():
-                self.state.action.Clear()
+        if self.state.action and self.state.action.task:
+            now = datetime.datetime.now()
+            completion = self.state.action.completion
+
+            # Ensure both datetimes are naive (no timezone info)
+            if completion.tzinfo is not None:
+                completion = completion.replace(tzinfo=None)
+            if now.tzinfo is not None:
+                now = now.replace(tzinfo=None)
+
+            if now > completion:
+                self.state.action = None
                 return False
             return True
         return False
@@ -186,17 +194,19 @@ class Game(object):
         self.state.stats.total_game_duration += duration
         if self.state.debug:
             duration = 0
-        self.state.action.task = task
-        self.state.action.target = str(target)
-        self.state.action.completion.FromDatetime(
-            datetime.datetime.now() + datetime.timedelta(seconds=duration)
+
+        from shellcraft.game_state import Action
+        self.state.action = Action(
+            task=task,
+            target=str(target),
+            completion=datetime.datetime.now() + datetime.timedelta(seconds=duration)
         )
 
     @classmethod
     def load(cls, filename):
         """Load a game from a save file."""
         with open(filename) as f:
-            state = json_format.Parse(f.read(), GameState())
+            state = GameState.model_validate_json(f.read())
             game = cls(state)
             game.save_file = filename
         return game
@@ -223,4 +233,4 @@ class Game(object):
     def save(self, filename=None):
         """Save a game to disk."""
         with open(filename or self.save_file, "w") as f:
-            f.write(json_format.MessageToJson(self.state))
+            f.write(self.state.model_dump_json(indent=2))

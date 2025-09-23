@@ -9,7 +9,7 @@ from __future__ import absolute_import
 import random
 
 from shellcraft.grammar import Grammar
-from shellcraft.game_state_pb2 import NPC as NPCPB
+from shellcraft.game_state import NPC as NPCPB
 
 
 class NPCFactory(object):

@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
 
 """Basic CLI for ShellCraft."""
-from shellcraft.core import BaseFactory, BaseItem
+
+import re
+
 from shellcraft._cli_impl import echo, echo_alerts
+from shellcraft.core import BaseFactory, BaseItem
 
 
 class Step(BaseItem):
     def __repr__(self):
         return f"<Tutorial {self.name}>"
+
+    def format_description(self):
+        return re.sub(r"(?<!\n)\n(?!\n)", " ", self.description)
 
 
 class TutorialFactory(BaseFactory):
@@ -23,7 +29,7 @@ class TutorialFactory(BaseFactory):
     def print_last_step(self):
         step = self.get(str(self.game.state.tutorial_step - 1))
         if step:
-            echo(step.description)
+            echo(step.format_description())
 
     def cont(self):
         step = self.get_next_step()
@@ -31,7 +37,7 @@ class TutorialFactory(BaseFactory):
             self.game.state.tutorial_step += 1
             self.apply_effects(step)
             self.game.save()
-            echo(step.description)
+            echo(step.format_description())
             if self.game._messages:
                 echo("")
             echo_alerts(self.game)

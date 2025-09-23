@@ -18,7 +18,9 @@ class FractionProxy(object):
         data = toml.load(path)
         for name, fraction in data.items():
             if name not in self._fractions:
-                f = self._field.add(name=name, influence=fraction["influence"])
+                from shellcraft.game_state import Fraction
+                f = Fraction(name=name, influence=fraction["influence"])
+                self._field.append(f)
                 self._fractions[name] = f
 
     def get(self, name):

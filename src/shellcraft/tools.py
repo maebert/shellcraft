@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Item Classes."""
 from shellcraft.core import BaseItem, BaseFactory
-from shellcraft.game_state_pb2 import Tool as ToolPB
+from shellcraft.game_state import Tool as ToolPB
 
 
 class Tool(BaseItem):

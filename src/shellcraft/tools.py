@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 """Item Classes."""
+
 from typing import Dict
+
 from pydantic import Field
-from shellcraft.core import BaseItem, BaseFactory
+
+from shellcraft.core import BaseFactory, BaseItem
 from shellcraft.game_state import Tool as ToolPB
 
 
@@ -26,12 +29,12 @@ class Tool(BaseItem):
 
         # Update with tool-specific data
         tool_data = {
-            'type': data.get("type", "tool"),
-            'durability': data.get("durability", -1),
-            'mining_bonus': data.get("mining_bonus", {}),
-            'event_bonus': data.get("event_bonus", {}),
-            'crafting_bonus': data.get("crafting_bonus", {}),
-            'research_bonus': data.get("research_bonus", 0),
+            "type": data.get("type", "tool"),
+            "durability": data.get("durability", -1),
+            "mining_bonus": data.get("mining_bonus", {}),
+            "event_bonus": data.get("event_bonus", {}),
+            "crafting_bonus": data.get("crafting_bonus", {}),
+            "research_bonus": data.get("research_bonus", 0),
         }
 
         # Create new Tool instance with all data
@@ -43,7 +46,7 @@ class Tool(BaseItem):
             cost=tool.cost,
             effects=tool.effects,
             strings=tool.strings,
-            **tool_data
+            **tool_data,
         )
 
     def __repr__(self):
@@ -76,7 +79,9 @@ class ToolFactory(BaseFactory):
 
     def make(self, source):
         tool = super(ToolFactory, self).make(source)
-        if not hasattr(tool, "condition"):
+        assert tool
+        if tool.condition is None:
+            assert tool.durability is not None
             tool.condition = tool.durability
         return tool
 

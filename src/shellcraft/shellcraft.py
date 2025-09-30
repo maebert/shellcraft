@@ -94,7 +94,6 @@ class Game(object):
     def craft(self, tool_name):
         """Craft a new tool by expending resources and time."""
         item = self.workshop.get(tool_name)
-        assert item
 
         for resource, res_cost in item.cost:
             self.resources.add(resource, -res_cost)
@@ -106,7 +105,6 @@ class Game(object):
     def research(self, project_name):
         """Research a new project by expending time."""
         project = self.lab.get(project_name)
-        assert project
 
         self.state.research_completed.append(project.name)
         self._act("research", project_name, project.difficulty)

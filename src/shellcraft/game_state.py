@@ -1,7 +1,7 @@
 """Pydantic models for ShellCraft game state."""
 
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from pydantic import BaseModel, Field
 
@@ -49,7 +49,7 @@ class Tool(BaseModel):
     """Represents a tool owned by the player."""
 
     name: str = ""
-    condition: float = 0.0
+    condition: float = 0
 
 
 class NPC(BaseModel):

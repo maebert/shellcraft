@@ -272,13 +272,16 @@ class BaseFactory:
         }
         self.game = game
 
-    def get(self, item_name) -> Optional[BaseItem]:
+    def get(self, item_name) -> BaseItem:
         """Get an item instance by name."""
         if isinstance(item_name, BaseItem):
             return item_name
-        return self.all_items.get(item_name)
+        item = self.all_items.get(item_name)
+        if not item:
+            raise ValueError(f"Item {item_name} not found")
+        return item
 
-    def make(self, source):
+    def make(self, source) -> BaseItem:
         """Create a new unique item from a source.
 
         The source may be a string, in which case the item is created from
@@ -291,7 +294,6 @@ class BaseFactory:
             return copy(self.get(source))
         elif self.PB_CLASS and isinstance(source, self.PB_CLASS):
             item = copy(self.get(source.name))
-            item._pb = source
             return item
         else:
             return copy(source)
@@ -303,7 +305,6 @@ class BaseFactory:
 
     def _resources_missing_to_craft(self, item_name):
         item = self.get(item_name)
-        assert item
 
         return {
             res: int(res_cost - self.game.resources.get(res))
@@ -314,7 +315,6 @@ class BaseFactory:
     def can_afford(self, item_name):
         """Return true if we have enough resources to create an item."""
         item = self.get(item_name)
-        assert item
 
         for resource in RESOURCES:
             if item.cost.get(resource, 0) > self.game.resources.get(resource):
@@ -325,7 +325,6 @@ class BaseFactory:
     def apply_effects(self, item_name):
         """Apply all effects of an item."""
         item = self.get(item_name)
-        assert item
 
         # Enable commands
         for command in item.effects.enable_commands:

@@ -8,28 +8,20 @@ ShellCraft is a command-line based crafting game inspired by Ted Chiang's "Seven
 
 ## Development Commands
 
-The project supports both Poetry and UV package managers. Use either consistently:
+The project uses [Mise](https://mise.jdx.dev) to manage the Python toolchain (via `uv`) and to expose development tasks. Run `mise install` once to provision Python and `uv`; `mise run <task>` thereafter.
 
-### With Poetry (legacy):
-- **Install dependencies**: `poetry install`
-- **Run tests**: `poetry run pytest`
-- **Format code**: `poetry run black tests src`
-- **Lint code**: `poetry run flake8 tests src --ignore E501,W503,E741`
-- **Coverage**: `poetry run coverage run --source shellcraft -m pytest`
-- **Build documentation**: `poetry run mkdocs build --clean`
-- **Serve documentation**: `poetry run mkdocs serve`
+### Mise tasks:
+- **Install dependencies**: `mise run install` (wraps `uv sync`)
+- **Run tests**: `mise run test`
+- **Format code**: `mise run format`
+- **Lint code**: `mise run lint`
+- **Coverage**: `mise run coverage`
+- **Build documentation**: `mise run docs`
+- **Serve documentation**: `mise run servedocs`
+- **Build package**: `mise run build`
+- **Clean artifacts**: `mise run clean`
 
-### With UV (preferred):
-- **Install dependencies**: `uv install`
-- **Run tests**: `uv run pytest`
-- **Format code**: `uv run black tests src`
-- **Lint code**: `uv run flake8 tests src --ignore E501,W503,E741`
-
-### Makefile shortcuts:
-- `make test` - Run tests with poetry
-- `make lint` - Run linting
-- `make format` - Format code with black
-- `make clean` - Remove build artifacts
+To override the Python version, set `PYTHON_VERSION` before running mise (e.g., `PYTHON_VERSION=3.11 mise install`).
 
 ## Architecture
 

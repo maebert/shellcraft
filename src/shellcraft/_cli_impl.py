@@ -259,7 +259,8 @@ class Action:
     def draw(self):
         """Echo the current progress bar."""
         term_width, _ = get_terminal_size()
-        bar_width = term_width - len(self.action) - 10
+        # Overhead beyond bar_width: 2 spaces + current-block char + 18-wide info field.
+        bar_width = max(1, term_width - alen(self.action) - 22)
         progress = self.elapsed / self.duration * bar_width
         blocks = min(bar_width, int(progress)) - 1
         current_block = int(progress % 1 * 4)

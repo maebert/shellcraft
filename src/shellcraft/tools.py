@@ -80,8 +80,9 @@ class ToolFactory(BaseFactory):
     def make(self, source):
         tool = super(ToolFactory, self).make(source)
         assert tool
-        if tool.condition is None:
-            assert tool.durability is not None
+        # Fresh crafts have no backing pb yet — start them at full durability.
+        # Tools loaded from a save carry their persisted condition via _pb.
+        if tool._pb is None and tool.durability and tool.durability > 0:
             tool.condition = tool.durability
         return tool
 

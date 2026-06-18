@@ -12,9 +12,9 @@ from __future__ import unicode_literals
 import os
 import pytest
 from click.testing import CliRunner
-import pkg_resources
 from shellcraft.cli import get_game, cli
 from shellcraft.shellcraft import Game
+from shellcraft.utils import get_project_version
 
 
 @pytest.fixture(scope="module")
@@ -48,7 +48,7 @@ def test_basic_cli(game):
 
     version_result = runner.invoke(cli, ["--version"])
     assert version_result.exit_code == 0
-    assert pkg_resources.get_distribution("shellcraft").version in version_result.output
+    assert get_project_version() in version_result.output
 
 
 def test_contract(game):
@@ -93,4 +93,4 @@ def test_game_run(game):
         game.tutorial.cont()
     assert "small_cart" in game.state.research_completed
     assert game.state.tutorial_step == 11
-    assert game.resources.get("clay") == 4
+    assert game.resources.get("clay") == 5

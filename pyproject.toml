@@ -23,5 +23,13 @@ Repository = "https://github.com/maebert/shellcraft"
 [project.scripts]
 shellcraft = 'shellcraft.cli:main'
 
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "black>=24",
+    "flake8>=7",
+    "coverage>=7",
+]
+
 [tool.uv]
 package = true

@@ -1,0 +1,57 @@
+min_version = "2024.9.5"
+
+[settings]
+python.uv_venv_auto = "source"
+
+[env]
+_.python.venv = { path = ".venv", create = true }
+
+[tools]
+python = "{{ get_env(name='PYTHON_VERSION', default='3.12') }}"
+uv = "latest"
+
+[tasks.install]
+description = "Install dependencies"
+run = "uv sync"
+
+[tasks.test]
+description = "Run tests"
+run = "uv run pytest"
+
+[tasks.format]
+description = "Format code with black"
+run = "uv run black tests src"
+
+[tasks.lint]
+description = "Lint code with flake8"
+run = "uv run flake8 tests src --ignore E501,W503,E741"
+
+[tasks.coverage]
+description = "Run coverage report"
+run = [
+    "uv run coverage run --source shellcraft -m pytest",
+    "uv run coverage report -m",
+    "uv run coverage html",
+]
+
+[tasks.docs]
+description = "Build documentation"
+run = "uv run mkdocs build --clean"
+
+[tasks.servedocs]
+description = "Serve documentation locally"
+run = "uv run mkdocs serve"
+
+[tasks.build]
+description = "Build source and wheel package"
+depends = ["clean"]
+run = "uv build"
+
+[tasks.clean]
+description = "Remove build, test, and Python artifacts"
+run = """
+rm -rf build/ dist/ .eggs/ pip-wheel-metadata/ site/ .tox/ htmlcov/ .coverage
+find . -name '*.pyc' -delete
+find . -name '*.pyo' -delete
+find . -name '__pycache__' -exec rm -rf {} +
+"""

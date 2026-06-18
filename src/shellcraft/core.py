@@ -294,6 +294,10 @@ class BaseFactory:
             return copy(self.get(source))
         elif self.PB_CLASS and isinstance(source, self.PB_CLASS):
             item = copy(self.get(source.name))
+            for field in self.PB_CLASS.model_fields:
+                if hasattr(item, field):
+                    setattr(item, field, getattr(source, field))
+            item._pb = source
             return item
         else:
             return copy(source)

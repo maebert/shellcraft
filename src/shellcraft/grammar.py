@@ -8,7 +8,6 @@ import re
 import sys
 import os
 
-
 VERBS = {"research": "researching", "mine": "mining", "craft": "crafting"}
 
 
@@ -25,7 +24,6 @@ class SymbolNotFound(Exception):
 
 
 class Grammar(object):
-
     grammars = {}
 
     def __init__(self, grammar_string):

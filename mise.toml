@@ -19,12 +19,12 @@ description = "Run tests"
 run = "uv run pytest"
 
 [tasks.format]
-description = "Format code with black"
-run = "uv run black tests src"
+description = "Format code with ruff"
+run = "uv run ruff format tests src"
 
 [tasks.lint]
-description = "Lint code with flake8"
-run = "uv run flake8 tests src --ignore E501,W503,E741"
+description = "Lint code with ruff"
+run = "uv run ruff check tests src"
 
 [tasks.coverage]
 description = "Run coverage report"
@@ -54,4 +54,28 @@ rm -rf build/ dist/ .eggs/ pip-wheel-metadata/ site/ .tox/ htmlcov/ .coverage
 find . -name '*.pyc' -delete
 find . -name '*.pyo' -delete
 find . -name '__pycache__' -exec rm -rf {} +
+"""
+
+[tasks.backup]
+description = "Copy the current savegame to config.json.bak"
+run = """
+SAVE=$(uv run python -c "import click, os; print(os.path.join(click.get_app_dir('ShellCraft'), 'config.json'))")
+if [ ! -f "$SAVE" ]; then
+    echo "No savegame at $SAVE" >&2
+    exit 1
+fi
+cp "$SAVE" "$SAVE.bak"
+echo "Backed up $SAVE -> $SAVE.bak"
+"""
+
+[tasks.restore]
+description = "Restore the savegame from config.json.bak"
+run = """
+SAVE=$(uv run python -c "import click, os; print(os.path.join(click.get_app_dir('ShellCraft'), 'config.json'))")
+if [ ! -f "$SAVE.bak" ]; then
+    echo "No backup at $SAVE.bak" >&2
+    exit 1
+fi
+cp "$SAVE.bak" "$SAVE"
+echo "Restored $SAVE from $SAVE.bak"
 """

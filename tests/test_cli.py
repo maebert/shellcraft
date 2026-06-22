@@ -88,6 +88,36 @@ def test_version_flag(runner_game):
     assert "ShellCraft" in result.output
 
 
+def test_research_while_busy_reports_remaining_time(runner_game):
+    """`research X` while another action is in progress must not crash on the
+    datetime arithmetic (regression: completion.ToDatetime() was a protobuf-ism)."""
+    import datetime
+
+    from shellcraft.game_state import Action
+
+    runner, _ = runner_game
+    game = cli_module.GAME
+    game.state.commands_enabled.append("research")
+    game.state.resources_enabled.append("clay")
+    game.state.research_enabled.append("small_cart")
+    game.resources.add("clay", 30)
+    # Simulate an in-progress mining action that hasn't completed yet.
+    game.state.debug = False
+    game.state.action = Action(
+        task="mine",
+        target="clay",
+        completion=datetime.datetime.now() + datetime.timedelta(seconds=5),
+    )
+
+    result = runner.invoke(cli, ["research", "small_cart"])
+    # err=True echoes call sys.exit(1) so a non-zero exit is expected.
+    assert "ToDatetime" not in result.output
+    # Message includes the verb, the target, and the human duration.
+    assert "mining clay" in result.output
+    assert "for another" in result.output
+    assert "second" in result.output
+
+
 def test_help_lists_commands(runner_game):
     runner, _ = runner_game
     result = runner.invoke(cli, ["--help"])

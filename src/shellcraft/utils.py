@@ -35,6 +35,41 @@ def to_list(string_or_list):
     return string_or_list
 
 
+def _plural(n: int, word: str) -> str:
+    return f"{n} {word}{'s' if n != 1 else ''}"
+
+
+def format_duration(seconds: float) -> str:
+    """Format a duration in seconds as a friendly string.
+
+    Drops trailing zero components so a whole number of minutes reads
+    "3 minutes" rather than "3 minutes and 0 seconds".
+
+    Examples:
+        >>> format_duration(8)
+        '8 seconds'
+        >>> format_duration(203)
+        '3 minutes and 23 seconds'
+        >>> format_duration(3725)
+        '1 hour and 2 minutes'
+    """
+    seconds = max(0, int(seconds))
+    if seconds < 60:
+        return _plural(seconds, "second")
+    if seconds < 3600:
+        minutes, secs = divmod(seconds, 60)
+        parts = [_plural(minutes, "minute")]
+        if secs:
+            parts.append(_plural(secs, "second"))
+        return " and ".join(parts)
+    hours, rem = divmod(seconds, 3600)
+    minutes = rem // 60
+    parts = [_plural(hours, "hour")]
+    if minutes:
+        parts.append(_plural(minutes, "minute"))
+    return " and ".join(parts)
+
+
 def to_float(s):
     """Convert anything to float.
 

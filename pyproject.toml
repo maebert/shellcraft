@@ -26,10 +26,18 @@ shellcraft = 'shellcraft.cli:main'
 [dependency-groups]
 dev = [
     "pytest>=8",
-    "black>=24",
-    "flake8>=7",
+    "ruff>=0.6",
     "coverage>=7",
 ]
 
 [tool.uv]
 package = true
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+# E501 (line too long) — black-compatible formatter handles long lines best-effort.
+# E741 (ambiguous variable name) — pre-existing `l` usage in CLI rendering code.
+ignore = ["E501", "E741"]

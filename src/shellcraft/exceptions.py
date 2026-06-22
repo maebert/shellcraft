@@ -10,16 +10,20 @@ class ShellcraftException(RuntimeError):
 
 
 class BusyException(ShellcraftException):
-    """Exception that is raised if the parse tree runs too deep."""
+    """Raised when the player tries to start an action while another is in progress."""
 
     def __init__(self, game):
-        self._time_left = (
-            game.state.action.completion - datetime.datetime.now()
-        )
+        self._time_left = game.state.action.completion - datetime.datetime.now()
         self._action = game.state.action.task
+        self._target = game.state.action.target
 
     def __str__(self):
-        return f"You're busy {VERBS[self._action]} for another { self._time_left.total_seconds():.0f} seconds."
+        from shellcraft.utils import format_duration
+
+        verb = VERBS[self._action]
+        target = f" {self._target}" if self._target else ""
+        duration = format_duration(self._time_left.total_seconds())
+        return f"You're busy {verb}{target} for another {duration}."
 
 
 class ResourceNotAvailable(ShellcraftException):

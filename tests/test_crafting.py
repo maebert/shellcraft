@@ -38,8 +38,13 @@ def test_busy_blocks_a_second_craft(shovel_game):
     shovel_game.state.debug = False
     shovel_game.resources.add("clay", 4)  # enough for two shovels
     shovel_game.craft("shovel")
-    with pytest.raises(BusyException):
+    with pytest.raises(BusyException) as exc_info:
         shovel_game.craft("shovel")
+    message = str(exc_info.value)
+    # Message includes the verb, the target, and a duration.
+    assert "crafting shovel" in message
+    assert "for another" in message
+    assert message.endswith(".")
 
 
 def test_crafting_an_automaton_lands_in_automata_not_tools(new_game):

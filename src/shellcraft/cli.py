@@ -233,11 +233,16 @@ def research(game, project=None):
     else:
         # Researching something now
         if game.is_busy:
-            dt = game.state.action.completion.ToDatetime() - datetime.datetime.now()
+            from shellcraft.utils import format_duration
+
+            dt = game.state.action.completion - datetime.datetime.now()
+            action = game.state.action
+            target = f" {action.target}" if action.target else ""
             echo(
-                "You're busy {} for another {:.0f} seconds.",
-                VERBS[game.state.action.task],
-                dt.total_seconds(),
+                "You're busy {}{} for another {}.",
+                VERBS[action.task],
+                target,
+                format_duration(dt.total_seconds()),
                 err=True,
             )
 

@@ -123,9 +123,7 @@ class Game:
         candidates = [t for t in self.state.tools if t.catalog.type == "tool"]
         if not candidates:
             return None
-        return max(
-            candidates, key=lambda t: t.catalog.mining_bonus.get(resource, 0)
-        )
+        return max(candidates, key=lambda t: t.catalog.mining_bonus.get(resource, 0))
 
     def mine(self, resource):
         if self.is_busy:

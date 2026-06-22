@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Automaton Class."""
+
 from shellcraft.epithets import Name
 from random import seed, randint, paretovariate, random
 import math
@@ -52,7 +53,7 @@ class World(object):
             absx, absy = abs(dx - x), abs(dy - y)
             absx = min(absx, self.width - absx)
             absy = min(absy, self.height - absy)
-            d = math.sqrt(absx ** 3 + absy ** 3)
+            d = math.sqrt(absx**3 + absy**3)
             if d < bd:
                 bd = d
                 best_deposit = deposit

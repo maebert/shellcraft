@@ -123,9 +123,7 @@ def test_mining_difficulty_multiply(fresh_game):
 
 def test_legacy_fixture_loads(tmp_path):
     """tests/fixtures/save1.json (the historical save format) loads cleanly."""
-    fixture = os.path.join(
-        os.path.dirname(__file__), "fixtures", "save1.json"
-    )
+    fixture = os.path.join(os.path.dirname(__file__), "fixtures", "save1.json")
     game = Game.load(fixture)
 
     assert game.resources.get("clay") == 30

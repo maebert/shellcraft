@@ -24,13 +24,13 @@ mining_bonus.ore = 4
 cost.clay = 20
 prerequisites.research = "small_cart"
 
-[axe]
-description = "A simple axe for mining ore."
+[pickaxe]
+description = "A simple pickaxe for mining ore."
 durability = 600
 difficulty = 30
 mining_bonus.ore = 8
-cost.ore = 40
-prerequisites.ore = 20
+cost.ore = 25
+prerequisites.ore = 1
 
 [crawler]
 description = "The easiest possible automaton."

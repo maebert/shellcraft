@@ -24,13 +24,13 @@ class SymbolNotFound(Exception):
 
 
 class Grammar(object):
-    grammars = {}
+    grammars: dict[str, "Grammar"] = {}
 
-    def __init__(self, grammar_string):
+    def __init__(self, grammar_string: str) -> None:
         self.grammar = self.parse_grammar(grammar_string)
 
     @classmethod
-    def load(cls, grammar_file):
+    def load(cls, grammar_file: str) -> "Grammar":
         with open(
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
@@ -41,7 +41,11 @@ class Grammar(object):
             cls.grammars[grammar_file] = cls(f.read())
             return cls.grammars[grammar_file]
 
-    def weighted_choice(self, options, weights):
+    def weighted_choice(
+        self,
+        options: "tuple[str, ...] | list[str]",
+        weights: "tuple[float, ...] | list[float]",
+    ) -> str | None:
         """Choose a random item, according to weights.
 
         Args:
@@ -57,7 +61,7 @@ class Grammar(object):
             if acc > target:
                 return options[idx]
 
-    def parse_grammar(self, grammar):
+    def parse_grammar(self, grammar: str) -> dict[str, list[tuple[str, float]]]:
         """Return a dictionary mapping symbols to extensions.
 
         Example:
@@ -109,7 +113,7 @@ class Grammar(object):
 
         return dict(result)
 
-    def transform(self, parts, rule):
+    def transform(self, parts: list[str], rule: str | None) -> list[str]:
         if rule == "gen":
             if parts[-1].rstrip().endswith("s"):
                 parts[-1] = parts[-1].rstrip() + "'"
@@ -121,7 +125,7 @@ class Grammar(object):
             return [p if p in ("by", "of", "and") else p.capitalize() for p in parts]
         return parts
 
-    def extend_rule(self, symbol="@s", max_depth=8):
+    def extend_rule(self, symbol: str = "@s", max_depth: int = 8) -> list[str]:
         """Start with a symbol and returns a list of tokens.
 
         Args:
@@ -144,7 +148,7 @@ class Grammar(object):
         result = self.extend_sentence(extension, max_depth)
         return self.transform(result, rule)
 
-    def extend_sentence(self, sentence, max_depth=8):
+    def extend_sentence(self, sentence, max_depth: int = 8) -> list[str]:
         result = []
         for part in sentence.replace("\n", "\n ").split(" "):
             if part.startswith("@"):
@@ -168,7 +172,7 @@ class Grammar(object):
     #         except ValueError:
     #             yield " ".join(sentence)
 
-    def assemble_sentence(self, parts):
+    def assemble_sentence(self, parts: list[str]) -> str:
         """Clean up parts and applies some syntactic rules.
 
         Args:
@@ -183,7 +187,7 @@ class Grammar(object):
         sentence = re.sub(r"\n ", "\n", sentence)
         return sentence.strip()
 
-    def generate(self, sentence=None):
+    def generate(self, sentence: str | None = None) -> str:
         """Generate a sentence from a grammar string.
 
         Args:

@@ -3,12 +3,27 @@
 
 """Module documentation."""
 
+from typing import ClassVar
+
 __author__ = "Manuel Ebert"
 __email__ = "manuel@1450.me"
 
 
 class Color(object):
     """Truecolor."""
+
+    # Declared here so the post-class assignments below type-check.
+    yellow: ClassVar["Color"]
+    green: ClassVar["Color"]
+    blue: ClassVar["Color"]
+    purple: ClassVar["Color"]
+    red: ClassVar["Color"]
+    pink: ClassVar["Color"]
+    grey: ClassVar["Color"]
+    paper: ClassVar["Color"]
+    ink: ClassVar["Color"]
+    dark: ClassVar["Color"]
+    white: ClassVar["Color"]
 
     def __init__(self, r=None, g=None, b=None, underline=False):
         """Initialise the color.
@@ -67,6 +82,11 @@ class Color(object):
 
 class Gradient(object):
     """Represents a gradient for colours."""
+
+    # Declared here so the post-class assignments below type-check.
+    yellow: ClassVar["Gradient"]
+    green: ClassVar["Gradient"]
+    dark: ClassVar["Gradient"]
 
     def __init__(self, start, end):
         self.start = start

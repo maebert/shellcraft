@@ -1,7 +1,7 @@
 """Tutorial step catalog and dispatch."""
 
 import re
-from typing import ClassVar
+from typing import ClassVar, cast
 
 from shellcraft._cli_impl import echo, echo_alerts
 from shellcraft.core import BaseFactory, BaseItem
@@ -20,18 +20,18 @@ class Step(BaseItem):
 class TutorialFactory(BaseFactory):
     ITEM_CLASS = Step
 
-    def get_next_step(self):
+    def get_next_step(self) -> "Step | None":
         step = self.all_items.get(str(self.game.state.tutorial_step))
         if step is None or not self.is_available(step):
             return None
-        return step
+        return cast(Step, step)
 
-    def print_last_step(self):
+    def print_last_step(self) -> None:
         step = self.all_items.get(str(self.game.state.tutorial_step - 1))
         if step:
-            echo(step.format_description())
+            echo(cast(Step, step).format_description())
 
-    def cont(self):
+    def cont(self) -> bool:
         step = self.get_next_step()
         if step is None:
             return False

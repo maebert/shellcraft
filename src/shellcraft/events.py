@@ -12,7 +12,7 @@ class Event(BaseItem):
 class EventFactory(BaseFactory):
     ITEM_CLASS = Event
 
-    def trigger(self, *event_names):
+    def trigger(self, *event_names: str) -> None:
         for name in event_names:
             event = self.get(name)
             self.game.alert(event.description)

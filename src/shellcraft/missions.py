@@ -2,7 +2,7 @@
 
 import datetime
 import random
-from typing import ClassVar
+from typing import Any, ClassVar, cast
 
 from shellcraft._cli_impl import ask, echo
 from shellcraft.core import BaseFactory, BaseItem
@@ -22,7 +22,10 @@ class Mission(BaseItem):
 class MissionFactory(BaseFactory):
     ITEM_CLASS = Mission
 
-    def add(self, name: str):
+    def get(self, name: "str | BaseItem") -> Mission:
+        return cast(Mission, super().get(name))
+
+    def add(self, name: str) -> MissionInstance | None:
         """Construct, randomize, and offer a new mission.
 
         If the player accepts, the instance is appended to game state and returned.
@@ -45,7 +48,7 @@ class MissionFactory(BaseFactory):
             if self._is_completed(mission):
                 self.game.state.missions.remove(mission)
 
-    def _vars(self, mission: MissionInstance) -> dict:
+    def _vars(self, mission: MissionInstance) -> dict[str, Any]:
         return {
             "writer": format_name(mission.writer),
             "demand": mission.demand,
@@ -71,8 +74,11 @@ class MissionFactory(BaseFactory):
             reward_type = mission.reward_type
 
         if game.workshop.available_items:
+            tools = [
+                game.workshop.get(item.name) for item in game.workshop.available_items
+            ]
             best_tool = max(
-                game.workshop.available_items,
+                tools,
                 key=lambda item: item.mining_bonus.get(demand_type, 0),
             )
             efficiency = best_tool.mining_bonus.get(demand_type) or 1

@@ -3,30 +3,31 @@
 import datetime
 import os
 from random import random
+from typing import Any
 
 import toml
 
 RESOURCE_WORTH = {"clay": 1, "ore": 2, "energy": 4}
 
 
-def to_date(delta_seconds=0):
+def to_date(delta_seconds: float = 0) -> str:
     """Convert delta in seconds to ISO-8601 string."""
     return (
         datetime.datetime.now() + datetime.timedelta(seconds=delta_seconds)
     ).isoformat()
 
 
-def parse_isoformat(s):
+def parse_isoformat(s: str) -> datetime.datetime:
     """Parse ISO-8601 string."""
     return datetime.datetime.strptime(s, "%Y-%m-%dT%H:%M:%S.%f")
 
 
-def convert_resource_value(frm, to):
+def convert_resource_value(frm: str, to: str) -> float:
     """Return the market value of a resource to trade."""
     return 1.0 * RESOURCE_WORTH[frm] / RESOURCE_WORTH[to]
 
 
-def to_list(string_or_list):
+def to_list(string_or_list: Any) -> list[Any]:
     """Encapsulate strings or numbers in a list."""
     if not string_or_list:
         return []

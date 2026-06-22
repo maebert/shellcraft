@@ -18,7 +18,7 @@ class NPCFactory(object):
     namer = Grammar.grammars["names"]
 
     @classmethod
-    def make(cls, nobility_factor=8, fraction=None):
+    def make(cls, nobility_factor: int = 8, fraction: str | None = None) -> NPCPB:
         """Generate a random NPC."""
         gender = random.randint(0, 1)
         last = cls.namer.generate("@family")

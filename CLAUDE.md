@@ -13,15 +13,28 @@ The project uses [Mise](https://mise.jdx.dev) to manage the Python toolchain (vi
 ### Mise tasks:
 - **Install dependencies**: `mise run install` (wraps `uv sync`)
 - **Run tests**: `mise run test`
-- **Format code**: `mise run format`
-- **Lint code**: `mise run lint`
+- **Format code**: `mise run format` (ruff format)
+- **Lint code**: `mise run lint` (ruff check)
+- **Type check**: `mise run typecheck` (ty)
 - **Coverage**: `mise run coverage`
 - **Build documentation**: `mise run docs`
 - **Serve documentation**: `mise run servedocs`
 - **Build package**: `mise run build`
 - **Clean artifacts**: `mise run clean`
+- **Backup savegame**: `mise run backup`
+- **Restore savegame**: `mise run restore`
 
 To override the Python version, set `PYTHON_VERSION` before running mise (e.g., `PYTHON_VERSION=3.11 mise install`).
+
+## Required checks after every code change
+
+Before marking any task complete, run **all three** of these and resolve any reported issues:
+
+1. `mise run format` — applies ruff formatting in place.
+2. `mise run typecheck` — runs ty across `src/` and `tests/`; must report "All checks passed!".
+3. `mise run test` — must show all tests passing.
+
+If any check fails, fix the underlying issue rather than skipping or silencing the check. Don't ignore ty errors with `# type: ignore` unless the type is genuinely unexpressible — prefer fixing the annotation or the code.
 
 ## Architecture
 

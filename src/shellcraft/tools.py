@@ -1,6 +1,6 @@
 """Tool catalog and factory."""
 
-from typing import ClassVar, Dict
+from typing import ClassVar, Dict, cast
 
 from pydantic import Field
 
@@ -41,7 +41,10 @@ class Tool(BaseItem):
 class ToolFactory(BaseFactory):
     ITEM_CLASS = Tool
 
-    def is_available(self, item_name):
+    def get(self, name: "str | BaseItem") -> Tool:
+        return cast(Tool, super().get(name))
+
+    def is_available(self, item_name: "str | BaseItem") -> bool:
         item = self.get(item_name)
         if item.name in self.game.state.tools_enabled:
             return True

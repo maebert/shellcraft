@@ -26,6 +26,10 @@ run = "uv run ruff format tests src"
 description = "Lint code with ruff"
 run = "uv run ruff check tests src"
 
+[tasks.typecheck]
+description = "Type check with ty"
+run = "uv run ty check src tests"
+
 [tasks.coverage]
 description = "Run coverage report"
 run = [

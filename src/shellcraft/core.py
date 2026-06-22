@@ -8,17 +8,22 @@ factories that hold a reference to the active Game.
 """
 
 import os
-from typing import ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional, TYPE_CHECKING, TypeVar, cast
 
 import toml
 from pydantic import BaseModel, Field, field_validator
 
 from shellcraft.utils import to_float
 
+if TYPE_CHECKING:
+    from shellcraft.shellcraft import Game
+
+_T = TypeVar("_T", bound="BaseItem")
+
 RESOURCES = ["clay", "energy", "ore"]
 
 
-def _wrap_in_list(v):
+def _wrap_in_list(v: Any) -> list:
     if v is None:
         return []
     if isinstance(v, (list, tuple)):
@@ -49,7 +54,7 @@ class Prerequisites(ResourceAmounts):
 
     @field_validator("items", "research", "triggers", mode="before")
     @classmethod
-    def _coerce_list(cls, v):
+    def _coerce_list(cls, v: Any) -> list:
         return _wrap_in_list(v)
 
 
@@ -77,7 +82,7 @@ class Effects(ResourceAmounts):
         mode="before",
     )
     @classmethod
-    def _coerce_list(cls, v):
+    def _coerce_list(cls, v: Any) -> list:
         return _wrap_in_list(v)
 
 
@@ -95,10 +100,10 @@ class BaseItem(BaseModel):
     FIXTURES: ClassVar[str] = ""
     _registry: ClassVar[Optional[Dict[str, "BaseItem"]]] = None
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self.name)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.name)
 
     @classmethod
@@ -116,13 +121,13 @@ class BaseItem(BaseModel):
         return cls._registry
 
     @classmethod
-    def all(cls) -> Dict[str, "BaseItem"]:
+    def all(cls: type[_T]) -> Dict[str, _T]:
         if cls._registry is None:
-            cls._load_catalog()
-        return cls._registry
+            return cast(Dict[str, _T], cls._load_catalog())
+        return cast(Dict[str, _T], cls._registry)
 
     @classmethod
-    def get(cls, name) -> "BaseItem":
+    def get(cls: type[_T], name: "str | BaseItem") -> _T:
         if isinstance(name, cls):
             return name
         item = cls.all().get(name)
@@ -140,21 +145,23 @@ class BaseFactory:
 
     ITEM_CLASS = BaseItem
 
-    def __init__(self, game):
+    def __init__(self, game: "Game") -> None:
         self.game = game
 
     @property
     def all_items(self) -> Dict[str, BaseItem]:
         return self.ITEM_CLASS.all()
 
-    def get(self, name) -> BaseItem:
+    def get(self, name: "str | BaseItem") -> BaseItem:
         return self.ITEM_CLASS.get(name)
 
     @property
     def available_items(self) -> List[BaseItem]:
         return [item for item in self.all_items.values() if self.is_available(item)]
 
-    def _resources_missing_to_craft(self, item_name):
+    def _resources_missing_to_craft(
+        self, item_name: "str | BaseItem"
+    ) -> dict[str, int]:
         item = self.get(item_name)
         return {
             res: int(res_cost - self.game.resources.get(res))
@@ -162,14 +169,14 @@ class BaseFactory:
             if res_cost - self.game.resources.get(res) > 0
         }
 
-    def can_afford(self, item_name):
+    def can_afford(self, item_name: "str | BaseItem") -> bool:
         item = self.get(item_name)
         for resource in RESOURCES:
             if item.cost.get(resource, 0) > self.game.resources.get(resource):
                 return False
         return True
 
-    def apply_effects(self, item_name):
+    def apply_effects(self, item_name: "str | BaseItem") -> None:
         item = self.get(item_name)
         state = self.game.state
 
@@ -208,7 +215,7 @@ class BaseFactory:
 
         self.game.events.trigger(*item.effects.events)
 
-    def is_available(self, item_name):
+    def is_available(self, item_name: "str | BaseItem") -> bool:
         item = self.get(item_name)
         for resource in RESOURCES:
             if self.game.resources.get(resource) < item.prerequisites.get(resource, 0):

@@ -3,11 +3,20 @@
 import datetime
 import os
 from random import random
+from typing import Any
 
 import shellcraft.fractions as fractions
+from shellcraft.core import BaseItem
 from shellcraft.events import EventFactory
 from shellcraft.exceptions import BusyException
-from shellcraft.game_state import Action, GameState, ToolInstance
+from shellcraft.game_state import (
+    Action,
+    Fraction,
+    GameState,
+    MissionInstance,
+    Resources,
+    ToolInstance,
+)
 from shellcraft.missions import MissionFactory
 from shellcraft.research import ResearchFactory
 from shellcraft.tools import ToolFactory
@@ -17,9 +26,9 @@ from shellcraft.tutorial import TutorialFactory
 class Game:
     """Owns the persisted state and the catalogs/factories that operate on it."""
 
-    def __init__(self, state=None):
+    def __init__(self, state: GameState | None = None) -> None:
         self.state = state or GameState()
-        self._messages = []
+        self._messages: list[str] = []
 
         self.lab = ResearchFactory(self)
         self.workshop = ToolFactory(self)
@@ -27,51 +36,51 @@ class Game:
         self.events = EventFactory(self)
         self.mission_factory = MissionFactory(self)
 
-        self.save_file = None
+        self.save_file: str | None = None
 
     # ---------- direct state accessors ----------
 
     @property
-    def resources(self):
+    def resources(self) -> Resources:
         return self.state.resources
 
     @property
-    def mining_difficulty(self):
+    def mining_difficulty(self) -> Resources:
         return self.state.mining_difficulty
 
     @property
-    def mining_difficulty_increment(self):
+    def mining_difficulty_increment(self) -> Resources:
         return self.state.mining_difficulty_increment
 
     @property
-    def total_mined(self):
+    def total_mined(self) -> Resources:
         return self.state.stats.total_mined
 
     @property
-    def missions(self):
+    def missions(self) -> list[MissionInstance]:
         return self.state.missions
 
     @property
-    def tools(self):
+    def tools(self) -> list[ToolInstance]:
         """Owned items with catalog type == 'tool' (excludes automata)."""
         return [t for t in self.state.tools if t.catalog.type == "tool"]
 
     @property
-    def automata(self):
+    def automata(self) -> list[ToolInstance]:
         return [t for t in self.state.tools if t.catalog.type == "automaton"]
 
     @property
-    def fractions(self):
+    def fractions(self) -> dict[str, Fraction]:
         """Faction state keyed by name."""
         return {f.name: f for f in self.state.fractions}
 
     # ---------- messaging ----------
 
-    def alert(self, msg, *args):
+    def alert(self, msg: str, *args: Any) -> None:
         self._messages.append(msg.format(*args))
 
     @property
-    def is_busy(self):
+    def is_busy(self) -> bool:
         if self.state.action and self.state.action.task:
             completion = self.state.action.completion
             if completion is None:
@@ -89,15 +98,15 @@ class Game:
 
     # ---------- missions ----------
 
-    def add_mission(self, name):
+    def add_mission(self, name: str) -> MissionInstance | None:
         return self.mission_factory.add(name)
 
-    def complete_missions(self):
+    def complete_missions(self) -> None:
         self.mission_factory.complete_due()
 
     # ---------- core actions ----------
 
-    def craft(self, tool_name):
+    def craft(self, tool_name: "str | BaseItem") -> float:
         item = self.workshop.get(tool_name)
         for resource, res_cost in item.cost:
             if res_cost:
@@ -108,24 +117,24 @@ class Game:
         self.alert("Crafted {}", item)
         return item.difficulty
 
-    def research(self, project_name):
+    def research(self, project_name: "str | BaseItem") -> float:
         project = self.lab.get(project_name)
         self.state.research_completed.append(project.name)
-        self._act("research", project_name, project.difficulty)
+        self._act("research", project.name, project.difficulty)
         self.alert("Researched {}.", project)
         self.lab.apply_effects(project)
         return project.difficulty
 
-    def has_item(self, item_name):
+    def has_item(self, item_name: str) -> bool:
         return any(t.name == item_name for t in self.state.tools)
 
-    def _best_mining_tool(self, resource):
+    def _best_mining_tool(self, resource: str) -> ToolInstance | None:
         candidates = [t for t in self.state.tools if t.catalog.type == "tool"]
         if not candidates:
             return None
         return max(candidates, key=lambda t: t.catalog.mining_bonus.get(resource, 0))
 
-    def mine(self, resource):
+    def mine(self, resource: str) -> tuple[float, int]:
         if self.is_busy:
             raise BusyException(self)
 
@@ -174,7 +183,7 @@ class Game:
         self.events.trigger(*events)
         return difficulty, efficiency
 
-    def _unlock_items(self):
+    def _unlock_items(self) -> None:
         for item in self.workshop.available_items:
             if item.name not in self.state.tools_enabled:
                 self.alert("You can now craft {}.", item)
@@ -184,7 +193,7 @@ class Game:
                 self.alert("You can now research %{}%.", research.name)
                 self.state.research_enabled.append(research.name)
 
-    def _act(self, task, target, duration):
+    def _act(self, task: str, target: Any, duration: float) -> None:
         if self.is_busy:
             raise BusyException(self)
 
@@ -201,7 +210,7 @@ class Game:
     # ---------- persistence ----------
 
     @classmethod
-    def load(cls, filename):
+    def load(cls, filename: str) -> "Game":
         with open(filename) as f:
             state = GameState.model_validate_json(f.read())
         game = cls(state)
@@ -209,7 +218,7 @@ class Game:
         return game
 
     @classmethod
-    def create(cls, filename):
+    def create(cls, filename: str) -> "Game":
         game = cls()
         game.state.mining_difficulty.clay = 0.5
         game.state.mining_difficulty.ore = 0.5
@@ -226,6 +235,9 @@ class Game:
         game.save()
         return game
 
-    def save(self, filename=None):
-        with open(filename or self.save_file, "w") as f:
+    def save(self, filename: str | None = None) -> None:
+        target = filename or self.save_file
+        if target is None:
+            raise ValueError("No save_file set; pass a filename explicitly.")
+        with open(target, "w") as f:
             f.write(self.state.model_dump_json(indent=2))

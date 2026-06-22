@@ -8,6 +8,7 @@ import textwrap
 import time
 from itertools import zip_longest
 from shutil import get_terminal_size
+from typing import Any
 
 import click
 
@@ -24,7 +25,7 @@ RESOURCE_COLORS = {
 }
 
 
-def handle_exception(e):
+def handle_exception(e: Exception) -> None:
     """Echo error message and shut down.
 
     Args:
@@ -33,12 +34,12 @@ def handle_exception(e):
     echo(str(e), err=True)
 
 
-def alen(s):
+def alen(s: str) -> int:
     """Length of a string without ANSI characters."""
     return len(s) - len("".join(re.findall(r"((?:\x1b|\033)\[[\d:;]+m)", s)))
 
 
-def grid_echo(*cols):
+def grid_echo(*cols) -> int:
     """Align columns into a grid and echo.
 
     Args:
@@ -57,7 +58,7 @@ def grid_echo(*cols):
     return max(map(len, cols))
 
 
-def box(s, join=True):
+def box(s: str, join: bool = True) -> str | list[str]:
     """Draw a box around a string.
 
     Args:
@@ -66,7 +67,7 @@ def box(s, join=True):
     """
     lines = s.splitlines()
     w = max(map(alen, lines))
-    result = ["╭" + "─" * w + "╮"]
+    result: list[str] = ["╭" + "─" * w + "╮"]
     result += [f"│{line:{w}}│" for line in lines]
     result += ["╰" + "─" * w + "╯"]
     if join:
@@ -74,8 +75,8 @@ def box(s, join=True):
     return result
 
 
-def draw_world(world, automaton, w, h):
-    def _field(**resources):
+def draw_world(world, automaton, w: int, h: int) -> str:
+    def _field(**resources: float) -> str:
         clay = resources.get("clay", 0)
         ore = resources.get("ore", 0)
         elevation = resources.get("elevation", 0)
@@ -100,7 +101,7 @@ def draw_world(world, automaton, w, h):
     return "\n".join(result)
 
 
-def draw_automaton_state(automaton):
+def draw_automaton_state(automaton) -> str:
     s = ""
     for line in automaton.name._cells:
         for cell in line:
@@ -111,7 +112,7 @@ def draw_automaton_state(automaton):
     return s
 
 
-def animate_automaton(automaton, world):
+def animate_automaton(automaton, world) -> None:
     while True:
         automaton.step()
         a = draw_automaton_state(automaton)
@@ -121,14 +122,14 @@ def animate_automaton(automaton, world):
         click.echo(f"\x1b[{height + 2}A")
 
 
-def echo_alerts(game):
+def echo_alerts(game) -> None:
     """Display all alerts that are currently queued up."""
     for m in game._messages:
         echo(m, use_cursor=True)
     game._messages = []
 
 
-def _color_in(match):
+def _color_in(match: re.Match[str]) -> str:
     s = match.group(0)
     color = Color.white
     if s.startswith("$"):
@@ -146,24 +147,26 @@ def _color_in(match):
     return color(s.strip("$*%`"))
 
 
-def _format_str(s):
+def _format_str(s: str) -> str:
     return re.sub(r"(([\$\*%`])[{};:.a-z0-9_\- \n]+(\2))", _color_in, s)
 
 
-def _unformat_str(s):
+def _unformat_str(s: str) -> str:
     return re.sub(r"(([\$\*%`])([{};:.a-z0-9_\- ]+)(\2))", r"\3", s)
 
 
-def _format_cost(cost):
-    return ", ".join(f"*{v} {k}*" for k, v in cost.items())
+def _format_cost(cost: Any) -> str:
+    """Format a cost mapping. Accepts a dict or any iterable of (key, value) pairs."""
+    items = cost.items() if hasattr(cost, "items") else cost
+    return ", ".join(f"*{v} {k}*" for k, v in items)
 
 
-def ask(msg):
+def ask(msg: str) -> bool:
     """Show a confirmation prompt."""
     return click.confirm("❯ " + _format_str(msg))
 
 
-def echo(s, *vals, **kwargs):
+def echo(s: str, *vals: Any, **kwargs: Any) -> None:
     """Echo a string with colours.
 
     Args:
@@ -227,7 +230,7 @@ def echo(s, *vals, **kwargs):
 class Action:
     """Represent an action that takes some time to complete."""
 
-    def __init__(self, action, target, duration):
+    def __init__(self, action: str, target: str, duration: float) -> None:
         """Set up the new action.
 
         Args:
@@ -244,7 +247,7 @@ class Action:
         self.action = _format_str(f"{VERBS[action]} {target_str}".capitalize())
         self.elapsed = 0.0
 
-    def _eta(self):
+    def _eta(self) -> str:
         """Friendly formatted ETA."""
         t = self.duration - self.elapsed
         if t < 1:
@@ -256,7 +259,7 @@ class Action:
         else:
             return f"{t // 3600:.0f}h {(t % 3600) / 60:.0f}m"
 
-    def draw(self):
+    def draw(self) -> None:
         """Echo the current progress bar."""
         term_width, _ = get_terminal_size()
         # Overhead beyond bar_width: 2 spaces + current-block char + 18-wide info field.
@@ -275,7 +278,7 @@ class Action:
         )
         click.echo(bar, nl=False)
 
-    def do(self, skip=False):
+    def do(self, skip: bool = False) -> None:
         """Start the action."""
         if skip:
             return

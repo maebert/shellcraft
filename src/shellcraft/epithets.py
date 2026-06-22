@@ -274,7 +274,7 @@ class Concurrence(Epithet):
 
     symbol = "C"
 
-    def traverse(self):
+    def traverse(self, force=False):
         """Apply activity to neighbouring cells."""
         if self.above.state == 1 or self.below.state == 1:
             self.left._next_state = 2
@@ -318,7 +318,7 @@ class Synchronicity(Epithet):
 
     symbol = "Y"
 
-    def traverse(self):
+    def traverse(self, force=False):
         """Apply activity to neighbouring cells."""
         if self.above.state == 1 and self.below.state == 1:
             self.left._next_state = 2

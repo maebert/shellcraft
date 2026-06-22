@@ -131,10 +131,10 @@ def test_legacy_fixture_loads(tmp_path):
 
     tools_by_name = {t.name: t.condition for t in game.tools}
     assert tools_by_name["sturdy_shovel"] == 42.5
-    assert tools_by_name["axe"] == 457.5
+    assert tools_by_name["pickaxe"] == 457.5
 
     assert game.workshop.get("sturdy_shovel").durability == 96
-    assert game.workshop.get("axe").mining_bonus["ore"] == 8
+    assert game.workshop.get("pickaxe").mining_bonus["ore"] == 8
 
 
 def test_save_load_roundtrip_via_json(fresh_game):

@@ -153,7 +153,7 @@ def mine(game: Game, resource: str) -> None:
 @click.argument("item", required=False, type=str, metavar="<item>")
 @click.pass_obj
 def craft(game: Game, item: Any) -> None:
-    """Mine a resource."""
+    """Craft an item."""
     if not item:
         if not game.workshop.available_items:
             echo("There's nothing you can craft right now.", err=True)
@@ -201,7 +201,7 @@ def resources(game: Game, resource_types: tuple[str, ...] | None = None) -> None
 @cli.command(options_metavar="")
 @click.pass_obj
 def inventory(game: Game) -> None:
-    """Show owned items and their condition."""
+    """Commence a research projec."""
     if not game.tools:
         echo("You don't own any items", err=True)
     else:
@@ -213,7 +213,7 @@ def inventory(game: Game) -> None:
 @cli.command(options_metavar="")
 @click.pass_obj
 def automata(game: Game) -> None:
-    """Show owned automata and their condition."""
+    """Control your automata."""
     if not game.tools:
         echo("You don't own any automata", err=True)
     else:

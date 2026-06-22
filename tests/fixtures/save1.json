@@ -33,7 +33,7 @@
             "shovel",
             "sturdy_shovel",
             "small_cart",
-            "axe"
+            "pickaxe"
         ],
         "research_completed": [
             "small_cart",
@@ -59,7 +59,7 @@
             "condition": 206.82817929914768
         },
         {
-            "name": "axe",
+            "name": "pickaxe",
             "condition": 457.5
         }
     ]

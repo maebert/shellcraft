@@ -1,21 +1,22 @@
-# -*- coding: utf-8 -*-
+"""Event catalog and trigger dispatch."""
 
-"""Events Interface."""
+from typing import ClassVar
 
-from shellcraft.core import BaseItem, BaseFactory
+from shellcraft.core import BaseFactory, BaseItem
 
 
 class Event(BaseItem):
-    def __repr__(self):
-        return self.name
+    FIXTURES: ClassVar[str] = "events.toml"
 
 
 class EventFactory(BaseFactory):
-    FIXTURES = "events.toml"
     ITEM_CLASS = Event
 
-    def trigger(self, *events):
-        for event in events:
-            event = self.get(event)
+    def trigger(self, *event_names):
+        for name in event_names:
+            event = self.get(name)
             self.game.alert(event.description)
             self.apply_effects(event)
+
+
+Event._load_catalog()

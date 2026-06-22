@@ -1,107 +1,123 @@
-# -*- coding: utf-8 -*-
+"""Mission catalog (text templates) and runtime mission helpers."""
 
-"""Events Interface."""
-
-from shellcraft.core import BaseItem, BaseFactory
-from shellcraft._cli_impl import echo, ask
-from shellcraft.utils import convert_resource_value, format_name
-from shellcraft.game_state import Mission as MissionPB
-from shellcraft.world import NPCFactory
 import datetime
 import random
+from typing import ClassVar
+
+from shellcraft._cli_impl import ask, echo
+from shellcraft.core import BaseFactory, BaseItem
+from shellcraft.game_state import MissionInstance
+from shellcraft.utils import convert_resource_value, format_name
+from shellcraft.world import NPCFactory
 
 
 class Mission(BaseItem):
-    """A trade contract, requesting a certain quantity of a resource in a given time."""
+    """Text template for a mission/contract. Runtime state lives on MissionInstance."""
 
-    def randomize(self, game):
-        """Generate random mission."""
-        self.writer = NPCFactory.make()
+    reward_type: str = ""
+
+    FIXTURES: ClassVar[str] = "missions.toml"
+
+
+class MissionFactory(BaseFactory):
+    ITEM_CLASS = Mission
+
+    def add(self, name: str):
+        """Construct, randomize, and offer a new mission.
+
+        If the player accepts, the instance is appended to game state and returned.
+        Otherwise returns None.
+        """
+        instance = MissionInstance(name=name)
+        # Carry default reward_type from the template, if any.
+        template = self.get(name)
+        if template.reward_type and not instance.reward_type:
+            instance.reward_type = template.reward_type
+        self._randomize(instance)
+        if self._offer(instance):
+            self.game.state.missions.append(instance)
+            return instance
+        return None
+
+    def complete_due(self) -> None:
+        """Remove any missions that resolved (succeeded or failed)."""
+        for mission in list(self.game.state.missions):
+            if self._is_completed(mission):
+                self.game.state.missions.remove(mission)
+
+    def _vars(self, mission: MissionInstance) -> dict:
+        return {
+            "writer": format_name(mission.writer),
+            "demand": mission.demand,
+            "due": mission.due,
+            "demand_type": mission.demand_type,
+            "reward": mission.reward,
+            "reward_type": mission.reward_type,
+            "deficit": mission.demand - self.game.resources.get(mission.demand_type),
+        }
+
+    def _randomize(self, mission: MissionInstance) -> None:
+        game = self.game
+        mission.writer = NPCFactory.make()
         random.shuffle(game.state.resources_enabled)
-        if not self.reward_type or self.reward_type == "resource":
+
+        if not mission.reward_type or mission.reward_type == "resource":
             demand_type, reward_type = game.state.resources_enabled[:2]
-        elif self.reward_type == "reputation":
+        elif mission.reward_type == "reputation":
             demand_type = game.state.resources_enabled[1]
+            reward_type = mission.reward_type
+        else:
+            demand_type = game.state.resources_enabled[0]
+            reward_type = mission.reward_type
 
         if game.workshop.available_items:
-            best_available_tool = max(
+            best_tool = max(
                 game.workshop.available_items,
                 key=lambda item: item.mining_bonus.get(demand_type, 0),
             )
-            efficiency = best_available_tool.mining_bonus.get(demand_type) or 1
+            efficiency = best_tool.mining_bonus.get(demand_type) or 1
         else:
             efficiency = 1
 
         difficulty = game.mining_difficulty.get(demand_type)
-
         extra_demand = random.random() * game.resources.get(demand_type)
 
-        self.demand = int(game.resources.get(demand_type) + extra_demand)
-        self.due = (
+        mission.demand = int(game.resources.get(demand_type) + extra_demand)
+        mission.due = (
             int(extra_demand / efficiency * difficulty * (2 + random.random())) + 10
         )
-        self.demand_type = demand_type
-        self.reward = int(
+        mission.demand_type = demand_type
+        mission.reward = int(
             (1 + game.state.trade_reputation + 0.3 * random.random())
             * convert_resource_value(demand_type, reward_type)
-            * self.demand
+            * mission.demand
         )
-        self.reward_type = reward_type
-        # a = str(self.writer)
-        # print("DEM", format_name(self.writer))
-        # self.writer.CopyFrom(npc)
+        mission.reward_type = reward_type
 
-    def vars(self, game):
-        return {
-            "writer": format_name(self.writer),
-            "demand": self.demand,
-            "due": self.due,
-            "demand_type": self.demand_type,
-            "reward": self.reward,
-            "reward_type": self.reward_type,
-            "deficit": self.demand - game.resources.get(self.demand_type),
-        }
-
-    def offer(self, game):
-        # return re.sub("  +", " ", d.replace("\n", " "))
-        echo(self.strings["intro"].format(**self.vars(game)))
-        if ask(self.strings["ask"].format(**self.vars(game))):
-            self.deadline.FromDatetime(
-                datetime.datetime.now() + datetime.timedelta(seconds=self.due)
+    def _offer(self, mission: MissionInstance) -> bool:
+        template = mission.template
+        echo(template.strings["intro"].format(**self._vars(mission)))
+        if ask(template.strings["ask"].format(**self._vars(mission))):
+            mission.deadline = datetime.datetime.now() + datetime.timedelta(
+                seconds=mission.due
             )
-            echo(self.strings["agree"].format(**self.vars(game)))
+            echo(template.strings["agree"].format(**self._vars(mission)))
             return True
-        else:
-            game.state.trade_reputation -= 0.02
-            echo(self.strings["disagree"].format(**self.vars(game)))
-            return False
+        self.game.state.trade_reputation -= 0.02
+        echo(template.strings["disagree"].format(**self._vars(mission)))
+        return False
 
-    def is_completed(self, game):
-        if datetime.datetime.now() > self.deadline.ToDatetime():
-            # Failed!
-            echo(self.strings["failed"].format(**self.vars(game)))
+    def _is_completed(self, mission: MissionInstance) -> bool:
+        template = mission.template
+        if mission.deadline and datetime.datetime.now() > mission.deadline:
+            echo(template.strings["failed"].format(**self._vars(mission)))
             return True
-        if game.resources.get(self.demand_type) >= self.demand:
-            echo(self.strings["completed"].format(**self.vars(game)))
-            game.resources.add(self.demand_type, -self.demand)
-            game.resources.add(self.reward_type, self.reward)
+        if self.game.resources.get(mission.demand_type) >= mission.demand:
+            echo(template.strings["completed"].format(**self._vars(mission)))
+            self.game.resources.add(mission.demand_type, -mission.demand)
+            self.game.resources.add(mission.reward_type, mission.reward)
             return True
         return False
 
-    def __repr__(self):
-        return "blank"
-        return "<{demand} {demand_type} in {due}s for {reward} {reward_type}>".format(
-            **vars(self)
-        )
 
-
-class MissionFactory(BaseFactory):
-    FIXTURES = "missions.toml"
-    ITEM_CLASS = Mission
-    PB_CLASS = MissionPB
-
-    def make(self, mission):
-        new_mission = super(MissionFactory, self).make(mission)
-        if not hasattr(new_mission, "demand"):
-            new_mission.randomize(self.game)
-        return new_mission
+Mission._load_catalog()

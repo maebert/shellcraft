@@ -1,28 +1,24 @@
-# -*- coding: utf-8 -*-
-"""Game Classes."""
+"""Game state machine: mining, crafting, research, missions."""
 
 import datetime
 import os
 from random import random
 
-from shellcraft.core import ItemProxy, ResourceProxy
+import shellcraft.fractions as fractions
 from shellcraft.events import EventFactory
 from shellcraft.exceptions import BusyException
-from shellcraft.fractions import FractionProxy
-from shellcraft.game_state import GameState
+from shellcraft.game_state import Action, GameState, ToolInstance
 from shellcraft.missions import MissionFactory
 from shellcraft.research import ResearchFactory
 from shellcraft.tools import ToolFactory
 from shellcraft.tutorial import TutorialFactory
 
 
-class Game(object):
-    """The Game class holds all information about, well, the game's state, and handles the logic."""
+class Game:
+    """Owns the persisted state and the catalogs/factories that operate on it."""
 
     def __init__(self, state=None):
-        """Create a new Game instante."""
         self.state = state or GameState()
-
         self._messages = []
 
         self.lab = ResearchFactory(self)
@@ -31,81 +27,89 @@ class Game(object):
         self.events = EventFactory(self)
         self.mission_factory = MissionFactory(self)
 
-        self.resources = ResourceProxy(self.state.resources)
-        self.total_mined = ResourceProxy(self.state.stats.total_mined)
-
-        self.mining_difficulty = ResourceProxy(self.state.mining_difficulty)
-        self.mining_difficulty_increment = ResourceProxy(
-            self.state.mining_difficulty_increment
-        )
-
-        self.tools = ItemProxy(
-            self.state.tools, self.workshop, filter=lambda tool: tool.type == "tool"
-        )
-        self.automata = ItemProxy(
-            self.state.tools,
-            self.workshop,
-            filter=lambda tool: tool.type == "automaton",
-        )
-        self.missions = ItemProxy(self.state.missions, self.mission_factory)
-        self.fractions = FractionProxy(self.state.fractions)
-
         self.save_file = None
 
+    # ---------- direct state accessors ----------
+
+    @property
+    def resources(self):
+        return self.state.resources
+
+    @property
+    def mining_difficulty(self):
+        return self.state.mining_difficulty
+
+    @property
+    def mining_difficulty_increment(self):
+        return self.state.mining_difficulty_increment
+
+    @property
+    def total_mined(self):
+        return self.state.stats.total_mined
+
+    @property
+    def missions(self):
+        return self.state.missions
+
+    @property
+    def tools(self):
+        """Owned items with catalog type == 'tool' (excludes automata)."""
+        return [t for t in self.state.tools if t.catalog.type == "tool"]
+
+    @property
+    def automata(self):
+        return [t for t in self.state.tools if t.catalog.type == "automaton"]
+
+    @property
+    def fractions(self):
+        """Faction state keyed by name."""
+        return {f.name: f for f in self.state.fractions}
+
+    # ---------- messaging ----------
+
     def alert(self, msg, *args):
-        """Add a message to the alert stack."""
         self._messages.append(msg.format(*args))
 
     @property
     def is_busy(self):
-        """True if the player is currently mining or crafting."""
         if self.state.action and self.state.action.task:
-            now = datetime.datetime.now()
             completion = self.state.action.completion
-
-            # Ensure both datetimes are naive (no timezone info)
+            if completion is None:
+                return False
+            now = datetime.datetime.now()
             if completion.tzinfo is not None:
                 completion = completion.replace(tzinfo=None)
             if now.tzinfo is not None:
                 now = now.replace(tzinfo=None)
-
             if now > completion:
                 self.state.action = None
                 return False
             return True
         return False
 
-    def add_mission(self, mission):
-        """Add a new mission.
+    # ---------- missions ----------
 
-        Args:
-            mission (str): Mission template to use.
-        """
-        mission = self.missions.add(mission)
-        if not mission.offer(self):
-            self.missions.remove(mission)
+    def add_mission(self, name):
+        return self.mission_factory.add(name)
 
     def complete_missions(self):
-        """Check if any missions can be completed."""
-        for mission in self.missions:
-            if mission.is_completed(self):
-                self.missions.remove(mission)
+        self.mission_factory.complete_due()
+
+    # ---------- core actions ----------
 
     def craft(self, tool_name):
-        """Craft a new tool by expending resources and time."""
         item = self.workshop.get(tool_name)
-
         for resource, res_cost in item.cost:
-            self.resources.add(resource, -res_cost)
-        self.tools.add(item)
-        self._act("craft", tool_name, item.difficulty)
+            if res_cost:
+                self.resources.add(resource, -res_cost)
+        instance = ToolInstance(name=item.name, condition=max(item.durability, 0))
+        self.state.tools.append(instance)
+        self._act("craft", item.name, item.difficulty)
         self.alert("Crafted {}", item)
         return item.difficulty
 
     def research(self, project_name):
-        """Research a new project by expending time."""
         project = self.lab.get(project_name)
-
         self.state.research_completed.append(project.name)
         self._act("research", project_name, project.difficulty)
         self.alert("Researched {}.", project)
@@ -113,54 +117,50 @@ class Game(object):
         return project.difficulty
 
     def has_item(self, item_name):
-        """True if the player has an instance of the tool in posession."""
-        for item in self.tools:
-            if item.name == item_name:
-                return True
-        return False
+        return any(t.name == item_name for t in self.state.tools)
 
     def _best_mining_tool(self, resource):
-        """Return the (currently owned) tool that gives the highest bonus on mining a particular resource."""
-        if self.tools.is_empty:
+        candidates = [t for t in self.state.tools if t.catalog.type == "tool"]
+        if not candidates:
             return None
-        return max(self.tools, key=lambda item: item.mining_bonus.get(resource, 0))
+        return max(
+            candidates, key=lambda t: t.catalog.mining_bonus.get(resource, 0)
+        )
 
     def mine(self, resource):
-        """Mine a resource."""
         if self.is_busy:
             raise BusyException(self)
 
         difficulty = self.mining_difficulty.get(resource)
-
         total_wear = 0
         efficiency = 0
         events = []
 
-        while not self.tools.is_empty and total_wear < difficulty:
+        while total_wear < difficulty:
             tool = self._best_mining_tool(resource)
+            if tool is None:
+                break
+
+            bonus = tool.catalog.mining_bonus.get(resource, 1)
             if tool.condition <= (difficulty - total_wear):
                 contribution = tool.condition / difficulty
                 total_wear += tool.condition
-                efficiency += (
-                    tool.condition * tool.mining_bonus.get(resource, 1) / difficulty
-                )
+                efficiency += tool.condition * bonus / difficulty
                 self.alert(f"Destroyed ${tool.name}$ while mining *{resource}*.")
-                self.tools.remove(tool)
+                self.state.tools.remove(tool)
             else:
                 contribution = (difficulty - total_wear) / difficulty
                 tool.condition -= difficulty - total_wear
                 total_wear = difficulty
 
-            efficiency += contribution * tool.mining_bonus.get(resource, 1)
+            efficiency += contribution * bonus
 
-            for event, prob in tool.event_bonus.items():
+            for event, prob in tool.catalog.event_bonus.items():
                 if random() * contribution < prob:
                     events.append(event)
 
-        # Hand mining has efficiency of 1
+        # Hand mining covers any remaining work at base efficiency 1.
         efficiency += (difficulty - total_wear) / difficulty
-
-        # Can only ever get integer results
         efficiency = int(efficiency)
 
         self.mining_difficulty.add(
@@ -169,7 +169,6 @@ class Game(object):
 
         self._act("mine", resource, difficulty)
         self.resources.add(resource, efficiency)
-
         self.total_mined.add(resource, efficiency)
 
         self._unlock_items()
@@ -182,7 +181,6 @@ class Game(object):
             if item.name not in self.state.tools_enabled:
                 self.alert("You can now craft {}.", item)
                 self.state.tools_enabled.append(item.name)
-
         for research in self.lab.available_items:
             if research.name not in self.state.research_enabled:
                 self.alert("You can now research %{}%.", research.name)
@@ -196,43 +194,40 @@ class Game(object):
         if self.state.debug:
             duration = 0
 
-        from shellcraft.game_state import Action
-
         self.state.action = Action(
             task=task,
             target=str(target),
             completion=datetime.datetime.now() + datetime.timedelta(seconds=duration),
         )
 
+    # ---------- persistence ----------
+
     @classmethod
     def load(cls, filename):
-        """Load a game from a save file."""
         with open(filename) as f:
             state = GameState.model_validate_json(f.read())
-            game = cls(state)
-            game.save_file = filename
+        game = cls(state)
+        game.save_file = filename
         return game
 
     @classmethod
     def create(cls, filename):
-        """Create a new game."""
-        game = Game()
-
+        game = cls()
         game.state.mining_difficulty.clay = 0.5
         game.state.mining_difficulty.ore = 0.5
         game.state.mining_difficulty.energy = 0.5
         game.state.mining_difficulty_increment.clay = 0.5
         game.state.mining_difficulty_increment.ore = 0.5
         game.state.mining_difficulty_increment.energy = 0.5
+        fractions.seed_defaults(game.state.fractions)
 
         game.save_file = filename
-        save_path, _ = os.path.split(filename)
-        if save_path and not os.path.exists(save_path):
-            os.makedirs(save_path)
+        save_dir, _ = os.path.split(filename)
+        if save_dir and not os.path.exists(save_dir):
+            os.makedirs(save_dir)
         game.save()
         return game
 
     def save(self, filename=None):
-        """Save a game to disk."""
         with open(filename or self.save_file, "w") as f:
             f.write(self.state.model_dump_json(indent=2))

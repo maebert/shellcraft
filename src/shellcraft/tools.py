@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
-"""Item Classes."""
+"""Tool catalog and factory."""
 
-from typing import Dict
+from typing import ClassVar, Dict
 
 from pydantic import Field
 
 from shellcraft.core import BaseFactory, BaseItem
-from shellcraft.game_state import Tool as ToolPB
 
 
 class Tool(BaseItem):
-    """Concept denoting any tool that the player can produce."""
+    """A craftable tool. Definition data; runtime instances live in game_state."""
 
     type: str = "tool"
     durability: float = -1
@@ -19,46 +17,13 @@ class Tool(BaseItem):
     crafting_bonus: Dict[str, float] = Field(default_factory=dict)
     research_bonus: float = 0
 
-    # Tool condition (runtime only, not in template)
-    condition: float = Field(default=0, exclude=True)
+    FIXTURES: ClassVar[str] = "tools.toml"
 
-    @classmethod
-    def from_dict(cls, name, data):
-        # Process base item data first
-        tool = super(Tool, cls).from_dict(name, data)
-
-        # Update with tool-specific data
-        tool_data = {
-            "type": data.get("type", "tool"),
-            "durability": data.get("durability", -1),
-            "mining_bonus": data.get("mining_bonus", {}),
-            "event_bonus": data.get("event_bonus", {}),
-            "crafting_bonus": data.get("crafting_bonus", {}),
-            "research_bonus": data.get("research_bonus", 0),
-        }
-
-        # Create new Tool instance with all data
-        return cls(
-            name=tool.name,
-            description=tool.description,
-            difficulty=tool.difficulty,
-            prerequisites=tool.prerequisites,
-            cost=tool.cost,
-            effects=tool.effects,
-            strings=tool.strings,
-            **tool_data,
-        )
-
-    def __repr__(self):
-        """Representation, e.g. 'clay_shovel (worn)'."""
-        if (
-            not hasattr(self, "condition")
-            or self.durability == -1
-            or self.durability == self.condition
-        ):
+    def describe_wear(self, condition: float) -> str:
+        """Return a human description of a given tool's condition."""
+        if self.durability == -1 or self.durability == condition:
             return f"${self.name}$"
-
-        wear = 1.0 * self.condition / self.durability
+        wear = condition / self.durability
         descriptions = {
             1: "new",
             0.9: "slightly used",
@@ -70,24 +35,18 @@ class Tool(BaseItem):
         for thresh, des in sorted(descriptions.items()):
             if wear < thresh:
                 return f"${self.name}$ ({des})"
+        return f"${self.name}$"
 
 
 class ToolFactory(BaseFactory):
-    FIXTURES = "tools.toml"
     ITEM_CLASS = Tool
-    PB_CLASS = ToolPB
-
-    def make(self, source):
-        tool = super(ToolFactory, self).make(source)
-        assert tool
-        # Fresh crafts have no backing pb yet — start them at full durability.
-        # Tools loaded from a save carry their persisted condition via _pb.
-        if tool._pb is None and tool.durability and tool.durability > 0:
-            tool.condition = tool.durability
-        return tool
 
     def is_available(self, item_name):
         item = self.get(item_name)
-        return item.name in self.game.state.tools_enabled or super(
-            ToolFactory, self
-        ).is_available(item)
+        if item.name in self.game.state.tools_enabled:
+            return True
+        return super().is_available(item)
+
+
+# Populate the catalog at import time.
+Tool._load_catalog()

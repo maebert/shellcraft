@@ -14,7 +14,7 @@ class BusyException(ShellcraftException):
 
     def __init__(self, game):
         self._time_left = (
-            game.state.action.completion.ToDatetime() - datetime.datetime.now()
+            game.state.action.completion - datetime.datetime.now()
         )
         self._action = game.state.action.task
 

@@ -1,32 +1,19 @@
-# -*- coding: utf-8 -*-
+"""Faction seeding helpers."""
 
-"""Basic CLI for ShellCraft."""
 import os
+
 import toml
 
+from shellcraft.game_state import Fraction
 
-class FractionProxy(object):
-    FIXTURES = "fractions.toml"
+FIXTURES = "fractions.toml"
 
-    def __init__(self, field):
-        self._field = field
-        self._fractions = {f.name: f for f in field}
 
-        path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "data", self.FIXTURES
-        )
-        data = toml.load(path)
-        for name, fraction in data.items():
-            if name not in self._fractions:
-                from shellcraft.game_state import Fraction
-                f = Fraction(name=name, influence=fraction["influence"])
-                self._field.append(f)
-                self._fractions[name] = f
-
-    def get(self, name):
-        return self._fractions[name]
-
-    def __getattr__(self, name):
-        if name in self._fractions:
-            return self._fractions[name]
-        raise AttributeError
+def seed_defaults(fractions: list) -> None:
+    """Append any factions from the fixture file that aren't already present."""
+    by_name = {f.name for f in fractions}
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", FIXTURES)
+    data = toml.load(path)
+    for name, payload in data.items():
+        if name not in by_name:
+            fractions.append(Fraction(name=name, influence=payload["influence"]))

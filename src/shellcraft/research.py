@@ -1,20 +1,25 @@
-# -*- coding: utf-8 -*-
+"""Research project catalog and factory."""
 
-"""Basic CLI for ShellCraft."""
-from shellcraft.core import BaseItem, BaseFactory
+from typing import ClassVar
+
+from shellcraft.core import BaseFactory, BaseItem
 
 
 class ResearchProject(BaseItem):
+    FIXTURES: ClassVar[str] = "research.toml"
+
     def __repr__(self):
         return f"%{self.name}%"
 
 
 class ResearchFactory(BaseFactory):
-    FIXTURES = "research.toml"
     ITEM_CLASS = ResearchProject
 
     def is_available(self, item_name):
         project = self.get(item_name)
-        return project.name not in self.game.state.research_completed and super(
-            ResearchFactory, self
-        ).is_available(project)
+        if project.name in self.game.state.research_completed:
+            return False
+        return super().is_available(project)
+
+
+ResearchProject._load_catalog()

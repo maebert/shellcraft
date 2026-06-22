@@ -208,7 +208,7 @@ def echo(s, *vals, **kwargs):
             result += Color.paper(" ╰┄┤ " + " " * w + " ┊\n")
             for paragraph in filter(bool, line.splitlines()):
                 for l in textwrap.wrap(paragraph, width=w, replace_whitespace=False):
-                    result += Color.paper("   ┊ ") + Color.ink(l)
+                    result += Color.paper("   ┊ ") + l
                     result += " " * (w - len(_unformat_str(l))) + Color.paper(" ┊\n")
                 result += Color.paper("   ┊ " + " " * w + " ┊\n")
             result += Color.paper("   ┊ ╭" + "┄" * w + "┴┄╮\n")

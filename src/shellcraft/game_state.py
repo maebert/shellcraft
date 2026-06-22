@@ -1,27 +1,22 @@
-"""Pydantic models for ShellCraft game state."""
+"""Pydantic models for persisted ShellCraft game state.
+
+Everything in this module is data: model classes carry the state that gets
+serialized to disk. Runtime behavior (mining, crafting, mission completion)
+lives in `shellcraft.shellcraft.Game` and the factories under `shellcraft.*`.
+
+Catalog data (tool durability, mission text templates, etc.) is *not* stored
+here — saved instances reference catalog entries by `name` and look them up
+lazily via the `.catalog` / `.template` properties.
+"""
 
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
 
-class CompatList(list):
-    """A list that provides protobuf-like .add() method for compatibility."""
-
-    def __init__(self, item_class):
-        super().__init__()
-        self._item_class = item_class
-
-    def add(self, **kwargs):
-        """Add a new item with the given kwargs, protobuf-style."""
-        item = self._item_class(**kwargs)
-        self.append(item)
-        return item
-
-
 class Action(BaseModel):
-    """Represents an ongoing action in the game."""
+    """An in-progress mine/craft/research action."""
 
     task: str = ""
     target: str = ""
@@ -29,7 +24,7 @@ class Action(BaseModel):
 
 
 class Fraction(BaseModel):
-    """Represents a faction/fraction in the game."""
+    """A faction the player can build reputation with."""
 
     name: str = ""
     influence: float = 0.0
@@ -38,23 +33,51 @@ class Fraction(BaseModel):
 
 
 class Resources(BaseModel):
-    """Represents the three main resource types in the game."""
+    """Container for the three resource types with arithmetic helpers.
+
+    Used for the player's pool, mining difficulty, mining-difficulty increment,
+    and lifetime totals.
+    """
 
     clay: float = 0.0
     ore: float = 0.0
     energy: float = 0.0
 
+    def get(self, resource: str, default: float = 0.0) -> float:
+        return getattr(self, resource, default)
 
-class Tool(BaseModel):
-    """Represents a tool owned by the player."""
+    def add(self, resource: str, value: float) -> None:
+        setattr(self, resource, getattr(self, resource, 0) + value)
 
-    name: str = ""
+    def multiply(self, resource: str, factor: float) -> None:
+        setattr(self, resource, getattr(self, resource, 0) * factor)
+
+    def __iter__(self):
+        yield ("clay", self.clay)
+        yield ("ore", self.ore)
+        yield ("energy", self.energy)
+
+
+class ToolInstance(BaseModel):
+    """A tool the player owns. Static stats live on the catalog entry."""
+
+    name: str
     condition: float = 0
+
+    @property
+    def catalog(self):
+        from shellcraft.tools import Tool
+
+        return Tool.get(self.name)
+
+    def __str__(self):
+        return self.catalog.describe_wear(self.condition)
+
+    def __repr__(self):
+        return f"<ToolInstance {self.name} {self.condition}>"
 
 
 class NPC(BaseModel):
-    """Represents a non-player character."""
-
     first: str = ""
     middle: str = ""
     last: str = ""
@@ -64,10 +87,10 @@ class NPC(BaseModel):
     fraction_name: str = ""
 
 
-class Mission(BaseModel):
-    """Represents a mission/contract in the game."""
+class MissionInstance(BaseModel):
+    """A mission the player has accepted. Text templates live on the catalog."""
 
-    name: str = ""
+    name: str
     demand: int = 0
     reward: int = 0
     demand_type: str = ""
@@ -77,22 +100,26 @@ class Mission(BaseModel):
     writer: Optional[NPC] = None
     reward_factor: int = 0
 
+    @property
+    def template(self):
+        from shellcraft.missions import Mission
+
+        return Mission.get(self.name)
+
 
 class Stats(BaseModel):
-    """Represents game statistics."""
-
     total_game_duration: float = 0.0
     total_mined: Resources = Field(default_factory=Resources)
 
 
 class GameState(BaseModel):
-    """Main game state containing all game data."""
+    """Root of the persisted save file."""
 
     debug: bool = False
 
     action: Optional[Action] = None
-    tools: List[Tool] = Field(default_factory=list)
-    missions: List[Mission] = Field(default_factory=list)
+    tools: List[ToolInstance] = Field(default_factory=list)
+    missions: List[MissionInstance] = Field(default_factory=list)
     resources: Resources = Field(default_factory=Resources)
 
     tools_enabled: List[str] = Field(default_factory=list)
@@ -110,20 +137,3 @@ class GameState(BaseModel):
 
     stats: Stats = Field(default_factory=Stats)
     fractions: List[Fraction] = Field(default_factory=list)
-
-    def model_post_init(self, __context):
-        """Convert regular lists to CompatList for protobuf compatibility."""
-        if not isinstance(self.fractions, CompatList):
-            compat_fractions = CompatList(Fraction)
-            compat_fractions.extend(self.fractions)
-            self.fractions = compat_fractions
-
-        if not isinstance(self.tools, CompatList):
-            compat_tools = CompatList(Tool)
-            compat_tools.extend(self.tools)
-            self.tools = compat_tools
-
-        if not isinstance(self.missions, CompatList):
-            compat_missions = CompatList(Mission)
-            compat_missions.extend(self.missions)
-            self.missions = compat_missions

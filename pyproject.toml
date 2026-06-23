@@ -1,18 +1,12 @@
 [project]
 name = "shellcraft"
-version = "0.13.0"
+version = "0.14.0"
 description = "ShellCraft is a command line based crafting game."
-authors = [
-  {name = "Manu Ebert", email = "manuel@1450.me"}
-]
+authors = [{ name = "Manu Ebert", email = "manuel@1450.me" }]
 license = "MIT"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "click>=8.1.8",
-    "pydantic>=2.11.9",
-    "toml>=0.10.2",
-]
+dependencies = ["click>=8.1.8", "pydantic>=2.11.9", "toml>=0.10.2"]
 
 [project.urls]
 Homepage = "https://maebert.github.io/shellcraft"
@@ -24,12 +18,7 @@ Repository = "https://github.com/maebert/shellcraft"
 shellcraft = 'shellcraft.cli:main'
 
 [dependency-groups]
-dev = [
-    "pytest>=8",
-    "ruff>=0.6",
-    "coverage>=7",
-    "ty",
-]
+dev = ["pytest>=8", "ruff>=0.6", "coverage>=7", "ty"]
 
 [tool.uv]
 package = true

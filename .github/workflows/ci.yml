@@ -1,15 +1,19 @@
 name: CI
 
-on: [push]
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test:
+    name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.11", "3.12", "3.13", "3.14"]
-
-    name: Python ${{ matrix.python-version }}
 
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -35,3 +39,92 @@ jobs:
 
       - name: Test with pytest
         run: mise run test
+
+  version-check:
+    name: Compare version with PyPI
+    needs: test
+    # Only the main branch is a candidate for publishing.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      should-publish: ${{ steps.compare.outputs.should-publish }}
+      version: ${{ steps.compare.outputs.version }}
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Compare repo version with PyPI
+        id: compare
+        run: |
+          set -euo pipefail
+
+          PROJECT=$(grep -E '^name *=' pyproject.toml | head -1 | sed -E 's/name *= *"([^"]+)".*/\1/')
+          CURRENT=$(grep -E '^version *=' pyproject.toml | head -1 | sed -E 's/version *= *"([^"]+)".*/\1/')
+          echo "Project: $PROJECT"
+          echo "Repo version:    $CURRENT"
+
+          # Hit PyPI's JSON API. 200 → use info.version; 404 → not yet published;
+          # anything else → bail rather than blindly retry-publish.
+          HTTP=$(curl -sS -o /tmp/pypi.json -w '%{http_code}' \
+            "https://pypi.org/pypi/${PROJECT}/json" || echo "000")
+
+          case "$HTTP" in
+            200)
+              PUBLISHED=$(python3 -c 'import json; print(json.load(open("/tmp/pypi.json"))["info"]["version"])')
+              ;;
+            404)
+              echo "Package not yet on PyPI; treating published version as 0.0.0"
+              PUBLISHED="0.0.0"
+              ;;
+            *)
+              echo "::error::Unexpected response from PyPI (HTTP $HTTP); aborting."
+              exit 1
+              ;;
+          esac
+          echo "PyPI version:    $PUBLISHED"
+
+          if [ "$CURRENT" = "$PUBLISHED" ]; then
+            echo "Version matches PyPI — nothing to publish."
+            echo "should-publish=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Version-sort (sort -V) to verify $CURRENT > $PUBLISHED.
+          HIGHER=$(printf '%s\n%s\n' "$PUBLISHED" "$CURRENT" | sort -V | tail -1)
+          if [ "$HIGHER" != "$CURRENT" ]; then
+            echo "::error::Repo version ($CURRENT) is lower than PyPI ($PUBLISHED); refusing to publish."
+            exit 1
+          fi
+
+          echo "Will publish: $PUBLISHED -> $CURRENT"
+          echo "should-publish=true" >> "$GITHUB_OUTPUT"
+          echo "version=$CURRENT" >> "$GITHUB_OUTPUT"
+
+  publish:
+    name: Publish to PyPI
+    needs: version-check
+    if: needs.version-check.outputs.should-publish == 'true'
+    runs-on: ubuntu-latest
+    # PyPI's trusted-publisher config must point at this repo + workflow file
+    # (ci.yml) + environment name. See https://docs.pypi.org/trusted-publishers/
+    environment:
+      name: pypi
+      url: https://pypi.org/p/shellcraft
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install mise
+        uses: jdx/mise-action@v2
+
+      - name: Install Dependencies
+        run: mise run install
+
+      - name: Build sdist and wheel
+        run: uv build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
